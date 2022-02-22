@@ -1,0 +1,109 @@
+@startuml Database
+entity  Outlet {
+  * id
+  __
+  * outlet_number
+  * name
+  * address
+  * phone
+}
+
+entity Customer {
+  * id
+  __
+  * customer_number
+  * name
+  * phone
+  * address
+  * gender
+}
+
+entity Mutation {
+  * id
+  __
+  * type
+  * amount
+  * outlet_id
+  transaction_id
+  expense_id
+}
+
+entity Transaction {
+  * id
+  __
+  * transaction_number
+  discount
+  * transaction_status_id
+  * user_id
+  * customer_id
+  * laundry_id
+  * outlet_id
+}
+
+entity TransactionDetail {
+  * id
+  __
+  * price
+  discount
+  * quantity
+  * transaction_id
+  * laundry_id
+}
+
+entity Laundry {
+  * id
+  __
+  * name
+  * price
+  * unit
+}
+
+entity TransactionStatus {
+  * id
+  __
+  * name
+}
+
+entity User {
+  * id
+  __
+  * name
+  * phone
+  * email
+  * address
+  * status
+  * gender
+  * password
+  * role_id
+  * outlet_id
+}
+
+entity Role {
+  * id
+  __
+  * name
+}
+
+entity Expense {
+  * id
+  __
+  * expense_number
+  * description
+  * amount
+  * user_id
+  * outlet_id
+}
+
+Mutation }|--|| Expense
+Mutation }|--|| Transaction
+Mutation ||--|{ Outlet
+Transaction }|--|| TransactionDetail
+Transaction ||--|{ TransactionStatus
+Transaction ||--|{ Outlet
+Transaction ||--|{ Customer
+Transaction ||--|{ User
+Expense ||--|{ User
+Expense ||--|{ Outlet
+User ||--|{ Role
+User ||--|{ Outlet
+TransactionDetail ||--|{ Laundry
