@@ -1,25 +1,15 @@
-<template>
-  <div>
-    <h1>Hello <span class="lv">Laravel</span> Vue {{ vue }}</h1>
+<script setup>
+import { ref } from 'vue'
+import { Link } from '@inertiajs/inertia-vue3'
 
-    <Link :href="$route('about')">To page About</Link>
-  </div>
-</template>
-
-<script>
-import { Link } from '@inertiajs/inertia-vue'
-
-export default {
-  components: {
-    Link,
-  },
-  data() {
-    return {
-      vue: 2,
-    }
-  },
-}
+const vue = ref(3)
 </script>
+
+<template>
+  <h1>Hello <span class="lv">Laravel</span> Vue {{ vue }}</h1>
+
+  <Link :href="route('about')">To page About</Link>
+</template>
 
 <style lang="scss" scoped>
 .lv {

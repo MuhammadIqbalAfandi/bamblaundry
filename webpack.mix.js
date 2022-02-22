@@ -15,7 +15,7 @@ mix
   .js('resources/js/vue.js', 'public/js')
   .sass('resources/sass/app.scss', 'public/css')
   .webpackConfig(require('./webpack.config'))
-  .vue({ version: 2 })
+  .vue()
   .browserSync('http://dev.test/')
   .disableNotifications()
 
