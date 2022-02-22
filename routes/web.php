@@ -14,9 +14,5 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::get('/', function () {
-    return inertia('home');
+    return inertia('dashboards/Home');
 });
-
-Route::get('/about', function () {
-    return inertia('about');
-})->name('about');

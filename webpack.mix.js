@@ -13,7 +13,6 @@ const mix = require('laravel-mix')
 
 mix
   .js('resources/js/vue.js', 'public/js')
-  .sass('resources/sass/app.scss', 'public/css')
   .webpackConfig(require('./webpack.config'))
   .vue()
   .browserSync('http://dev.test/')
