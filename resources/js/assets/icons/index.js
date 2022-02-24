@@ -11,6 +11,10 @@ import {
   cilWc,
   cilSitemap,
   cilLoopCircular,
+  cilAt,
+  cilChevronRight,
+  cilCheckCircle,
+  cilXCircle,
 } from '@coreui/icons'
 
 export default {
@@ -26,4 +30,8 @@ export default {
   cilWc,
   cilSitemap,
   cilLoopCircular,
+  cilAt,
+  cilChevronRight,
+  cilCheckCircle,
+  cilXCircle,
 }

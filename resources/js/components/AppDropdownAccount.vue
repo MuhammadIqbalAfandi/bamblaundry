@@ -1,3 +1,7 @@
+<script setup>
+import { Link } from '@inertiajs/inertia-vue3'
+</script>
+
 <template>
   <CDropdown variant="nav-item">
     <CDropdownToggle :caret="false" class="py-0">
@@ -18,10 +22,10 @@
 
       <CDropdownDivider />
 
-      <CDropdownItem>
+      <Link :href="route('logout')" method="post" as="button" class="dropdown-item">
         <CIcon icon="cil-lock-locked" />
         Logout
-      </CDropdownItem>
+      </Link>
     </CDropdownMenu>
   </CDropdown>
 </template>

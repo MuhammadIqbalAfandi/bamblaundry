@@ -3,6 +3,8 @@ import { createInertiaApp } from '@inertiajs/inertia-vue3'
 import { InertiaProgress } from '@inertiajs/progress'
 import CoreuiVue from '@coreui/vue'
 import CIcon from '@coreui/icons-vue'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import '@coreui/coreui/dist/css/coreui.min.css'
 
 import icons from '@/assets/icons'
 

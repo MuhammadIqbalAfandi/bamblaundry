@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,13 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::get('/', function () {
-    return inertia('dashboards/Home');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/', function () {
+        return inertia('user/Index');
+    });
+
+    Route::delete('/users/block/{user}', [UserController::class, 'block'])->name('users.block');
+    Route::resource('/users', UserController::class);
 });
+
+require __DIR__ . '/auth.php';

@@ -4,7 +4,7 @@ import { inject } from 'vue'
 import AppBreadCrumb from '@/components/AppBreadCrumb.vue'
 import AppDropdownAccount from '@/components/AppDropdownAccount.vue'
 
-const { toggleSidebar } = inject('sidebar')
+const { toggleSidebar } = inject('defaultLayout')
 </script>
 
 <template>

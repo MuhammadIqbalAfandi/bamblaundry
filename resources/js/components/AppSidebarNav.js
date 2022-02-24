@@ -1,13 +1,12 @@
-import { h, defineComponent, resolveComponent, onMounted } from 'vue'
-import { Link, usePage } from '@inertiajs/inertia-vue3'
+import { h, defineComponent, resolveComponent } from 'vue'
+import { Link } from '@inertiajs/inertia-vue3'
 
 import nav from '@/utils/nav'
 
 const SidebarNav = defineComponent({
-  setup() {
-    const page = usePage
-
-    const renderItem = (item) => {
+  props: ['url'],
+  setup(props) {
+    const renderItem = (item, url) => {
       if (item.items) {
         h(
           resolveComponent('CNavGroup'),
@@ -35,7 +34,7 @@ const SidebarNav = defineComponent({
                   Link,
                   {
                     href: item.to,
-                    class: ['nav-link', { active: page.url === item.to }],
+                    class: ['nav-link', { active: url === item.to }],
                   },
                   {
                     default: () => [
@@ -69,7 +68,7 @@ const SidebarNav = defineComponent({
         resolveComponent('CSidebarNav'),
         {},
         {
-          default: () => nav.map((item) => renderItem(item)),
+          default: () => nav.map((item) => renderItem(item, props.url)),
         }
       )
   },

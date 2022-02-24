@@ -1,38 +1,43 @@
 <script setup>
 import { provide, ref } from 'vue'
-import '@coreui/coreui/dist/css/coreui.min.css'
-import 'bootstrap/dist/css/bootstrap.min.css'
 
 import AppHeader from '@/components/AppHeader.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
 import AppFooter from '@/components/AppFooter.vue'
+import AppFlashMessages from '@/components/AppFlashMessages.vue'
 
 const sidebarVisible = ref(true)
-const sidebarUnfoldable = ref(false)
 const toggleSidebar = () => (sidebarVisible.value = !sidebarVisible.value)
+
+const sidebarUnfoldable = ref(false)
 const toggleUnfoldable = () => (sidebarUnfoldable.value = !sidebarUnfoldable.value)
 
-provide('sidebar', {
+const modalAlertVisible = ref(false)
+const toggleModalAlert = () => (modalAlertVisible.value = !modalAlertVisible.value)
+
+provide('defaultLayout', {
   sidebarVisible,
   toggleSidebar,
   sidebarUnfoldable,
   toggleUnfoldable,
+  modalAlertVisible,
+  toggleModalAlert,
 })
 </script>
 
 <template>
-  <div>
-    <AppSidebar />
+  <AppSidebar />
 
-    <div class="wrapper">
-      <AppHeader />
+  <div class="wrapper">
+    <AppHeader />
 
-      <CContainer lg>
-        <slot />
-      </CContainer>
+    <CContainer fluid>
+      <AppFlashMessages />
 
-      <AppFooter />
-    </div>
+      <slot :toggleModalAlert="toggleModalAlert" />
+    </CContainer>
+
+    <AppFooter />
   </div>
 </template>
 

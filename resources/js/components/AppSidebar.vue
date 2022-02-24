@@ -5,7 +5,7 @@ import logoNegative from '@/assets/brand/logoNegative'
 import sygnet from '@/assets/brand/sygnet'
 import AppSidebarNav from '@/components/AppSidebarNav'
 
-const { sidebarVisible, sidebarUnfoldable, toggleUnfoldable } = inject('sidebar')
+const { sidebarVisible, sidebarUnfoldable, toggleUnfoldable } = inject('defaultLayout')
 </script>
 
 <template>
@@ -15,7 +15,7 @@ const { sidebarVisible, sidebarUnfoldable, toggleUnfoldable } = inject('sidebar'
       <CIcon custom-class-name="sidebar-brand-narrow" :icon="sygnet" height="35" />
     </CSidebarBrand>
 
-    <AppSidebarNav />
+    <AppSidebarNav :url="$page.url" />
 
     <CSidebarToggler class="d-none d-lg-flex" @click="toggleUnfoldable" />
   </CSidebar>
