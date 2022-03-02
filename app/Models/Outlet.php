@@ -12,7 +12,19 @@ class Outlet extends Model
     protected $fillable = [
         'outlet_number',
         'name',
-        'address',
         'phone',
+        'address',
     ];
+
+    public function scopeFilter($query, $search)
+    {
+        $query->when($search ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('outlet_number', 'like', '%' . $search . '%')
+                    ->orWhere('name', 'like', '%' . $search . '%')
+                    ->orWhere('phone', 'like', '%' . $search . '%')
+                    ->orWhere('address', 'like', '%' . $search . '%');
+            });
+        });
+    }
 }

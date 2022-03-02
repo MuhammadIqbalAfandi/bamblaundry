@@ -24,14 +24,17 @@ return [
         'store' => [
             'user' => 'Akun user berhasil ditambahkan',
             'customer' => 'Akun customer berhasil ditambahkan',
+            'outlet' => 'Data outlet berhasil ditambahkan',
         ],
         'update' => [
             'user' => 'Akun user berhasil diubah',
             'customer' => 'Akun customer berhasil diubah',
+            'outlet' => 'Data outlet berhasil diubah',
         ],
         'destroy' => [
             'user' => 'Akun user berhasil dihapus',
             'customer' => 'Akun customer berhasil dihapus',
+            'outlet' => 'Data outlet berhasil dihapus',
         ],
     ],
 

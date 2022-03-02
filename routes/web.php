@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\OutletController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/users', UserController::class);
 
     Route::resource('/customers', CustomerController::class);
+
+    Route::resource('/outlets', OutletController::class);
 });
 
 require __DIR__ . '/auth.php';
