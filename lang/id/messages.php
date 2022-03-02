@@ -23,12 +23,15 @@ return [
         ],
         'store' => [
             'user' => 'Akun user berhasil ditambahkan',
+            'customer' => 'Akun customer berhasil ditambahkan',
         ],
         'update' => [
             'user' => 'Akun user berhasil diubah',
+            'customer' => 'Akun customer berhasil diubah',
         ],
         'destroy' => [
             'user' => 'Akun user berhasil dihapus',
+            'customer' => 'Akun customer berhasil dihapus',
         ],
     ],
 

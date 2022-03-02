@@ -36059,6 +36059,30 @@ var map = {
 		"./resources/js/pages/auth/VerifyEmail.vue",
 		"resources_js_pages_auth_VerifyEmail_vue"
 	],
+	"./customer/Create": [
+		"./resources/js/pages/customer/Create.vue",
+		"resources_js_pages_customer_Create_vue"
+	],
+	"./customer/Create.vue": [
+		"./resources/js/pages/customer/Create.vue",
+		"resources_js_pages_customer_Create_vue"
+	],
+	"./customer/Edit": [
+		"./resources/js/pages/customer/Edit.vue",
+		"resources_js_pages_customer_Edit_vue"
+	],
+	"./customer/Edit.vue": [
+		"./resources/js/pages/customer/Edit.vue",
+		"resources_js_pages_customer_Edit_vue"
+	],
+	"./customer/Index": [
+		"./resources/js/pages/customer/Index.vue",
+		"resources_js_pages_customer_Index_vue"
+	],
+	"./customer/Index.vue": [
+		"./resources/js/pages/customer/Index.vue",
+		"resources_js_pages_customer_Index_vue"
+	],
 	"./user/Create": [
 		"./resources/js/pages/user/Create.vue",
 		"resources_js_pages_user_Create_vue"
@@ -36200,7 +36224,7 @@ module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"P
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_pages_auth_ForgotPassword_vue":"0fe99db6d6fcc258","resources_js_pages_auth_Login_vue":"e1c13983db27e9f2","resources_js_pages_auth_ResetPassword_vue":"6b187ff736b53a31","resources_js_pages_auth_VerifyEmail_vue":"e0f0fe37bc316d8b","resources_js_pages_user_Create_vue":"25ab874fafe1eacc","resources_js_pages_user_Edit_vue":"779add5c7af7d268","resources_js_pages_user_Index_vue":"82752327bdeafd43"}[chunkId] + "";
+/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_pages_auth_ForgotPassword_vue":"70818f45cbbab151","resources_js_pages_auth_Login_vue":"c4cf6fd873885e8f","resources_js_pages_auth_ResetPassword_vue":"adb7b3ce1defe237","resources_js_pages_auth_VerifyEmail_vue":"766e409b18e8e260","resources_js_pages_customer_Create_vue":"043463d47e5a7d20","resources_js_pages_customer_Edit_vue":"ad87bcdaff2e284c","resources_js_pages_customer_Index_vue":"c9964211a38d2db5","resources_js_pages_user_Create_vue":"c40384f40ba5a089","resources_js_pages_user_Edit_vue":"a880111a8912f84c","resources_js_pages_user_Index_vue":"62f17f79119649c8"}[chunkId] + "";
 /******/ 		};
 /******/ 	})();
 /******/ 	

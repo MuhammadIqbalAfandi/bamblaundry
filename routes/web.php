@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/users/block/{user}', [UserController::class, 'block'])->name('users.block');
     Route::resource('/users', UserController::class);
+
+    Route::resource('/customers', CustomerController::class);
 });
 
 require __DIR__ . '/auth.php';
