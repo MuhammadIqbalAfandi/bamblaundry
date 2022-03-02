@@ -61,7 +61,7 @@ return [
     'image' => 'Harus gambar.',
     'in' => 'The selected Nilai is invalid.',
     'in_array' => 'Nilai does not exist in :other.',
-    'integer' => 'Nilai harus be an integer.',
+    'integer' => 'Nilai harus integer.',
     'ip' => 'Nilai harus be a valid IP address.',
     'ipv4' => 'Nilai harus be a valid IPv4 address.',
     'ipv6' => 'Nilai harus be a valid IPv6 address.',

@@ -25,16 +25,19 @@ return [
             'user' => 'Akun user berhasil ditambahkan',
             'customer' => 'Akun customer berhasil ditambahkan',
             'outlet' => 'Data outlet berhasil ditambahkan',
+            'laundry' => 'Data laundry berhasil ditambahkan',
         ],
         'update' => [
             'user' => 'Akun user berhasil diubah',
             'customer' => 'Akun customer berhasil diubah',
             'outlet' => 'Data outlet berhasil diubah',
+            'laundry' => 'Data laundry berhasil diubah',
         ],
         'destroy' => [
             'user' => 'Akun user berhasil dihapus',
             'customer' => 'Akun customer berhasil dihapus',
             'outlet' => 'Data outlet berhasil dihapus',
+            'laundry' => 'Data laundry berhasil dihapus',
         ],
     ],
 

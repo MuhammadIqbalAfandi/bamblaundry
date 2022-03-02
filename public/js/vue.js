@@ -36083,6 +36083,30 @@ var map = {
 		"./resources/js/pages/customer/Index.vue",
 		"resources_js_pages_customer_Index_vue"
 	],
+	"./laundry/Create": [
+		"./resources/js/pages/laundry/Create.vue",
+		"resources_js_pages_laundry_Create_vue"
+	],
+	"./laundry/Create.vue": [
+		"./resources/js/pages/laundry/Create.vue",
+		"resources_js_pages_laundry_Create_vue"
+	],
+	"./laundry/Edit": [
+		"./resources/js/pages/laundry/Edit.vue",
+		"resources_js_pages_laundry_Edit_vue"
+	],
+	"./laundry/Edit.vue": [
+		"./resources/js/pages/laundry/Edit.vue",
+		"resources_js_pages_laundry_Edit_vue"
+	],
+	"./laundry/Index": [
+		"./resources/js/pages/laundry/Index.vue",
+		"resources_js_pages_laundry_Index_vue"
+	],
+	"./laundry/Index.vue": [
+		"./resources/js/pages/laundry/Index.vue",
+		"resources_js_pages_laundry_Index_vue"
+	],
 	"./outlet/Create": [
 		"./resources/js/pages/outlet/Create.vue",
 		"resources_js_pages_outlet_Create_vue"
@@ -36248,7 +36272,7 @@ module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"P
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_pages_auth_ForgotPassword_vue":"70818f45cbbab151","resources_js_pages_auth_Login_vue":"c4cf6fd873885e8f","resources_js_pages_auth_ResetPassword_vue":"adb7b3ce1defe237","resources_js_pages_auth_VerifyEmail_vue":"766e409b18e8e260","resources_js_pages_customer_Create_vue":"043463d47e5a7d20","resources_js_pages_customer_Edit_vue":"ad87bcdaff2e284c","resources_js_pages_customer_Index_vue":"c9964211a38d2db5","resources_js_pages_outlet_Create_vue":"610831f5d05c5c2f","resources_js_pages_outlet_Edit_vue":"fb9c21c755b35f2b","resources_js_pages_outlet_Index_vue":"84c5671f63445ef0","resources_js_pages_user_Create_vue":"c40384f40ba5a089","resources_js_pages_user_Edit_vue":"a880111a8912f84c","resources_js_pages_user_Index_vue":"62f17f79119649c8"}[chunkId] + "";
+/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_pages_auth_ForgotPassword_vue":"70818f45cbbab151","resources_js_pages_auth_Login_vue":"c4cf6fd873885e8f","resources_js_pages_auth_ResetPassword_vue":"adb7b3ce1defe237","resources_js_pages_auth_VerifyEmail_vue":"766e409b18e8e260","resources_js_pages_customer_Create_vue":"043463d47e5a7d20","resources_js_pages_customer_Edit_vue":"ad87bcdaff2e284c","resources_js_pages_customer_Index_vue":"c9964211a38d2db5","resources_js_pages_laundry_Create_vue":"954d4dad399640b9","resources_js_pages_laundry_Edit_vue":"f751616dc7a87eb5","resources_js_pages_laundry_Index_vue":"c995220ff8690d76","resources_js_pages_outlet_Create_vue":"610831f5d05c5c2f","resources_js_pages_outlet_Edit_vue":"fb9c21c755b35f2b","resources_js_pages_outlet_Index_vue":"84c5671f63445ef0","resources_js_pages_user_Create_vue":"c40384f40ba5a089","resources_js_pages_user_Edit_vue":"a880111a8912f84c","resources_js_pages_user_Index_vue":"62f17f79119649c8"}[chunkId] + "";
 /******/ 		};
 /******/ 	})();
 /******/ 	
