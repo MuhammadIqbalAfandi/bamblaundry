@@ -1411,8 +1411,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                           }, {
                             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppTextInput"], {
-                                label: "Address",
-                                placeholder: "address",
+                                label: "Alamat",
+                                placeholder: "alamat",
                                 error: $setup.form.errors.address,
                                 modelValue: $setup.form.address,
                                 "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {

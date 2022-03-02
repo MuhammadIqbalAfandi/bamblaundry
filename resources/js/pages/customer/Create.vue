@@ -46,12 +46,7 @@ const submit = () => {
               </CCol>
 
               <CCol md="6" class="mb-4">
-                <AppTextInput
-                  label="Address"
-                  placeholder="address"
-                  :error="form.errors.address"
-                  v-model="form.address"
-                />
+                <AppTextInput label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
               </CCol>
 
               <CCol md="6" class="mb-4">
