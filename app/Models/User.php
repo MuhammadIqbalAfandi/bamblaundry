@@ -52,7 +52,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function gender(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $value === 1 ? __('words.female') : __('words.male'),
+            get:fn($value) => $value == 1 ? __('words.female') : __('words.male'),
         );
     }
 
