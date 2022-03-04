@@ -6,6 +6,7 @@ import AppButtonMove from '@/components/AppButtonMove.vue'
 import AppButtonDetail from '@/components/AppButtonDetail.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
 
 defineProps({
   users: Object,
@@ -15,7 +16,7 @@ defineProps({
 <template>
   <Head title="Daftar User" />
 
-  <DefaultLayout>
+  <AppLayout>
     <CRow class="mb-4">
       <CCol></CCol>
 
@@ -61,5 +62,5 @@ defineProps({
         <AppPagination :links="users.links" />
       </CCol>
     </CRow>
-  </DefaultLayout>
+  </AppLayout>
 </template>

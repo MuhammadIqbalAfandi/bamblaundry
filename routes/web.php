@@ -18,9 +18,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', function () {
-        return inertia('user/Index');
-    });
+    Route::get('/', [UserController::class, 'index']);
 
     Route::delete('/users/block/{user}', [UserController::class, 'block'])->name('users.block');
     Route::resource('/users', UserController::class);

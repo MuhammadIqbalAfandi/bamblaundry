@@ -3,7 +3,7 @@ import { provide, ref } from 'vue'
 
 import AppHeader from '@/components/AppHeader.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
-import AppFooter from '@/components/AppFooter.vue'
+import AppFooterCoreUI from '@/components/AppFooterCoreUI.vue'
 import AppFlashMessages from '@/components/AppFlashMessages.vue'
 
 const sidebarVisible = ref(true)
@@ -37,7 +37,7 @@ provide('defaultLayout', {
       <slot :toggleModalAlert="toggleModalAlert" />
     </CContainer>
 
-    <AppFooter />
+    <AppFooterCoreUI />
   </div>
 </template>
 
