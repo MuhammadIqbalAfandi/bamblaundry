@@ -20,9 +20,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('address');
             $table->boolean('status')->default(true);
-            $table->enum('gender', [1, 2]);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->default(bcrypt('12345678'));
+            $table->enum('gender_id', [1, 2]);
             $table->foreignId('role_id')->constrained();
             $table->foreignId('outlet_id')->constrained();
             $table->rememberToken();

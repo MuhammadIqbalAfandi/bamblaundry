@@ -1,12 +1,10 @@
 <script setup>
-import { Head } from '@inertiajs/inertia-vue3'
-
-import AppTable from '@/components/AppTable.vue'
-import AppButtonMove from '@/components/AppButtonMove.vue'
-import AppButtonDetail from '@/components/AppButtonDetail.vue'
-import AppPagination from '@/components/AppPagination.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import { Head, Link } from '@inertiajs/inertia-vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
+import AppButton from '@/components/AppButton.vue'
+import AppPagination from '@/components/AppPagination.vue'
+
+import TableHeader from './TableHeader'
 
 defineProps({
   users: Object,
@@ -17,50 +15,49 @@ defineProps({
   <Head title="Daftar User" />
 
   <AppLayout>
-    <CRow class="mb-4">
-      <CCol></CCol>
+    <DataTable
+      responsiveLayout="scroll"
+      columnResizeMode="expand"
+      :value="users.data"
+      :rowHover="true"
+      :stripedRows="true"
+    >
+      <template #header>
+        <div class="grid">
+          <div class="col-12 md:col-6">
+            <div class="flex align-items-center">
+              <h5 class="mr-3 mb-0">User</h5>
 
-      <CCol xs="auto">
-        <AppButtonMove :href="route('users.create')">Tambah User</AppButtonMove>
-      </CCol>
-    </CRow>
+              <InputText class="w-full md:w-27rem" placeholder="cari..." />
+            </div>
+          </div>
 
-    <CRow>
-      <CCol>
-        <AppTable>
-          <template #table-head>
-            <CTableRow>
-              <CTableHeaderCell>Nama</CTableHeaderCell>
-              <CTableHeaderCell>HP</CTableHeaderCell>
-              <CTableHeaderCell>Email</CTableHeaderCell>
-              <CTableHeaderCell>Alamat</CTableHeaderCell>
-              <CTableHeaderCell>Jenis Kelamin</CTableHeaderCell>
-              <CTableHeaderCell>Role</CTableHeaderCell>
-              <CTableHeaderCell>Status</CTableHeaderCell>
-            </CTableRow>
-          </template>
-          <template #table-body>
-            <CTableRow v-for="user in users.data" key="user.id">
-              <CTableDataCell>{{ user.name }}</CTableDataCell>
-              <CTableDataCell>{{ user.phone }}</CTableDataCell>
-              <CTableDataCell>{{ user.email }}</CTableDataCell>
-              <CTableDataCell>{{ user.address }}</CTableDataCell>
-              <CTableDataCell>{{ user.gender }}</CTableDataCell>
-              <CTableDataCell>{{ user.role }}</CTableDataCell>
-              <CTableDataCell>{{ user.status }}</CTableDataCell>
-              <CTableDataCell>
-                <AppButtonDetail :href="route('users.edit', user.id)" />
-              </CTableDataCell>
-            </CTableRow>
-          </template>
-        </AppTable>
-      </CCol>
-    </CRow>
+          <div class="col-12 md:col-6 flex justify-content-end">
+            <AppButton :href="route('users.create')" label="Tambah User" icon="pi pi-pencil" />
+          </div>
+        </div>
+      </template>
 
-    <CRow>
-      <CCol>
-        <AppPagination :links="users.links" />
-      </CCol>
-    </CRow>
+      <Column
+        v-for="tableHeader in TableHeader"
+        :field="tableHeader.field"
+        :header="tableHeader.header"
+        :key="tableHeader.field"
+      />
+
+      <Column>
+        <template #body="{ data }">
+          <Link
+            as="button"
+            :href="route('users.edit', data.id)"
+            class="p-button p-component p-button-icon-only p-button-rounded p-button-text"
+          >
+            <i class="pi pi-angle-double-right p-button-icon"></i>
+          </Link>
+        </template>
+      </Column>
+    </DataTable>
+
+    <AppPagination :links="users.links" />
   </AppLayout>
 </template>

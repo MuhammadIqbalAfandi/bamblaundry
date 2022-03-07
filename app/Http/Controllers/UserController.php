@@ -29,7 +29,7 @@ class UserController extends Controller
                     'phone' => $user->phone,
                     'email' => $user->email,
                     'address' => $user->address,
-                    'gender' => $user->gender,
+                    'gender' => $user->gender_id,
                     'role' => $user->role->name,
                     'status' => $user->status,
                 ]),
@@ -47,14 +47,18 @@ class UserController extends Controller
             'roles' => Role::whereNotIn('id', [1])
                 ->get()
                 ->transform(fn($role) => [
-                    'id' => $role->id,
-                    'name' => $role->name,
+                    'label' => $role->name,
+                    'value' => $role->id,
                 ]),
             'outlets' => Outlet::all()
                 ->transform(fn($outlet) => [
-                    'id' => $outlet->id,
-                    'name' => $outlet->name,
+                    'label' => $outlet->name,
+                    'value' => $outlet->id,
                 ]),
+            'genders' => [
+                ['label' => 'Perempuan', 'value' => 1],
+                ['label' => 'Laki-laki', 'value' => 2],
+            ],
         ]);
     }
 
@@ -97,21 +101,25 @@ class UserController extends Controller
                 'phone' => $user->phone,
                 'email' => $user->email,
                 'address' => $user->address,
-                'gender' => $user->getRawOriginal('gender'),
+                'gender' => $user->getRawOriginal('gender_id'),
                 'outlet' => $user->outlet_id,
                 'role' => $user->role_id,
             ],
             'roles' => Role::whereNotIn('id', [1])
                 ->get()
                 ->transform(fn($role) => [
-                    'id' => $role->id,
-                    'name' => $role->name,
+                    'label' => $role->name,
+                    'value' => $role->id,
                 ]),
             'outlets' => Outlet::all()
                 ->transform(fn($outlet) => [
-                    'id' => $outlet->id,
-                    'name' => $outlet->name,
+                    'label' => $outlet->name,
+                    'value' => $outlet->id,
                 ]),
+            'genders' => [
+                ['label' => 'Perempuan', 'value' => 1],
+                ['label' => 'Laki-laki', 'value' => 2],
+            ],
         ]);
     }
 

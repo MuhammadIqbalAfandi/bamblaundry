@@ -1,16 +1,16 @@
 <script setup>
-import { useForm, Link, Head } from '@inertiajs/inertia-vue3'
-
-import AppTextInput from '@/components/AppTextInput.vue'
-import AppSelectInput from '@/components/AppSelectInput.vue'
-import AppButtonCreate from '@/components/AppButtonCreate.vue'
-import AppButtonDelete from '@/components/AppButtonDelete.vue'
-import AppButtonAction from '@/components/AppButtonAction.vue'
-import AppModalAlert from '@/components/AppModalAlert.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import { ref } from 'vue'
+import { Inertia } from '@inertiajs/inertia'
+import { useForm, Head } from '@inertiajs/inertia-vue3'
+import AppInputText from '@/components/AppInputText.vue'
+import AppDropdown from '@/components/AppDropdown.vue'
+import AppButton from '@/components/AppButton.vue'
+import AppDialog from '@/components/AppDialog.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
 
 const props = defineProps({
   user: Object,
+  genders: Array,
   outlets: Array,
   roles: Array,
 })
@@ -20,7 +20,7 @@ const form = useForm({
   phone: props.user.phone,
   email: props.user.email,
   address: props.user.address,
-  gender: props.user.gender,
+  gender_id: props.user.gender,
   outlet_id: props.user.outlet,
   role_id: props.user.role,
 })
@@ -28,80 +28,103 @@ const form = useForm({
 const submit = () => {
   form.put(route('users.update', props.user.id))
 }
+
+const visibleDialog = ref(false)
+
+const confirmDialog = () => {
+  visibleDialog.value = true
+}
+
+const onAgree = (id) => Inertia.delete(route('users.destroy', id))
+
+const onCancel = () => (visibleDialog.value = false)
 </script>
 
 <template>
   <Head title="Ubah User" />
 
-  <DefaultLayout v-slot="{ toggleModalAlert }">
-    <CRow>
-      <CCol md="8">
-        <CCard color="light" class="border-light">
-          <CForm @submit.prevent="submit">
-            <CRow class="p-4">
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
-              </CCol>
-
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
-              </CCol>
-
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Email" placeholder="email" :error="form.errors.email" v-model="form.email" />
-              </CCol>
-
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
-              </CCol>
-
-              <CCol md="6" class="mb-4">
-                <AppSelectInput label="Jenis Kelamin" :error="form.errors.gender" v-model="form.gender">
-                  <option value="1">Perempuan</option>
-                  <option value="2">Laki-laki</option>
-                </AppSelectInput>
-              </CCol>
-
-              <CCol md="6" class="mb-4">
-                <AppSelectInput label="Outlet" :error="form.errors.outlet_id" v-model="form.outlet_id">
-                  <option v-for="outlet in outlets" key="outlet.id" :value="outlet.id">{{ outlet.name }}</option>
-                </AppSelectInput>
-              </CCol>
-
-              <CCol md="6">
-                <AppSelectInput label="Hak Akses" :error="form.errors.role_id" v-model="form.role_id">
-                  <option v-for="role in roles" key="role.id" :value="role.id">{{ role.name }}</option>
-                </AppSelectInput>
-              </CCol>
-            </CRow>
-
-            <CCardFooter class="d-flex justify-content-between align-items-center">
-              <AppButtonAction @click="toggleModalAlert">Hapus User</AppButtonAction>
-
-              <AppModalAlert>
-                Anda yakin ingin mengahapus user ini?
-
-                <template #footer>
-                  <AppButtonDelete :href="route('users.destroy', user.id)">Hapus User</AppButtonDelete>
-                </template>
-              </AppModalAlert>
-
-              <div>
-                <Link
-                  :href="route('users.block', user.id)"
-                  as="button"
-                  method="delete"
-                  class="btn btn-ghost-primary me-2"
-                >
-                  Block User
-                </Link>
-
-                <AppButtonCreate :disabled="form.processing">Ubah User</AppButtonCreate>
+  <AppLayout>
+    <div class="grid">
+      <div class="col-12 lg:col-8">
+        <Card>
+          <template #content>
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
               </div>
-            </CCardFooter>
-          </CForm>
-        </CCard>
-      </CCol>
-    </CRow>
-  </DefaultLayout>
+
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
+              </div>
+
+              <div class="col-12 md:col-6">
+                <AppInputText label="Email" placeholder="email" :error="form.errors.email" v-model="form.email" />
+              </div>
+
+              <div class="col-12 md:col-6">
+                <AppInputText label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
+              </div>
+
+              <div class="col-12 md:col-6">
+                <AppDropdown
+                  label="Jenis Kelamin"
+                  placeholder="Pilih satu"
+                  v-model="form.gender_id"
+                  :options="genders"
+                  :error="form.errors.gender_id"
+                />
+              </div>
+
+              <div class="col-12 md:col-6">
+                <AppDropdown
+                  label="Hak Akses"
+                  placeholder="Pilih satu"
+                  v-model="form.role_id"
+                  :options="roles"
+                  :error="form.errors.role_id"
+                />
+              </div>
+
+              <div class="col-12 md:col-6">
+                <AppDropdown
+                  label="Outlet"
+                  placeholder="Pilih satu"
+                  v-model="form.outlet_id"
+                  :options="outlets"
+                  :error="form.errors.outlet_id"
+                />
+              </div>
+            </div>
+          </template>
+
+          <template #footer>
+            <div
+              class="flex flex-column sm:flex-row align-items-center sm:justify-content-center sm:justify-content-between"
+            >
+              <AppDialog
+                message="Yakin akan menghapus data ini?"
+                v-model:visible="visibleDialog"
+                @agree="onAgree(user.id)"
+                @cancel="onCancel"
+              />
+
+              <Button label="Hapus" icon="pi pi-trash" class="p-button-text p-button-danger" @click="confirmDialog" />
+
+              <div class="flex flex-column sm:flex-row align-items-center sm:justify-content-center">
+                <AppButton
+                  label="Blokir"
+                  icon="pi pi-ban"
+                  :href="route('users.block', user.id)"
+                  method="delete"
+                  class="p-button-text p-button-danger md:mr-3"
+                />
+
+                <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+              </div>
+            </div>
+          </template>
+        </Card>
+      </div>
+    </div>
+  </AppLayout>
 </template>

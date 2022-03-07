@@ -19,11 +19,13 @@ class UserSeeder extends Seeder
             'phone' => '',
             'email' => 'admin@laundry.com',
             'address' => '',
-            'gender' => 2, // 1(female), 2(male)
             'email_verified_at' => now(),
             'password' => bcrypt('admin'),
+            'gender_id' => 2, // 1(female), 2(male)
             'role_id' => 1,
             'outlet_id' => 1,
         ]);
+
+        // User::factory(199)->create();
     }
 }

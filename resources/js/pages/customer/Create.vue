@@ -1,13 +1,15 @@
 <script setup>
 import { Head, useForm } from '@inertiajs/inertia-vue3'
 
-import AppButtonCreate from '@/components/AppButtonCreate.vue'
-import AppTextInput from '@/components/AppTextInput.vue'
-import AppSelectInput from '@/components/AppSelectInput.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import AppButton from '@/components/AppButton.vue'
+import AppDropdown from '@/components/AppDropdown.vue'
+import AppInputText from '@/components/AppInputText.vue'
+import AppDialog from '@/components/AppDialog.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
 
 const props = defineProps({
   customer_number: String,
+  genders: Array,
 })
 
 const form = useForm({
@@ -15,7 +17,7 @@ const form = useForm({
   name: '',
   phone: '',
   address: '',
-  gender: '',
+  gender_id: '',
 })
 
 const submit = () => {
@@ -26,43 +28,47 @@ const submit = () => {
 <template>
   <Head title="Tambah Customer" />
 
-  <DefaultLayout>
-    <CRow>
-      <CCol md="8">
-        <CCard color="light" class="border-light">
-          <CForm @submit.prevent="submit">
-            <CRow class="p-4">
-              <CCol md="6" class="mb-4">
-                <CFormLabel>Id Customer</CFormLabel>
-                <CFormInput disabled v-model="form.customer_number" />
-              </CCol>
+  <AppLayout>
+    <div class="grid">
+      <div class="col-12 lg:col-8">
+        <Card>
+          <template #content>
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <AppInputText :disabled="true" label="Id Customer" v-model="form.customer_number" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppSelectInput label="Jenis Kelamin" :error="form.errors.gender" v-model="form.gender">
-                  <option value="1">Perempuan</option>
-                  <option value="2">Laki-laki</option>
-                </AppSelectInput>
-              </CCol>
-            </CRow>
+              <div class="col-12 md:col-6">
+                <AppDropdown
+                  label="Jenis Kelamin"
+                  placeholder="Pilih satu"
+                  v-model="form.gender_id"
+                  :options="genders"
+                  :error="form.errors.gender_id"
+                />
+              </div>
+            </div>
+          </template>
 
-            <CCardFooter class="d-flex justify-content-end">
-              <AppButtonCreate :disabled="form.processing">Tambah Customer</AppButtonCreate>
-            </CCardFooter>
-          </CForm>
-        </CCard>
-      </CCol>
-    </CRow>
-  </DefaultLayout>
+          <template #footer>
+            <div class="flex justify-content-end">
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+            </div>
+          </template>
+        </Card>
+      </div>
+    </div>
+  </AppLayout>
 </template>

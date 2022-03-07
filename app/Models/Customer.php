@@ -15,10 +15,10 @@ class Customer extends Model
         'name',
         'phone',
         'address',
-        'gender',
+        'gender_id',
     ];
 
-    protected function gender(): Attribute
+    protected function genderId(): Attribute
     {
         return Attribute::make(
             get:fn($value) => $value == 1 ? __('words.female') : __('words.male'),

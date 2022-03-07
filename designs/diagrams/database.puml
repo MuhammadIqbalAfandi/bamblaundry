@@ -72,8 +72,8 @@ entity User {
   * email
   * address
   * status
-  * gender
   * password
+  * gender_id
   * role_id
   * outlet_id
 }

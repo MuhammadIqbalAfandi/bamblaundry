@@ -1,14 +1,15 @@
 <script setup>
 import { useForm, Head } from '@inertiajs/inertia-vue3'
-
-import AppButtonCreate from '@/components/AppButtonCreate.vue'
-import AppTextInput from '@/components/AppTextInput.vue'
-import AppSelectInput from '@/components/AppSelectInput.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import AppInputText from '@/components/AppInputText.vue'
+import AppDropdown from '@/components/AppDropdown.vue'
+import AppButton from '@/components/AppButton.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
+import { useConfirm } from 'primevue/useconfirm'
 
 defineProps({
-  roles: Array,
+  genders: Array,
   outlets: Array,
+  roles: Array,
 })
 
 const form = useForm({
@@ -16,7 +17,7 @@ const form = useForm({
   phone: '',
   email: '',
   address: '',
-  gender: '',
+  gender_id: '',
   outlet_id: '',
   role_id: '',
 })
@@ -29,54 +30,67 @@ const submit = () => {
 <template>
   <Head title="Tambah User" />
 
-  <DefaultLayout>
-    <CRow>
-      <CCol md="8">
-        <CCard color="light" class="border-light">
-          <CForm @submit.prevent="submit">
-            <CRow class="p-4">
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
-              </CCol>
+  <AppLayout>
+    <div class="grid">
+      <div class="col-12 lg:col-8">
+        <Card>
+          <template #content>
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Email" placeholder="email" :error="form.errors.email" v-model="form.email" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Email" placeholder="email" :error="form.errors.email" v-model="form.email" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppSelectInput label="Jenis Kelamin" :error="form.errors.gender" v-model="form.gender">
-                  <option value="1">Perempuan</option>
-                  <option value="2">Laki-laki</option>
-                </AppSelectInput>
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppDropdown
+                  label="Jenis Kelamin"
+                  placeholder="pilih satu"
+                  v-model="form.gender_id"
+                  :options="genders"
+                  :error="form.errors.gender_id"
+                />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppSelectInput label="Outlet" :error="form.errors.outlet_id" v-model="form.outlet_id">
-                  <option v-for="outlet in outlets" key="outlet.id" :value="outlet.id">{{ outlet.name }}</option>
-                </AppSelectInput>
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppDropdown
+                  label="Hak Akses"
+                  placeholder="pilih satu"
+                  v-model="form.role_id"
+                  :options="roles"
+                  :error="form.errors.role_id"
+                />
+              </div>
 
-              <CCol md="6">
-                <AppSelectInput label="Hak Akses" :error="form.errors.role_id" v-model="form.role_id">
-                  <option v-for="role in roles" key="role.id" :value="role.id">{{ role.name }}</option>
-                </AppSelectInput>
-              </CCol>
-            </CRow>
+              <div class="col-12 md:col-6">
+                <AppDropdown
+                  label="Outlet"
+                  placeholder="pilih satu"
+                  v-model="form.outlet_id"
+                  :options="outlets"
+                  :error="form.errors.outlet_id"
+                />
+              </div>
+            </div>
+          </template>
 
-            <CCardFooter class="d-flex justify-content-end">
-              <AppButtonCreate :disabled="form.processing">Tambah User</AppButtonCreate>
-            </CCardFooter>
-          </CForm>
-        </CCard>
-      </CCol>
-    </CRow>
-  </DefaultLayout>
+          <template #footer>
+            <div class="flex justify-content-end">
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+            </div>
+          </template>
+        </Card>
+      </div>
+    </div>
+  </AppLayout>
 </template>

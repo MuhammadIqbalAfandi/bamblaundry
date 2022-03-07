@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import AppTopBar from '@/components/AppTopBar.vue'
 import AppMenu from '@/components/AppMenu.vue'
 import AppFooter from '@/components/AppFooter.vue'
+import AppMessage from '@/components/AppMessage.vue'
 
 import menu from '@/utils/menu'
 
@@ -52,6 +53,8 @@ const onWrapperClick = () => {
 
     <div class="layout-main-container">
       <div class="layout-main">
+        <AppMessage />
+
         <slot />
       </div>
 

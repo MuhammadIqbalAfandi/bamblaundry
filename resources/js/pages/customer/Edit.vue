@@ -1,16 +1,16 @@
 <script setup>
+import { ref } from 'vue'
+import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm } from '@inertiajs/inertia-vue3'
-
-import AppTextInput from '@/components/AppTextInput.vue'
-import AppSelectInput from '@/components/AppSelectInput.vue'
-import AppButtonCreate from '@/components/AppButtonCreate.vue'
-import AppButtonDelete from '@/components/AppButtonDelete.vue'
-import AppButtonAction from '@/components/AppButtonAction.vue'
-import AppModalAlert from '@/components/AppModalAlert.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import AppButton from '@/components/AppButton.vue'
+import AppDropdown from '@/components/AppDropdown.vue'
+import AppInputText from '@/components/AppInputText.vue'
+import AppDialog from '@/components/AppDialog.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
 
 const props = defineProps({
   customer: Object,
+  genders: Array,
 })
 
 const form = useForm({
@@ -18,64 +18,79 @@ const form = useForm({
   name: props.customer.name,
   phone: props.customer.phone,
   address: props.customer.address,
-  gender: props.customer.gender,
+  gender_id: props.customer.gender_id,
 })
 
 const submit = () => {
   form.put(route('customers.update', props.customer.id))
 }
+
+const visibleDialog = ref(false)
+
+const confirmDialog = () => {
+  visibleDialog.value = true
+}
+
+const onAgree = (id) => Inertia.delete(route('customers.destroy', id))
+
+const onCancel = () => (visibleDialog.value = false)
 </script>
 
 <template>
   <Head title="Ubah Customer" />
 
-  <DefaultLayout v-slot="{ toggleModalAlert }">
-    <CRow>
-      <CCol md="8">
-        <CCard color="light" class="border-light">
-          <CForm @submit.prevent="submit">
-            <CRow class="p-4">
-              <CCol md="6" class="mb-4">
-                <CFormLabel>Id Customer</CFormLabel>
-                <CFormInput disabled v-model="form.customer_number" />
-              </CCol>
+  <AppLayout>
+    <div class="grid">
+      <div class="col-12 lg:col-8">
+        <Card>
+          <template #content>
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <AppInputText :disabled="true" label="Id Customer" v-model="form.customer_number" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppSelectInput label="Jenis Kelamin" :error="form.errors.gender" v-model="form.gender">
-                  <option value="1">Perempuan</option>
-                  <option value="2">Laki-laki</option>
-                </AppSelectInput>
-              </CCol>
-            </CRow>
+              <div class="col-12 md:col-6">
+                <AppDropdown
+                  label="Jenis Kelamin"
+                  placeholder="Pilih satu"
+                  v-model="form.gender_id"
+                  :options="genders"
+                  :error="form.errors.gender_id"
+                />
+              </div>
+            </div>
+          </template>
 
-            <CCardFooter class="d-flex justify-content-between align-items-center">
-              <AppButtonAction @click="toggleModalAlert">Hapus Customer</AppButtonAction>
+          <template #footer>
+            <div
+              class="flex flex-column sm:flex-row align-items-center sm:justify-content-center sm:justify-content-between"
+            >
+              <AppDialog
+                message="Yakin akan menghapus data ini?"
+                v-model:visible="visibleDialog"
+                @agree="onAgree(customer.id)"
+                @cancel="onCancel"
+              />
 
-              <AppModalAlert>
-                Anda yakin ingin mengahapus customer ini?
+              <Button label="Hapus" icon="pi pi-trash" class="p-button-text p-button-danger" @click="confirmDialog" />
 
-                <template #footer>
-                  <AppButtonDelete :href="route('customers.destroy', customer.id)">Hapus Customer</AppButtonDelete>
-                </template>
-              </AppModalAlert>
-
-              <AppButtonCreate :disabled="form.processing">Ubah Customer</AppButtonCreate>
-            </CCardFooter>
-          </CForm>
-        </CCard>
-      </CCol>
-    </CRow>
-  </DefaultLayout>
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+            </div>
+          </template>
+        </Card>
+      </div>
+    </div>
+  </AppLayout>
 </template>

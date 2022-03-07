@@ -1,4 +1,6 @@
 <script setup>
+import { Link } from '@inertiajs/inertia-vue3'
+
 defineEmits(['menu-toggle'])
 </script>
 
@@ -29,24 +31,23 @@ defineEmits(['menu-toggle'])
 
     <ul class="layout-topbar-menu hidden lg:flex origin-top">
       <li>
-        <button class="p-link layout-topbar-button">
-          <i class="pi pi-calendar"></i>
-          <span>Events</span>
-        </button>
-      </li>
+        <span class="hidden lg:inline">{{ $page.props.auth.user.name }}</span>
 
-      <li>
-        <button class="p-link layout-topbar-button">
-          <i class="pi pi-cog"></i>
-          <span>Settings</span>
-        </button>
-      </li>
-
-      <li>
-        <button class="p-link layout-topbar-button">
+        <Link href="" class="p-link layout-topbar-button" v-tooltip.bottom="'Pengaturan Profil'">
           <i class="pi pi-user"></i>
-          <span>Profile</span>
-        </button>
+          <span>Pengaturan Profil</span>
+        </Link>
+
+        <Link
+          :href="route('logout')"
+          as="button"
+          method="post"
+          class="p-link layout-topbar-button"
+          v-tooltip.bottom="'Sign Out'"
+        >
+          <i class="pi pi-sign-out"></i>
+          <span>Sign Out</span>
+        </Link>
       </li>
     </ul>
   </div>

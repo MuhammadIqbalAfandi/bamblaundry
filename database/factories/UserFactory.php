@@ -22,11 +22,11 @@ class UserFactory extends Factory
             'phone' => $this->faker->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
             'address' => $this->faker->address,
-            'gender' => random_int(1, 2),
             'email_verified_at' => now(),
             'password' => bcrypt('12345678'),
+            'gender_id' => random_int(1, 2),
             'role_id' => random_int(2, 4),
-            'outlet_id' => 2,
+            'outlet_id' => 1,
             'remember_token' => Str::random(10),
         ];
     }

@@ -13,7 +13,19 @@ import PrimeVue from 'primevue/config'
 import CoreuiVue from '@coreui/vue'
 import CIcon from '@coreui/icons-vue'
 import StyleClass from 'primevue/styleclass'
+import Button from 'primevue/button'
+import Column from 'primevue/column'
+import Card from 'primevue/card'
+import DataTable from 'primevue/datatable'
+import Dialog from 'primevue/dialog'
+import Dropdown from 'primevue/dropdown'
+import InputText from 'primevue/inputtext'
+import Menu from 'primevue/menu'
+import Message from 'primevue/message'
+import Paginator from 'primevue/paginator'
+import Password from 'primevue/password'
 import Ripple from 'primevue/ripple'
+import Tooltip from 'primevue/tooltip'
 
 import icons from '@/assets/icons'
 
@@ -28,7 +40,19 @@ createInertiaApp({
       .provide('icons', icons)
       .directive('styleclass', StyleClass)
       .directive('ripple', Ripple)
+      .directive('tooltip', Tooltip)
       .component('CIcon', CIcon)
+      .component('Button', Button)
+      .component('Column', Column)
+      .component('Card', Card)
+      .component('DataTable', DataTable)
+      .component('InputText', InputText)
+      .component('Menu', Menu)
+      .component('Message', Message)
+      .component('Paginator', Paginator)
+      .component('Password', Password)
+      .component('Dropdown', Dropdown)
+      .component('Dialog', Dialog)
       .mount(el)
   },
 })

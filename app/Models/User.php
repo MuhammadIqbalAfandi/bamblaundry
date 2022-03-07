@@ -24,8 +24,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'address',
         'status',
-        'gender',
         'password',
+        'gender_id',
         'role_id',
         'outlet_id',
     ];
@@ -49,7 +49,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    protected function gender(): Attribute
+    protected function genderId(): Attribute
     {
         return Attribute::make(
             get:fn($value) => $value == 1 ? __('words.female') : __('words.male'),

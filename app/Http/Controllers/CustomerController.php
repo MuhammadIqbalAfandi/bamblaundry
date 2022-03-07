@@ -27,7 +27,7 @@ class CustomerController extends Controller
                     'name' => $customer->name,
                     'phone' => $customer->phone,
                     'address' => $customer->address,
-                    'gender' => $customer->gender,
+                    'gender' => $customer->gender_id,
                 ]),
         ]);
     }
@@ -41,6 +41,10 @@ class CustomerController extends Controller
     {
         return inertia('customer/Create', [
             'customer_number' => 'CS' . now()->format('YmdHis'),
+            'genders' => [
+                ['label' => 'Perempuan', 'value' => 1],
+                ['label' => 'Laki-laki', 'value' => 2],
+            ],
         ]);
     }
 
@@ -83,7 +87,11 @@ class CustomerController extends Controller
                 'name' => $customer->name,
                 'phone' => $customer->phone,
                 'address' => $customer->address,
-                'gender' => $customer->getRawOriginal('gender'),
+                'gender_id' => $customer->getRawOriginal('gender_id'),
+            ],
+            'genders' => [
+                ['label' => 'Perempuan', 'value' => 1],
+                ['label' => 'Laki-laki', 'value' => 2],
             ],
         ]);
     }
