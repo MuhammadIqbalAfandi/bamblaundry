@@ -507,9 +507,9 @@ __webpack_require__.r(__webpack_exports__);
       phone: props.user.phone,
       email: props.user.email,
       address: props.user.address,
-      gender_id: props.user.gender,
-      outlet_id: props.user.outlet,
-      role_id: props.user.role
+      gender_id: props.user.gender_id,
+      outlet_id: props.user.outlet_id,
+      role_id: props.user.role_id
     });
 
     var submit = function submit() {

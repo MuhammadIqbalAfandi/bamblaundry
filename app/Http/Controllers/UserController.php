@@ -101,9 +101,9 @@ class UserController extends Controller
                 'phone' => $user->phone,
                 'email' => $user->email,
                 'address' => $user->address,
-                'gender' => $user->getRawOriginal('gender_id'),
-                'outlet' => $user->outlet_id,
-                'role' => $user->role_id,
+                'gender_id' => $user->getRawOriginal('gender_id'),
+                'outlet_id' => $user->outlet_id,
+                'role_id' => $user->role_id,
             ],
             'roles' => Role::whereNotIn('id', [1])
                 ->get()
