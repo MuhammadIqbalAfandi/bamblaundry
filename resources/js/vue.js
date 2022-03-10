@@ -1,5 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css'
-import '@coreui/coreui/dist/css/coreui.min.css'
 import 'primevue/resources/themes/tailwind-light/theme.css'
 import 'primevue/resources/primevue.min.css'
 import 'primeflex/primeflex.css'
@@ -10,8 +8,6 @@ import { createApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/inertia-vue3'
 import { InertiaProgress } from '@inertiajs/progress'
 import PrimeVue from 'primevue/config'
-import CoreuiVue from '@coreui/vue'
-import CIcon from '@coreui/icons-vue'
 import StyleClass from 'primevue/styleclass'
 import Button from 'primevue/button'
 import Column from 'primevue/column'
@@ -27,21 +23,16 @@ import Password from 'primevue/password'
 import Ripple from 'primevue/ripple'
 import Tooltip from 'primevue/tooltip'
 
-import icons from '@/assets/icons'
-
 createInertiaApp({
   resolve: (name) => import(`./pages/${name}`),
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(App, props) })
       .use(plugin)
-      .use(CoreuiVue)
       .use(PrimeVue, { ripple: true })
       .mixin({ methods: { route } })
-      .provide('icons', icons)
       .directive('styleclass', StyleClass)
       .directive('ripple', Ripple)
       .directive('tooltip', Tooltip)
-      .component('CIcon', CIcon)
       .component('Button', Button)
       .component('Column', Column)
       .component('Card', Card)

@@ -907,26 +907,6 @@
     "@babel/helper-validator-identifier" "^7.16.7"
     to-fast-properties "^2.0.0"
 
-"@coreui/coreui@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@coreui/coreui/-/coreui-4.1.0.tgz#24abbd88ead2fef0360a208ac752f2bb8e4a8f7d"
-  integrity sha512-2iMKPpxXquN3ZyL44s6Urvsnk03iw+KuJk/AKz5spSgKReUr7AM3WEiaTNFNo1/ZypB67pg0966tT22BSmgkGg==
-
-"@coreui/icons-vue@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@coreui/icons-vue/-/icons-vue-2.0.0.tgz#722e55f74badba58fdf0ab6f83ffa54deffbcbb3"
-  integrity sha512-3OLOv6TExmi93kapV4n9kmJ36fqxTHv3Vn/SPGAUX1btwf0wCmXen4xF3A8OdLEwR0i6Ggqw+MY/T7WjA6k2xg==
-
-"@coreui/icons@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@coreui/icons/-/icons-2.1.0.tgz#b21641d3d034fdef308c87dc347c8684c408a753"
-  integrity sha512-3yY9J0088TSY403jwJeP5YERH3RLOvxdhOa4VIQsGOX4fuQZiyVUM+vwlzyCSpgAv9NwKPkCor+gc+JJaYf0TA==
-
-"@coreui/vue@^4.1.2":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@coreui/vue/-/vue-4.1.2.tgz#ea23cc5ad4062ca5a3c088df1c05fd696afe35bc"
-  integrity sha512-JN/kBZMLaEsB+8MPx6i/tmJniCaXw1TBSqgITD3XUWv37pJdE+hWcymO9iCwW3wvnefvMp3Qx6dSnmdFMDFNMA==
-
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.6.tgz#d5e0706cf8c6acd8c6032f8d54070af261bbbb2f"
@@ -1808,11 +1788,6 @@ boolbase@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
-
-bootstrap@^5.1.3:
-  version "5.1.3"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.1.3.tgz#ba081b0c130f810fa70900acbc1c6d3c28fa8f34"
-  integrity sha512-fcQztozJ8jToQWXxVuEyXWW+dSo8AiXWKwiSSrKWsRB/Qt+Ewwza+JWoLKiTuQLaEPhdNAJ7+Dosc9DOIqNy7Q==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
