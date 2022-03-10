@@ -1,11 +1,10 @@
 <script setup>
-import { Head } from '@inertiajs/inertia-vue3'
-
-import AppTable from '@/components/AppTable.vue'
-import AppButtonMove from '@/components/AppButtonMove.vue'
-import AppButtonDetail from '@/components/AppButtonDetail.vue'
+import { Head, Link } from '@inertiajs/inertia-vue3'
+import AppButton from '@/components/AppButton.vue'
 import AppPagination from '@/components/AppPagination.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
+
+import TableHeader from './TableHeader'
 
 defineProps({
   outlets: Object,
@@ -15,43 +14,50 @@ defineProps({
 <template>
   <Head title="Daftar Outlet" />
 
-  <DefaultLayout>
-    <CRow class="mb-4">
-      <CCol></CCol>
+  <AppLayout>
+    <DataTable
+      responsiveLayout="scroll"
+      columnResizeMode="expand"
+      :value="outlets.data"
+      :rowHover="true"
+      :stripedRows="true"
+    >
+      <template #header>
+        <div class="grid">
+          <div class="col-12 md:col-6">
+            <div class="flex align-items-center">
+              <h5 class="mr-3 mb-0">Outlet</h5>
 
-      <CCol xs="auto">
-        <AppButtonMove :href="route('outlets.create')">Tambah Outlet</AppButtonMove>
-      </CCol>
-    </CRow>
+              <InputText class="w-full md:w-27rem" placeholder="cari..." />
+            </div>
+          </div>
 
-    <CRow>
-      <CCol>
-        <AppTable>
-          <template #table-head>
-            <CTableRow>
-              <CTableHeaderCell>Id Outlet</CTableHeaderCell>
-              <CTableHeaderCell>Nama</CTableHeaderCell>
-              <CTableHeaderCell>HP</CTableHeaderCell>
-              <CTableHeaderCell>Alamat</CTableHeaderCell>
-            </CTableRow>
-          </template>
-          <template #table-body>
-            <CTableRow v-for="outlet in outlets.data" :key="outlet.id">
-              <CTableDataCell>{{ outlet.outlet_number }}</CTableDataCell>
-              <CTableDataCell>{{ outlet.name }}</CTableDataCell>
-              <CTableDataCell>{{ outlet.phone }}</CTableDataCell>
-              <CTableDataCell>{{ outlet.address }}</CTableDataCell>
-              <CTableDataCell>
-                <AppButtonDetail :href="route('outlets.edit', outlet.id)" />
-              </CTableDataCell>
-            </CTableRow>
-          </template>
-        </AppTable>
-      </CCol>
-    </CRow>
+          <div class="col-12 md:col-6 flex justify-content-end">
+            <AppButton :href="route('outlets.create')" label="Tambah Outlet" icon="pi pi-pencil" />
+          </div>
+        </div>
+      </template>
 
-    <CRow>
-      <AppPagination :links="outlets.links" />
-    </CRow>
-  </DefaultLayout>
+      <Column
+        v-for="tableHeader in TableHeader"
+        :field="tableHeader.field"
+        :header="tableHeader.header"
+        :key="tableHeader.field"
+      />
+
+      <Column>
+        <template #body="{ data }">
+          <Link
+            as="button"
+            :href="route('outlets.edit', data.id)"
+            class="p-button p-component p-button-icon-only p-button-rounded p-button-text"
+          >
+            <i class="pi pi-angle-double-right p-button-icon"></i>
+          </Link>
+        </template>
+      </Column>
+    </DataTable>
+
+    <AppPagination :links="outlets.links" />
+  </AppLayout>
 </template>

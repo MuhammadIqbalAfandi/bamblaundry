@@ -1,10 +1,8 @@
 <script setup>
 import { Head, useForm } from '@inertiajs/inertia-vue3'
-
 import AppButton from '@/components/AppButton.vue'
 import AppDropdown from '@/components/AppDropdown.vue'
 import AppInputText from '@/components/AppInputText.vue'
-import AppDialog from '@/components/AppDialog.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 
 const props = defineProps({

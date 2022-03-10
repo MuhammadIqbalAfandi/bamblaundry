@@ -1,9 +1,8 @@
 <script setup>
 import { Head, useForm } from '@inertiajs/inertia-vue3'
-
-import AppButtonCreate from '@/components/AppButtonCreate.vue'
-import AppTextInput from '@/components/AppTextInput.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import AppButton from '@/components/AppButton.vue'
+import AppInputText from '@/components/AppInputText.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
 
 const props = defineProps({
   outlet_number: String,
@@ -24,36 +23,37 @@ const submit = () => {
 <template>
   <Head title="Tambah Outlet" />
 
-  <DefaultLayout>
-    <CRow>
-      <CCol md="8">
-        <CCard color="light" class="border-light">
-          <CForm @submit.prevent="submit">
-            <CRow class="p-4">
-              <CCol md="6" class="mb-4">
-                <CFormLabel>Id Outlet</CFormLabel>
-                <CFormInput disabled v-model="form.outlet_number" />
-              </CCol>
+  <AppLayout>
+    <div class="grid">
+      <div class="col-12 lg:col-8">
+        <Card>
+          <template #content>
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <AppInputText :disabled="true" label="Id Outlet" v-model="form.outlet_number" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
-              </CCol>
-            </CRow>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
+              </div>
+            </div>
+          </template>
 
-            <CCardFooter class="d-flex justify-content-end">
-              <AppButtonCreate :disabled="form.processing">Tambah Outlet</AppButtonCreate>
-            </CCardFooter>
-          </CForm>
-        </CCard>
-      </CCol>
-    </CRow>
-  </DefaultLayout>
+          <template #footer>
+            <div class="flex justify-content-end">
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+            </div>
+          </template>
+        </Card>
+      </div>
+    </div>
+  </AppLayout>
 </template>
