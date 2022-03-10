@@ -124,6 +124,7 @@ return [
     'uploaded' => 'Gagal untuk mengupload.',
     'url' => 'Nilai harus be a valid URL.',
     'uuid' => 'Nilai harus be a valid UUID.',
+    'table' => 'Table tidak boleh kosong',
 
     /*
     |--------------------------------------------------------------------------

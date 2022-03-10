@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('price');
             $table->unsignedInteger('discount');
-            $table->unsignedInteger('quantity');
+            $table->unsignedFloat('quantity');
             $table->foreignId('transaction_id')->constrained();
             $table->foreignId('laundry_id')->constrained();
             $table->timestamps();

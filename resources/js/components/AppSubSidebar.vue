@@ -31,7 +31,7 @@ const onMenuItemClick = (event, item, index) => {
       <template v-if="root">
         <div class="layout-menuitem-root-text" :aria-label="item.label">{{ item.label }}</div>
 
-        <AppSubMenu :items="item.items"></AppSubMenu>
+        <AppSubSidebar :items="item.items" />
       </template>
       <template v-else>
         <Link
@@ -62,7 +62,7 @@ const onMenuItemClick = (event, item, index) => {
         </a>
 
         <Transition name="layout-submenu-wrapper">
-          <AppSubMenu v-show="activeIndex === i" :items="item.items"></AppSubMenu>
+          <AppSubSidebar v-show="activeIndex === i" :items="item.items" />
         </Transition>
       </template>
     </li>

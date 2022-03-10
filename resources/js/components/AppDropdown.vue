@@ -2,10 +2,6 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  label: {
-    type: String,
-    default: '',
-  },
   optionLabel: {
     type: String,
     default: 'label',
@@ -14,13 +10,27 @@ const props = defineProps({
     type: String,
     default: 'value',
   },
-  placeholder: String,
+  optionDisabled: {
+    type: String,
+    default: 'disabled',
+  },
   options: {
     type: Array,
     required: true,
   },
-  error: String,
-  modelValue: [String, Number, Boolean, Array, Object],
+  label: {
+    type: String,
+    required: true,
+  },
+  placeholder: {
+    type: String,
+    required: true,
+  },
+  error: {
+    type: String,
+    default: null,
+  },
+  modelValue: null,
 })
 
 defineEmits(['update:modelValue'])
@@ -43,10 +53,11 @@ const selectedDropdownLabel = (value) => {
   <label :for="forLabel">{{ label }}</label>
 
   <Dropdown
-    class="w-full"
+    class="w-full mt-2"
     :class="{ 'p-invalid': isError }"
     :id="forLabel"
     :aria-describedby="ariaDescribedbyLabel"
+    :option-disabled="optionDisabled"
     :option-label="optionLabel"
     :option-value="optionValue"
     :placeholder="placeholder"
@@ -58,12 +69,18 @@ const selectedDropdownLabel = (value) => {
       <div v-if="slotProps.value">
         {{ selectedDropdownLabel(slotProps.value) }}
       </div>
+
       <div v-else>
         {{ slotProps.placeholder }}
       </div>
     </template>
+
+    <template #option="{ option, index }">
+      <slot name="option" :option="option" :index="index" />
+    </template>
   </Dropdown>
-  <small :id="ariaDescribedbyLabel" :class="{ 'p-error': isError }">
+
+  <small v-if="error" :id="ariaDescribedbyLabel" :class="{ 'p-error': isError }">
     {{ error }}
   </small>
 </template>

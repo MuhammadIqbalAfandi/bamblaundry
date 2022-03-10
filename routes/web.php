@@ -3,6 +3,7 @@
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LaundryController;
 use App\Http\Controllers\OutletController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', [UserController::class, 'index']);
+    Route::get('/', [TransactionController::class, 'index']);
 
     Route::delete('/users/block/{user}', [UserController::class, 'block'])->name('users.block');
     Route::resource('/users', UserController::class);
@@ -28,6 +29,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/outlets', OutletController::class);
 
     Route::resource('/laundries', LaundryController::class);
+
+    Route::resource('/transactions', TransactionController::class);
 });
 
 require __DIR__ . '/auth.php';

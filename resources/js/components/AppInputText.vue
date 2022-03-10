@@ -2,21 +2,27 @@
 import { computed } from 'vue'
 
 const props = defineProps({
+  type: {
+    type: String,
+    default: 'text',
+  },
   label: {
     type: String,
-    default: '',
+    required: true,
   },
   disabled: {
     type: Boolean,
     default: false,
   },
-  placeholder: String,
-  type: {
+  placeholder: {
     type: String,
-    default: 'text',
+    required: true,
   },
-  error: String,
-  modelValue: [String, Number, Boolean, Array, Object],
+  error: {
+    type: String,
+    default: null,
+  },
+  modelValue: null,
 })
 
 defineEmits(['update:modelValue'])
@@ -37,14 +43,14 @@ const ariaDescribedbyLabel = computed(() => props.label.toLowerCase().replace(/\
       :class="{ 'p-invalid': isError }"
       :id="forLabel"
       :aria-describedby="ariaDescribedbyLabel"
-      :type="type"
+      :model-value="type"
       :placeholder="placeholder"
       :value="modelValue"
       :disabled="disabled"
       @input="$emit('update:modelValue', $event.target.value)"
     />
 
-    <small :id="ariaDescribedbyLabel" :class="{ 'p-error': isError }">
+    <small v-if="error" :id="ariaDescribedbyLabel" :class="{ 'p-error': isError }">
       {{ error }}
     </small>
   </div>

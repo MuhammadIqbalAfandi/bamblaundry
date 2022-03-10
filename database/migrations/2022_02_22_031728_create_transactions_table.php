@@ -20,7 +20,6 @@ return new class extends Migration
             $table->foreignId('transaction_status_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('customer_id')->constrained();
-            $table->foreignId('laundry_id')->constrained();
             $table->foreignId('outlet_id')->constrained();
             $table->timestamps();
         });

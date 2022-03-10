@@ -23,12 +23,20 @@ class StoreCustomerRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $basicValidation = [
             'customer_number' => 'required|string',
             'name' => 'required|string|max:50',
-            'phone' => 'required|numeric|min:12|unique:users,phone',
+            'phone' => 'required|numeric|min:12|unique:customers,phone',
             'address' => 'required|string|max:100',
             'gender_id' => 'required|integer',
         ];
+
+        if ($this->transaction_number) {
+            array_push($basicValidation, ['transaction_number' => 'required|string']);
+
+            return $basicValidation;
+        } else {
+            return $basicValidation;
+        }
     }
 }

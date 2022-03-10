@@ -17,6 +17,13 @@ class Laundry extends Model
         'unit',
     ];
 
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            set:fn($value) => ucwords($value)
+        );
+    }
+
     protected function unit(): Attribute
     {
         return Attribute::make(

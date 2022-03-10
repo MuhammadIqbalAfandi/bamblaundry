@@ -20,7 +20,7 @@ watch(
 
 <template>
   <Message v-if="hasErrors" severity="error" :style="messageDisplay" @close="onClose()">
-    <ul class="mb-0">
+    <ul class="m-0">
       <li v-for="(error, key) in errors" :key="key">{{ error }}</li>
     </ul>
   </Message>

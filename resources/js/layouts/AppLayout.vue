@@ -1,15 +1,11 @@
 <script setup>
 import { ref, computed } from 'vue'
 import AppTopBar from '@/components/AppTopBar.vue'
-import AppMenu from '@/components/AppMenu.vue'
+import AppSidebar from '@/components/AppSidebar.vue'
 import AppFooter from '@/components/AppFooter.vue'
 import AppMessage from '@/components/AppMessage.vue'
 
 import menu from '@/utils/menu'
-
-const mobileMenuActive = ref(false)
-const staticMenuInactive = ref(false)
-const menuClick = ref(false)
 
 const containerClass = computed(() => {
   return [
@@ -21,6 +17,12 @@ const containerClass = computed(() => {
     },
   ]
 })
+
+const mobileMenuActive = ref(false)
+
+const staticMenuInactive = ref(false)
+
+const menuClick = ref(false)
 
 const isDesktop = () => window.innerWidth >= 992
 
@@ -48,7 +50,7 @@ const onWrapperClick = () => {
     <AppTopBar @menu-toggle="onMenuToggle" />
 
     <div class="layout-sidebar">
-      <AppMenu :model="menu" />
+      <AppSidebar :model="menu" />
     </div>
 
     <div class="layout-main-container">

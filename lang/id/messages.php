@@ -22,12 +22,14 @@ return [
             'verify_email' => 'Link verifikasi email berhasil terkirim',
         ],
         'store' => [
+            'transaction' => 'Transaksi berhasil ditambahkan',
             'user' => 'Akun user berhasil ditambahkan',
             'customer' => 'Akun customer berhasil ditambahkan',
             'outlet' => 'Data outlet berhasil ditambahkan',
             'laundry' => 'Data laundry berhasil ditambahkan',
         ],
         'update' => [
+            'transaction_status' => 'Status transaksi berhasil diubah',
             'user' => 'Akun user berhasil diubah',
             'customer' => 'Akun customer berhasil diubah',
             'outlet' => 'Data outlet berhasil diubah',
@@ -42,6 +44,8 @@ return [
     ],
 
     'error' => [
+        'store' => [
+            'transaction' => 'Transaksi gagal ditambahkan',
+        ],
     ],
-
 ];

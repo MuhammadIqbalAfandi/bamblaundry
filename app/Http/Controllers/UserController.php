@@ -90,7 +90,7 @@ class UserController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  User  $user
-     * @return \Illuminate\Http\Response
+     * @return \Inertia\Response
      */
     public function edit(User $user)
     {

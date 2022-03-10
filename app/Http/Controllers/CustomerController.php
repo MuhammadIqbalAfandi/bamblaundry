@@ -58,7 +58,11 @@ class CustomerController extends Controller
     {
         Customer::create($request->validated());
 
-        return to_route('customers.index')->with('success', __('messages.success.store.customer'));
+        if ($request->transaction_number) {
+            return back()->with('success', __('messages.success.store.customer'));
+        } else {
+            return to_route('customers.index')->with('success', __('messages.success.store.customer'));
+        }
     }
 
     /**

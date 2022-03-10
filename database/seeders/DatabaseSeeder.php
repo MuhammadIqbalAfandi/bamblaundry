@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
+use Database\Seeders\CustomerSeeder;
 use Database\Seeders\OutletSeeder;
 use Database\Seeders\RoleSeeder;
+use Database\Seeders\TransactionStatusSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Database\Seeder;
 
@@ -17,6 +19,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
+            TransactionStatusSeeder::class,
             CustomerSeeder::class,
             OutletSeeder::class,
             RoleSeeder::class,

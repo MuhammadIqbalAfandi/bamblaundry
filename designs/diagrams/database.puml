@@ -36,7 +36,6 @@ entity Transaction {
   * transaction_status_id
   * user_id
   * customer_id
-  * laundry_id
   * outlet_id
 }
 

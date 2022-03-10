@@ -1,6 +1,9 @@
 <script setup>
 defineProps({
-  message: String,
+  message: {
+    type: String,
+    default: null,
+  },
   header: {
     type: String,
     default: 'Peringatan',

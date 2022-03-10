@@ -4,7 +4,6 @@ import AppInputText from '@/components/AppInputText.vue'
 import AppDropdown from '@/components/AppDropdown.vue'
 import AppButton from '@/components/AppButton.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
-import { useConfirm } from 'primevue/useconfirm'
 
 defineProps({
   genders: Array,

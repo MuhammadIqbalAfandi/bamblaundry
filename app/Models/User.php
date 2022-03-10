@@ -68,6 +68,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Role::class);
     }
 
+    public function outlet()
+    {
+        return $this->belongsTo(Outlet::class);
+    }
+
     public function scopeFilter($query, $search)
     {
         $query->when($search ?? null, function ($query, $search) {
