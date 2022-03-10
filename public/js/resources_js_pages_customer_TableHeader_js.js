@@ -15,10 +15,10 @@ __webpack_require__.r(__webpack_exports__);
   field: 'customer_number',
   header: 'Id Customer'
 }, {
-  field: 'phone',
+  field: 'name',
   header: 'Nama'
 }, {
-  field: 'email',
+  field: 'phone',
   header: 'HP'
 }, {
   field: 'address',
