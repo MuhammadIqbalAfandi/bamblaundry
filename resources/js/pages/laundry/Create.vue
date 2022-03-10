@@ -1,9 +1,8 @@
 <script setup>
 import { Head, useForm } from '@inertiajs/inertia-vue3'
-
-import AppButtonCreate from '@/components/AppButtonCreate.vue'
-import AppTextInput from '@/components/AppTextInput.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import AppButton from '@/components/AppButton.vue'
+import AppInputText from '@/components/AppInputText.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
 
 const form = useForm({
   name: '',
@@ -19,31 +18,33 @@ const submit = () => {
 <template>
   <Head title="Tambah tipe Laundry" />
 
-  <DefaultLayout>
-    <CRow>
-      <CCol md="8">
-        <CCard color="light" class="border-light">
-          <CForm @submit.prevent="submit">
-            <CRow class="p-4">
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
-              </CCol>
+  <AppLayout>
+    <div class="grid">
+      <div class="col-12 lg:col-8">
+        <Card>
+          <template #content>
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Harga" placeholder="harga" :error="form.errors.price" v-model="form.price" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Harga" placeholder="harga" :error="form.errors.price" v-model="form.price" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Satuan" placeholder="unit" :error="form.errors.unit" v-model="form.unit" />
-              </CCol>
-            </CRow>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Satuan" placeholder="satuan" :error="form.errors.unit" v-model="form.unit" />
+              </div>
+            </div>
+          </template>
 
-            <CCardFooter class="d-flex justify-content-end">
-              <AppButtonCreate :disabled="form.processing">Tambah tipe Laundry</AppButtonCreate>
-            </CCardFooter>
-          </CForm>
-        </CCard>
-      </CCol>
-    </CRow>
-  </DefaultLayout>
+          <template #footer>
+            <div class="flex justify-content-end">
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+            </div>
+          </template>
+        </Card>
+      </div>
+    </div>
+  </AppLayout>
 </template>

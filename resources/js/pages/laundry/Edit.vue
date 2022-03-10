@@ -1,12 +1,11 @@
 <script setup>
+import { ref } from 'vue'
+import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm } from '@inertiajs/inertia-vue3'
-
-import AppTextInput from '@/components/AppTextInput.vue'
-import AppButtonCreate from '@/components/AppButtonCreate.vue'
-import AppButtonDelete from '@/components/AppButtonDelete.vue'
-import AppButtonAction from '@/components/AppButtonAction.vue'
-import AppModalAlert from '@/components/AppModalAlert.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import AppButton from '@/components/AppButton.vue'
+import AppInputText from '@/components/AppInputText.vue'
+import AppDialog from '@/components/AppDialog.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
 
 const props = defineProps({
   laundry: Object,
@@ -21,46 +20,59 @@ const form = useForm({
 const submit = () => {
   form.put(route('laundries.update', props.laundry.id))
 }
+
+const visibleDialog = ref(false)
+
+const confirmDialog = () => {
+  visibleDialog.value = true
+}
+
+const onAgree = (id) => Inertia.delete(route('laundries.destroy', id))
+
+const onCancel = () => (visibleDialog.value = false)
 </script>
 
 <template>
   <Head title="Ubah tipe Laundry" />
 
-  <DefaultLayout v-slot="{ toggleModalAlert }">
-    <CRow>
-      <CCol md="8">
-        <CCard color="light" class="border-light">
-          <CForm @submit.prevent="submit">
-            <CRow class="p-4">
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
-              </CCol>
+  <AppLayout>
+    <div class="grid">
+      <div class="col-12 lg:col-8">
+        <Card>
+          <template #content>
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <AppInputText label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Harga" placeholder="harga" :error="form.errors.price" v-model="form.price" />
-              </CCol>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Harga" placeholder="harga" :error="form.errors.price" v-model="form.price" />
+              </div>
 
-              <CCol md="6" class="mb-4">
-                <AppTextInput label="Satuan" placeholder="unit" :error="form.errors.unit" v-model="form.unit" />
-              </CCol>
-            </CRow>
+              <div class="col-12 md:col-6">
+                <AppInputText label="Satuan" placeholder="satuan" :error="form.errors.unit" v-model="form.unit" />
+              </div>
+            </div>
+          </template>
 
-            <CCardFooter class="d-flex justify-content-between">
-              <AppButtonAction @click="toggleModalAlert">Hapus tipe Laundry</AppButtonAction>
+          <template #footer>
+            <div
+              class="flex flex-column sm:flex-row align-items-center sm:justify-content-center sm:justify-content-between"
+            >
+              <AppDialog
+                message="Yakin akan menghapus data ini?"
+                v-model:visible="visibleDialog"
+                @agree="onAgree(laundry.id)"
+                @cancel="onCancel"
+              />
 
-              <AppModalAlert>
-                Anda yakin ingin mengahapus tipe laundry ini?
+              <Button label="Hapus" icon="pi pi-trash" class="p-button-text p-button-danger" @click="confirmDialog" />
 
-                <template #footer>
-                  <AppButtonDelete :href="route('laundries.destroy', laundry.id)">Hapus tipe Laundry</AppButtonDelete>
-                </template>
-              </AppModalAlert>
-
-              <AppButtonCreate :disabled="form.processing">Ubah tipe Laundry</AppButtonCreate>
-            </CCardFooter>
-          </CForm>
-        </CCard>
-      </CCol>
-    </CRow>
-  </DefaultLayout>
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+            </div>
+          </template>
+        </Card>
+      </div>
+    </div>
+  </AppLayout>
 </template>

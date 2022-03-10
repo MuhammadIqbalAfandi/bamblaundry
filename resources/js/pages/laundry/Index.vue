@@ -1,11 +1,10 @@
 <script setup>
-import { Head } from '@inertiajs/inertia-vue3'
-
-import AppTable from '@/components/AppTable.vue'
-import AppButtonMove from '@/components/AppButtonMove.vue'
-import AppButtonDetail from '@/components/AppButtonDetail.vue'
+import { Head, Link } from '@inertiajs/inertia-vue3'
+import AppButton from '@/components/AppButton.vue'
 import AppPagination from '@/components/AppPagination.vue'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
+
+import TableHeader from './TableHeader'
 
 defineProps({
   laundries: Object,
@@ -15,41 +14,50 @@ defineProps({
 <template>
   <Head title="Daftar Tipe Laundry" />
 
-  <DefaultLayout>
-    <CRow class="mb-4">
-      <CCol></CCol>
+  <AppLayout>
+    <DataTable
+      responsiveLayout="scroll"
+      columnResizeMode="expand"
+      :value="laundries.data"
+      :rowHover="true"
+      :stripedRows="true"
+    >
+      <template #header>
+        <div class="grid">
+          <div class="col-12 md:col-6">
+            <div class="flex align-items-center">
+              <h5 class="mr-3 mb-0">Laundry</h5>
 
-      <CCol xs="auto">
-        <AppButtonMove :href="route('laundries.create')">Tambah tipe Laundry</AppButtonMove>
-      </CCol>
-    </CRow>
+              <InputText class="w-full md:w-27rem" placeholder="cari..." />
+            </div>
+          </div>
 
-    <CRow>
-      <CCol>
-        <AppTable>
-          <template #table-head>
-            <CTableRow>
-              <CTableHeaderCell>Nama</CTableHeaderCell>
-              <CTableHeaderCell>Harga</CTableHeaderCell>
-              <CTableHeaderCell>Satuan</CTableHeaderCell>
-            </CTableRow>
-          </template>
-          <template #table-body>
-            <CTableRow v-for="laundry in laundries.data" :key="laundry.id">
-              <CTableDataCell>{{ laundry.name }}</CTableDataCell>
-              <CTableDataCell>{{ laundry.price }}</CTableDataCell>
-              <CTableDataCell>{{ laundry.unit }}</CTableDataCell>
-              <CTableDataCell>
-                <AppButtonDetail :href="route('laundries.edit', laundry.id)" />
-              </CTableDataCell>
-            </CTableRow>
-          </template>
-        </AppTable>
-      </CCol>
-    </CRow>
+          <div class="col-12 md:col-6 flex justify-content-end">
+            <AppButton :href="route('laundries.create')" label="Tambah Laundry" icon="pi pi-pencil" />
+          </div>
+        </div>
+      </template>
 
-    <CRow>
-      <AppPagination :links="laundries.links" />
-    </CRow>
-  </DefaultLayout>
+      <Column
+        v-for="tableHeader in TableHeader"
+        :field="tableHeader.field"
+        :header="tableHeader.header"
+        :key="tableHeader.field"
+      />
+
+      <Column>
+        <template #body="{ data }">
+          <Link
+            as="button"
+            :href="route('laundries.edit', data.id)"
+            class="p-button p-component p-button-icon-only p-button-rounded p-button-text"
+          >
+            <i class="pi pi-angle-double-right p-button-icon"></i>
+          </Link>
+        </template>
+      </Column>
+    </DataTable>
+
+    <AppPagination :links="laundries.links" />
+  </AppLayout>
 </template>

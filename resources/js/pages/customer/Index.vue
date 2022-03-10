@@ -1,6 +1,5 @@
 <script setup>
 import { Head, Link } from '@inertiajs/inertia-vue3'
-
 import AppButton from '@/components/AppButton.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
