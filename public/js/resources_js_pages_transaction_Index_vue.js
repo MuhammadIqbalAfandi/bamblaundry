@@ -724,7 +724,6 @@ __webpack_require__.r(__webpack_exports__);
     var expose = _ref.expose;
     expose();
     var props = __props;
-    var filter = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)();
     var transactionId = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)();
     var updateStatusDialog = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
     var updateStatusForm = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm)({
@@ -756,7 +755,8 @@ __webpack_require__.r(__webpack_exports__);
         to: route('transactions.show', data.id)
       }, {
         label: 'Cetak ulang',
-        icon: 'pi pi-print'
+        icon: 'pi pi-print',
+        command: function command() {}
       }];
       updateStatusItems.value = props.transactionsStatus.filter(function (val) {
         return val.value >= data.transactionStatusId;
@@ -768,7 +768,6 @@ __webpack_require__.r(__webpack_exports__);
 
     var __returned__ = {
       props: props,
-      filter: filter,
       transactionId: transactionId,
       updateStatusDialog: updateStatusDialog,
       updateStatusForm: updateStatusForm,
@@ -1531,7 +1530,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$page.props.auth.user.name), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
-    href: "",
+    href: _ctx.route('users.show', _ctx.$page.props.auth.user.id),
     "class": "p-link layout-topbar-button"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -1540,7 +1539,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })), [[_directive_tooltip, 'Pengaturan Profil', void 0, {
+  }, 8
+  /* PROPS */
+  , ["href"])), [[_directive_tooltip, 'Pengaturan Profil', void 0, {
     bottom: true
   }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
     href: _ctx.route('logout'),

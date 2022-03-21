@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
-import { useForm, Head } from '@inertiajs/inertia-vue3'
+import { useForm, Head, usePage } from '@inertiajs/inertia-vue3'
 import AppInputText from '@/components/AppInputText.vue'
 import AppDropdown from '@/components/AppDropdown.vue'
 import AppButton from '@/components/AppButton.vue'
@@ -38,6 +38,12 @@ const confirmDialog = () => {
 const onAgree = (id) => Inertia.delete(route('users.destroy', id))
 
 const onCancel = () => (visibleDialog.value = false)
+
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
 </script>
 
 <template>
@@ -114,12 +120,12 @@ const onCancel = () => (visibleDialog.value = false)
                 <AppButton
                   label="Blokir"
                   icon="pi pi-ban"
-                  :href="route('users.block', user.id)"
                   method="delete"
                   class="p-button-text p-button-danger md:mr-3"
+                  :href="route('users.block', user.id)"
                 />
 
-                <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+                <AppButton label="Simpan" class="p-button-text" icon="pi pi-check" @click="submit" />
               </div>
             </div>
           </template>

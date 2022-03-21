@@ -552,6 +552,12 @@ __webpack_require__.r(__webpack_exports__);
       return visibleDialog.value = false;
     };
 
+    var errors = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
+      return (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.usePage)().props.value.errors;
+    });
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.watch)(errors, function () {
+      form.clearErrors();
+    });
     var __returned__ = {
       props: props,
       form: form,
@@ -560,10 +566,14 @@ __webpack_require__.r(__webpack_exports__);
       confirmDialog: confirmDialog,
       onAgree: onAgree,
       onCancel: onCancel,
+      errors: errors,
       ref: vue__WEBPACK_IMPORTED_MODULE_0__.ref,
+      watch: vue__WEBPACK_IMPORTED_MODULE_0__.watch,
+      computed: vue__WEBPACK_IMPORTED_MODULE_0__.computed,
       Inertia: _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_1__.Inertia,
       useForm: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm,
       Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.Head,
+      usePage: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.usePage,
       AppInputText: _components_AppInputText_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
       AppDropdown: _components_AppDropdown_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
       AppButton: _components_AppButton_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
@@ -1197,7 +1207,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$page.props.auth.user.name), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
-    href: "",
+    href: _ctx.route('users.show', _ctx.$page.props.auth.user.id),
     "class": "p-link layout-topbar-button"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -1206,7 +1216,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })), [[_directive_tooltip, 'Pengaturan Profil', void 0, {
+  }, 8
+  /* PROPS */
+  , ["href"])), [[_directive_tooltip, 'Pengaturan Profil', void 0, {
     bottom: true
   }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
     href: _ctx.route('logout'),
@@ -1435,15 +1447,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             label: "Blokir",
             icon: "pi pi-ban",
-            href: _ctx.route('users.block', $props.user.id),
             method: "delete",
-            "class": "p-button-text p-button-danger md:mr-3"
+            "class": "p-button-text p-button-danger md:mr-3",
+            href: _ctx.route('users.block', $props.user.id)
           }, null, 8
           /* PROPS */
           , ["href"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
-            onClick: $setup.submit,
             label: "Simpan",
-            icon: "pi pi-check"
+            "class": "p-button-text",
+            icon: "pi pi-check",
+            onClick: $setup.submit
           })])])];
         }),
         _: 1

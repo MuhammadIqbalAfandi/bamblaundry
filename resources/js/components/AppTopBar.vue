@@ -33,7 +33,11 @@ defineEmits(['menu-toggle'])
       <li>
         <span class="hidden lg:inline">{{ $page.props.auth.user.name }}</span>
 
-        <Link href="" class="p-link layout-topbar-button" v-tooltip.bottom="'Pengaturan Profil'">
+        <Link
+          :href="route('users.show', $page.props.auth.user.id)"
+          class="p-link layout-topbar-button"
+          v-tooltip.bottom="'Pengaturan Profil'"
+        >
           <i class="pi pi-user"></i>
           <span>Pengaturan Profil</span>
         </Link>

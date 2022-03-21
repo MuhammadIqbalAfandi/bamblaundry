@@ -14,8 +14,6 @@ const props = defineProps({
   transactionsStatus: Array,
 })
 
-const filter = ref()
-
 const transactionId = ref()
 
 const updateStatusDialog = ref(false)
@@ -55,6 +53,7 @@ const overlayToggle = (event, data) => {
     {
       label: 'Cetak ulang',
       icon: 'pi pi-print',
+      command() {},
     },
   ]
 

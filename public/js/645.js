@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[645],{4645:(e,a,d)=>{d.r(a),d.d(a,{default:()=>l});const l=[{field:"outlet_number",header:"Id Outlet"},{field:"name",header:"Nama"},{field:"phone",header:"No HP"},{field:"address",header:"Alamat"}]}}]);

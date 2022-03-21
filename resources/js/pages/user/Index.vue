@@ -33,7 +33,7 @@ defineProps({
           </div>
 
           <div class="col-12 md:col-6 flex justify-content-end">
-            <AppButton :href="route('users.create')" label="Tambah User" icon="pi pi-pencil" />
+            <AppButton :href="route('users.create')" label="Tambah User" icon="pi pi-pencil" class="p-button-text" />
           </div>
         </div>
       </template>

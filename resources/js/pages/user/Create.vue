@@ -1,5 +1,6 @@
 <script setup>
-import { useForm, Head } from '@inertiajs/inertia-vue3'
+import { computed, watch } from 'vue'
+import { useForm, Head, usePage } from '@inertiajs/inertia-vue3'
 import AppInputText from '@/components/AppInputText.vue'
 import AppDropdown from '@/components/AppDropdown.vue'
 import AppButton from '@/components/AppButton.vue'
@@ -24,6 +25,12 @@ const form = useForm({
 const submit = () => {
   form.post(route('users.store'))
 }
+
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
 </script>
 
 <template>
@@ -85,7 +92,7 @@ const submit = () => {
 
           <template #footer>
             <div class="flex justify-content-end">
-              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+              <AppButton label="Simpan" @click="submit" icon="pi pi-check" class="p-button-text" />
             </div>
           </template>
         </Card>

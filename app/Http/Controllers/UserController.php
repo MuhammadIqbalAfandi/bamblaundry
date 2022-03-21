@@ -78,12 +78,32 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  User  $user
      * @return \Inertia\Response
      */
-    public function show($id)
+    public function show(User $user)
     {
-        //
+        return inertia('user/Show', [
+            'user' => [
+                'name' => $user->name,
+                'phone' => $user->phone,
+                'email' => $user->email,
+                'address' => $user->address,
+                'gender' => $user->gender_id,
+                'role' => $user->role->name,
+                'outlet' => $user->outlet->name,
+            ],
+            'roles' => Role::whereNotIn('id', [1])
+                ->get()
+                ->transform(fn($role) => [
+                    'label' => $role->name,
+                    'value' => $role->id,
+                ]),
+            'genders' => [
+                ['label' => 'Perempuan', 'value' => 1],
+                ['label' => 'Laki-laki', 'value' => 2],
+            ],
+        ]);
     }
 
     /**
