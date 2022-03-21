@@ -1,11 +1,9 @@
 export const IndexTable = [
-  { field: 'customerNumber', header: 'Id Customer' },
-  { field: 'dateLaundry', header: 'Tanggal Laundry' },
-  { field: 'name', header: 'Nama' },
-  { field: 'phone', header: 'No HP' },
-  { field: 'address', header: 'Alamat' },
+  { field: 'transactionNumber', header: 'Id Transaksi' },
+  { field: 'customer', header: 'Id Customer' },
+  { field: 'price', header: 'Harga' },
   { field: 'outlet', header: 'Outlet' },
-  { field: 'transactionStatsName', header: 'Status' },
+  { field: 'transactionStatusName', header: 'Status' },
 ]
 
 export const TransactionBasketTable = [

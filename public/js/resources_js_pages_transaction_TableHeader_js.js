@@ -13,25 +13,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TransactionBasketTable": () => (/* binding */ TransactionBasketTable)
 /* harmony export */ });
 var IndexTable = [{
-  field: 'customerNumber',
+  field: 'transactionNumber',
+  header: 'Id Transaksi'
+}, {
+  field: 'customer',
   header: 'Id Customer'
 }, {
-  field: 'dateLaundry',
-  header: 'Tanggal Laundry'
-}, {
-  field: 'name',
-  header: 'Nama'
-}, {
-  field: 'phone',
-  header: 'No HP'
-}, {
-  field: 'address',
-  header: 'Alamat'
+  field: 'price',
+  header: 'Harga'
 }, {
   field: 'outlet',
   header: 'Outlet'
 }, {
-  field: 'transactionStatsName',
+  field: 'transactionStatusName',
   header: 'Status'
 }];
 var TransactionBasketTable = [{

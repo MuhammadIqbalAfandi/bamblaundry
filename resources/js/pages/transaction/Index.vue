@@ -14,6 +14,8 @@ const props = defineProps({
   transactionsStatus: Array,
 })
 
+const filter = ref()
+
 const transactionId = ref()
 
 const updateStatusDialog = ref(false)
@@ -109,6 +111,15 @@ const overlayToggle = (event, data) => {
             <Badge v-if="data['transactionStatusId'] === 1" :value="data[field]"></Badge>
             <Badge v-else-if="data['transactionStatusId'] === 2" :value="data[field]" severity="warning"></Badge>
             <Badge v-else :value="data[field]" severity="success"></Badge>
+          </template>
+          <template v-else-if="field === 'customer'">
+            <p class="font-bold">{{ data.customer.number }}</p>
+            <p>{{ data.customer.name }}</p>
+            <p>{{ data.customer.phone }}</p>
+          </template>
+          <template v-else-if="field === 'transactionNumber'">
+            <p class="font-bold">{{ data[field] }}</p>
+            <p>{{ data.dateLaundry }}</p>
           </template>
           <template v-else>
             {{ data[field] }}

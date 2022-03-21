@@ -65,13 +65,27 @@ class Transaction extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('transaction_number', 'like', '%' . $search . '%')
+                    ->orWhere('customer.customer_number', 'like', '%' . $search . '%')
+                    ->orWhere('phone', 'like', '%' . $search . '%');
+            });
+        });
+    }
+
     public function totalPrice()
     {
         $price = $this->transactionDetails->sum(function ($transactionDetail) {
-            return $transactionDetail->getRawOriginal('price') * $transactionDetail->quantity;
+            $price = $transactionDetail->getRawOriginal('price') * $transactionDetail->quantity;
+            return $price - $price * ($transactionDetail->getRawOriginal('discount') / 100);
         });
+
         $totalPrice = $price - $price * ($this->getRawOriginal('discount') / 100);
 
         return $this->setRupiahFormat($totalPrice);
     }
+
 }

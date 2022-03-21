@@ -16,7 +16,17 @@ defineProps({
   <Head title="Detail Transaksi" />
 
   <AppLayout>
-    <div class="grid px-1">
+    <div class="grid px-2">
+      <div class="col-auto mr-7">
+        <h2 class="mb-4">
+          <span class="text-base"> <i class="pi pi-id-card" /> Id Transaksi</span>
+
+          <br />
+
+          <span class="text-xl font-bold">{{ transaction.number }}</span>
+        </h2>
+      </div>
+
       <div class="col-auto mr-7">
         <h2 class="mb-4">
           <span class="text-base"> <i class="pi pi-id-card" /> Id Customer</span>
@@ -43,7 +53,7 @@ defineProps({
         <Card class="surface-100">
           <template #content>
             <div class="grid">
-              <div class="col-12 md:col-4">
+              <div class="col-auto mr-7">
                 <h3>Nama Customer</h3>
                 <p>{{ customer.name }}</p>
 
@@ -56,7 +66,7 @@ defineProps({
 
               <Divider type="dashed" class="block md:hidden" />
 
-              <div class="col-12 md:col-4">
+              <div class="col-auto mr-7">
                 <h3>Nama Admin</h3>
                 <p>{{ $page.props.auth.user.name }}</p>
 
@@ -69,7 +79,7 @@ defineProps({
 
               <Divider type="dashed" class="block md:hidden" />
 
-              <div class="col-12 md:col-4">
+              <div class="col-auto">
                 <h3>Status Laundry</h3>
                 <Badge v-if="transaction.statusId === 1" :value="transaction.status"></Badge>
                 <Badge v-else-if="transaction.statusId === 2" :value="transaction.status" severity="warning"></Badge>

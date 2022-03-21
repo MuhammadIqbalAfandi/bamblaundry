@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, watch, computed, useSlots } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppButton from '@/components/AppButton.vue'
@@ -49,7 +49,7 @@ watch(errors, () => {
   form.clearErrors()
 })
 
-const customerDialogHide = () => {
+const customerDialogOnHide = () => {
   formCustomer.reset()
 
   formCustomer.clearErrors()
@@ -104,16 +104,7 @@ const laundryOnSelected = (event) => {
 
 const transactionBasket = reactive([])
 
-const transactionPriceTotal = () => {
-  form.discount_all = form.discount_all ?? 0
-
-  const totalPrice = transactionBasket.reduce((prev, current) => prev + current.totalPrice, 0)
-  const totalPriceAfterDiscount = totalPrice - totalPrice * (form.discount_all / 100)
-
-  return IDRCurrencyFormat(totalPriceAfterDiscount)
-}
-
-const addTransactionBasket = () => {
+const transactionBasketOnClick = () => {
   form.clearErrors()
 
   if (!form.customer_id.id) {
@@ -144,7 +135,7 @@ const addTransactionBasket = () => {
   form.reset('laundry_id', 'quantity')
 }
 
-const transactionBasketOnCellEdit = (event) => {
+const transactionBasketCellEdit = (event) => {
   const { data, newValue, field } = event
 
   if (field === 'discount') {
@@ -157,6 +148,15 @@ const transactionBasketOnCellEdit = (event) => {
 
 const transactionBasketOnDelete = (id) => {
   transactionBasket.splice(id, 1)
+}
+
+const transactionPriceTotal = () => {
+  form.discount_all = form.discount_all ?? 0
+
+  const totalPrice = transactionBasket.reduce((prev, current) => prev + current.totalPrice, 0)
+  const totalPriceAfterDiscount = totalPrice - totalPrice * (form.discount_all / 100)
+
+  return IDRCurrencyFormat(totalPriceAfterDiscount)
 }
 </script>
 
@@ -184,7 +184,7 @@ const transactionBasketOnDelete = (id) => {
                   dropdown
                   complete-on-focus
                   label="Customer"
-                  field="customer_number"
+                  field="customerNumber"
                   placeholder="Customer"
                   v-model="form.customer_id"
                   :error="form.errors.customer_id"
@@ -256,7 +256,7 @@ const transactionBasketOnDelete = (id) => {
                   label="Tambahkan"
                   class="p-button-text"
                   icon="pi pi-shopping-cart"
-                  @click="addTransactionBasket"
+                  @click="transactionBasketOnClick"
                 />
               </div>
 
@@ -270,7 +270,7 @@ const transactionBasketOnDelete = (id) => {
                   column-resize-mode="expand"
                   edit-mode="cell"
                   :value="transactionBasket"
-                  @cell-edit-complete="transactionBasketOnCellEdit"
+                  @cell-edit-complete="transactionBasketCellEdit"
                 >
                   <template v-if="$page.props.errors.laundries" #empty>
                     <div class="flex justify-content-center p-error">
@@ -389,7 +389,7 @@ const transactionBasketOnDelete = (id) => {
       header="Tambah Customer"
       :style="{ width: '450px' }"
       :breakpoints="{ '960px': '75vw' }"
-      @hide="customerDialogHide"
+      @hide="customerDialogOnHide"
     >
       <div class="grid">
         <div class="col-12 md:col-6">

@@ -23,15 +23,19 @@ class TransactionController extends Controller
     {
         return inertia('transaction/Index', [
             'transactions' => Transaction::latest()
+                ->filter(request()->only(['search']))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($transaction) => [
                     'id' => $transaction->id,
-                    'customerNumber' => $transaction->customer->customer_number,
+                    'transactionNumber' => $transaction->transaction_number,
                     'dateLaundry' => $transaction->created_at,
-                    'name' => $transaction->customer->name,
-                    'phone' => $transaction->customer->phone,
-                    'address' => $transaction->customer->address,
+                    'customer' => [
+                        'number' => $transaction->customer->customer_number,
+                        'name' => $transaction->customer->name,
+                        'phone' => $transaction->customer->phone,
+                    ],
+                    'price' => $transaction->totalPrice(),
                     'outlet' => $transaction->outlet->name,
                     'transactionStatusName' => $transaction->transactionStatus->name,
                     'transactionStatusId' => $transaction->transactionStatus->id,
@@ -104,7 +108,7 @@ class TransactionController extends Controller
                     'price' => $laundry['price'],
                     'discount' => $laundry['discount'],
                     'quantity' => $laundry['quantity'],
-                    'laundry_id' => $laundry['laundry_id'],
+                    'laundry_id' => $laundry['laundryId'],
                 ]);
             }
 
@@ -121,13 +125,14 @@ class TransactionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  Int  $id
      * @return \Inertia\Response
      */
     public function show(Transaction $transaction)
     {
         return inertia('transaction/Show', [
             'transaction' => [
+                'number' => $transaction->transaction_number,
                 'statusId' => $transaction->transactionStatus->id,
                 'status' => $transaction->transactionStatus->name,
                 'discount' => $transaction->discount,
