@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm } from '@inertiajs/inertia-vue3'
 import AppButton from '@/components/AppButton.vue'
 import AppPagination from '@/components/AppPagination.vue'
@@ -41,7 +42,7 @@ const overlayToggle = (event, data) => {
     {
       label: 'Perbaharui status',
       icon: 'pi pi-refresh',
-      command: () => {
+      command() {
         updateStatusDialog.value = true
       },
     },
