@@ -52,7 +52,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function genderId(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $value == 1 ? __('Perempuan') : __('Laki-laki'),
+            get:fn($value) => $value == 1 ? __('words.female') : __('words.male'),
         );
     }
 
@@ -84,7 +84,8 @@ class User extends Authenticatable implements MustVerifyEmail
         });
     }
 
-    public function hasRole($role) {
-        return $this->role()->where('name', $role)->first() ? true: false;
+    public function hasRole($role)
+    {
+        return $this->role()->where('name', $role)->first() ? true : false;
     }
 }

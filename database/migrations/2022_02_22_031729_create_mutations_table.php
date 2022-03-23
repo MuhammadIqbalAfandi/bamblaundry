@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('mutations', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
+            $table->enum('type', [1, 2]);
             $table->unsignedBigInteger('amount');
             $table->foreignId('outlet_id')->constrained();
             $table->foreignId('transaction_id')->constrained();

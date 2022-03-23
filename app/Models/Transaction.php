@@ -88,4 +88,26 @@ class Transaction extends Model
         return $this->setRupiahFormat($totalPrice);
     }
 
+    public function subTotal()
+    {
+        $subTotal = $this->transactionDetails->sum(function ($transactionDetail) {
+            $price = $transactionDetail->getRawOriginal('price') * $transactionDetail->quantity;
+            return $price - $price * ($transactionDetail->getRawOriginal('discount') / 100);
+        });
+
+        return $subTotal;
+    }
+
+    public function subTotalAsString()
+    {
+        return $this->setRupiahFormat($this->subTotal());
+    }
+
+    public function discountAsString()
+    {
+        $discount = $this->getRawOriginal('discount') / 100;
+
+        return $this->setRupiahFormat($discount * $this->subTotal());
+    }
+
 }

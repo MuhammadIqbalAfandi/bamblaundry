@@ -3,6 +3,7 @@
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LaundryController;
 use App\Http\Controllers\OutletController;
+use App\Http\Controllers\ThermalPrintingController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/laundries', LaundryController::class);
 
     Route::resource('/transactions', TransactionController::class);
+
+    Route::get('/thermal-printing/{transaction:transaction_number}', ThermalPrintingController::class);
 });
 
 require __DIR__ . '/auth.php';
