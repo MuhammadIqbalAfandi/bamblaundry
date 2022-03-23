@@ -13,6 +13,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
@@ -23,8 +24,13 @@ class TransactionController extends Controller
      */
     public function index()
     {
+        if (Auth::user()->hasRole('Admin')) {
+            $transactions = Transaction::latest();
+        } else {
+            $transactions = Transaction::where('outlet_id',Auth::user()->outlet_id)->latest();
+        }
         return inertia('transaction/Index', [
-            'transactions' => Transaction::latest()
+            'transactions' => $transactions
                 ->filter(request()->only(['search']))
                 ->paginate(10)
                 ->withQueryString()
@@ -218,9 +224,9 @@ class TransactionController extends Controller
 
             $printer->close();
 
-            return to_route('transactions.index')->with('success', __('messages.success.store.transaction'));
+            return to_route('transactions.index')->with('success', __('Transaksi berhasil ditambahkan'));
         } catch (QueryException $e) {
-            return back()->with('error', __('messages.error.store.transaction'));
+            return back()->with('error', __('Penambahan transaksi gagal'));
 
             DB::rollBack();
         }
@@ -286,7 +292,7 @@ class TransactionController extends Controller
     {
         $transaction->update($request->validated());
 
-        return back()->with('success', __('messages.success.update.transaction_status'));
+        return back()->with('success', __('Transaksi berhasil diperbaharui'));
     }
 
     /**

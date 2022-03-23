@@ -10,7 +10,9 @@ export default [
   {
     label: "Master",
     items: [
+      { label: "User", icon: "pi pi-user", to: "/users" },
       { label: "Customer", icon: "pi pi-users", to: "/customers" },
+      { label: "Outlet", icon: "pi pi-share-alt", to: "/outlets" },
       { label: "Laundry", icon: "pi pi-table", to: "/laundries" },
     ],
   },

@@ -8,6 +8,7 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\Outlet;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -18,6 +19,10 @@ class UserController extends Controller
      */
     public function index()
     {
+        if (!Auth::user()->hasRole('Admin')) {
+            return inertia('Access');
+        }
+
         return inertia('user/Index', [
             'users' => User::latest()
                 ->filter(request()->search)
@@ -43,6 +48,10 @@ class UserController extends Controller
      */
     public function create()
     {
+        if (!Auth::user()->hasRole('Admin')) {
+            return inertia('Access');
+        }
+
         return inertia('user/Create', [
             'roles' => Role::whereNotIn('id', [1])
                 ->get()
@@ -114,6 +123,10 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        if (!Auth::user()->hasRole('Admin')) {
+            return inertia('Access');
+        }
+
         return inertia('user/Edit', [
             'user' => [
                 'id' => $user->id,

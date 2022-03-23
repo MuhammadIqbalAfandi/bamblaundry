@@ -1,9 +1,9 @@
 <script setup>
-import AppSubSidebar from '@/components/AppSubSidebar.vue'
+import AppSubSidebar from "@/components/AppSubSidebar.vue";
 
 defineProps({
   model: Array,
-})
+});
 </script>
 
 <template>

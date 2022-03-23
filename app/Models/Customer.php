@@ -21,7 +21,7 @@ class Customer extends Model
     protected function genderId(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $value == 1 ? __('words.female') : __('words.male'),
+            get:fn($value) => $value == 1 ? __('Perempuan') : __('Laki-laki'),
         );
     }
 

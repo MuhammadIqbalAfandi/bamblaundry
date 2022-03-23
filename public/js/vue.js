@@ -43140,6 +43140,14 @@ function compileToFunction(template, options) {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var map = {
+	"./Access": [
+		"./resources/js/pages/Access.vue",
+		"resources_js_pages_Access_vue"
+	],
+	"./Access.vue": [
+		"./resources/js/pages/Access.vue",
+		"resources_js_pages_Access_vue"
+	],
 	"./auth/ForgotPassword": [
 		"./resources/js/pages/auth/ForgotPassword.vue",
 		"resources_js_pages_auth_ForgotPassword_vue"
@@ -43457,7 +43465,7 @@ module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"P
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_pages_auth_ForgotPassword_vue":"9db08b886f3acf35","resources_js_pages_auth_Login_vue":"998ee232f83d0aa9","resources_js_pages_auth_ResetPassword_vue":"3191258dc6d8a4b7","resources_js_pages_auth_VerifyEmail_vue":"632c69e9e8e9c0af","resources_js_pages_customer_Create_vue":"4ba1f271ce9b781c","resources_js_pages_customer_Edit_vue":"23c3054ebb404b62","resources_js_pages_customer_Index_vue":"f7432697b80af43f","resources_js_pages_customer_TableHeader_js":"be6685f342bbd7c2","resources_js_pages_laundry_Create_vue":"c4b56c67525f4e1f","resources_js_pages_laundry_Edit_vue":"30e125cedf169908","resources_js_pages_laundry_Index_vue":"15fea0560e096667","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_outlet_Create_vue":"e19f2a891dc20922","resources_js_pages_outlet_Edit_vue":"982931910701d96d","resources_js_pages_outlet_Index_vue":"1ef1092cf1538ef5","resources_js_pages_outlet_TableHeader_js":"960433b5f8e003c1","resources_js_pages_transaction_Create_vue":"ae5762803b9386e6","resources_js_pages_transaction_Index_vue":"1ea653b3c8983ce8","resources_js_pages_transaction_Show_vue":"d16fff4d5fda59f2","resources_js_pages_transaction_TableHeader_js":"71bd61b63f8df88b","resources_js_pages_user_Create_vue":"8565d61415e10bb1","resources_js_pages_user_Edit_vue":"5b5cef31f19e36e7","resources_js_pages_user_Index_vue":"912cdd6ab105e461","resources_js_pages_user_Show_vue":"51a29105fb8b704d","resources_js_pages_user_TableHeader_js":"c19ccf0fa7c2fb2b"}[chunkId] + "";
+/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_pages_Access_vue":"ff388458b67b06b1","resources_js_pages_auth_ForgotPassword_vue":"3554854765c279e7","resources_js_pages_auth_Login_vue":"9a1d539fb847ae14","resources_js_pages_auth_ResetPassword_vue":"e25203b18c22c6f4","resources_js_pages_auth_VerifyEmail_vue":"935e9a061613a89a","resources_js_pages_customer_Create_vue":"99d8dcb10b626c29","resources_js_pages_customer_Edit_vue":"ffe51567d91ad145","resources_js_pages_customer_Index_vue":"57014709184d45e8","resources_js_pages_customer_TableHeader_js":"be6685f342bbd7c2","resources_js_pages_laundry_Create_vue":"5ab299ce5c57e372","resources_js_pages_laundry_Edit_vue":"bb941d6433f6cd75","resources_js_pages_laundry_Index_vue":"64a8f23b0bab8a24","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_outlet_Create_vue":"5a329b8563af2d84","resources_js_pages_outlet_Edit_vue":"6b9122f99cb827d0","resources_js_pages_outlet_Index_vue":"642928174f191d2d","resources_js_pages_outlet_TableHeader_js":"960433b5f8e003c1","resources_js_pages_transaction_Create_vue":"aba9c9404c8de9e8","resources_js_pages_transaction_Index_vue":"3dfd62b94e3a4845","resources_js_pages_transaction_Show_vue":"6a1474aa7e19a671","resources_js_pages_transaction_TableHeader_js":"8b928867ad174e10","resources_js_pages_user_Create_vue":"9187c32de6be3cf9","resources_js_pages_user_Edit_vue":"e81791f4e2f1606c","resources_js_pages_user_Index_vue":"0c94e65297b602d8","resources_js_pages_user_Show_vue":"e6c28ada624c909b","resources_js_pages_user_TableHeader_js":"c19ccf0fa7c2fb2b"}[chunkId] + "";
 /******/ 		};
 /******/ 	})();
 /******/ 	

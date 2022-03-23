@@ -13,36 +13,36 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "TransactionBasketTable": () => (/* binding */ TransactionBasketTable)
 /* harmony export */ });
 var IndexTable = [{
-  field: 'transactionNumber',
-  header: 'Id Transaksi'
+  field: "transactionNumber",
+  header: "Id Transaksi"
 }, {
-  field: 'customer',
-  header: 'Id Customer'
+  field: "customer",
+  header: "Id Customer"
 }, {
-  field: 'price',
-  header: 'Harga'
+  field: "price",
+  header: "Total Harga"
 }, {
-  field: 'outlet',
-  header: 'Outlet'
+  field: "outlet",
+  header: "Outlet"
 }, {
-  field: 'transactionStatusName',
-  header: 'Status'
+  field: "transactionStatusName",
+  header: "Status"
 }];
 var TransactionBasketTable = [{
-  field: 'laundry',
-  header: 'Tipe Laundry'
+  field: "laundry",
+  header: "Tipe Laundry"
 }, {
-  field: 'discount',
-  header: 'Diskon'
+  field: "discount",
+  header: "Diskon"
 }, {
-  field: 'quantity',
-  header: 'Kuantitas'
+  field: "quantity",
+  header: "Kuantitas"
 }, {
-  field: 'price',
-  header: 'Harga'
+  field: "price",
+  header: "Harga"
 }, {
-  field: 'totalPrice',
-  header: 'Total Harga'
+  field: "totalPrice",
+  header: "Total Harga"
 }];
 
 /***/ })

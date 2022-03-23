@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Outlet\StoreOutletRequest;
 use App\Http\Requests\Outlet\UpdateOutletRequest;
 use App\Models\Outlet;
+use Illuminate\Support\Facades\Auth;
 
 class OutletController extends Controller
 {
@@ -16,6 +17,10 @@ class OutletController extends Controller
      */
     public function index()
     {
+        if (!Auth::user()->hasRole('Admin')) {
+            return inertia('Access');
+        }
+
         return inertia('outlet/Index', [
             'outlets' => Outlet::latest()
                 ->filter(request()->search)
@@ -38,6 +43,10 @@ class OutletController extends Controller
      */
     public function create()
     {
+        if (!Auth::user()->hasRole('Admin')) {
+            return inertia('Access');
+        }
+
         return inertia('outlet/Create', [
             'outlet_number' => 'OT' . now()->format('YmdHis'),
         ]);
@@ -75,6 +84,10 @@ class OutletController extends Controller
      */
     public function edit(Outlet $outlet)
     {
+        if (!Auth::user()->hasRole('Admin')) {
+            return inertia('Access');
+        }
+
         return inertia('outlet/Edit', [
             'outlet' => [
                 'id' => $outlet->id,

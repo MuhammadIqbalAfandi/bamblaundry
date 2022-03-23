@@ -1,71 +1,87 @@
 <script setup>
-import { ref } from 'vue'
-import { Inertia } from '@inertiajs/inertia'
-import { Head, useForm } from '@inertiajs/inertia-vue3'
-import AppButton from '@/components/AppButton.vue'
-import AppPagination from '@/components/AppPagination.vue'
-import AppMenu from '@/components/AppMenu.vue'
-import AppDropdown from '@/components/AppDropdown.vue'
-import AppLayout from '@/layouts/AppLayout.vue'
+import { ref } from "vue";
+import { Inertia } from "@inertiajs/inertia";
+import { Head, useForm } from "@inertiajs/inertia-vue3";
+import AppButton from "@/components/AppButton.vue";
+import AppPagination from "@/components/AppPagination.vue";
+import AppMenu from "@/components/AppMenu.vue";
+import AppDropdown from "@/components/AppDropdown.vue";
+import AppLayout from "@/layouts/AppLayout.vue";
 
-import { IndexTable } from './TableHeader'
+import { IndexTable } from "./TableHeader";
 
 const props = defineProps({
   transactions: Object,
   transactionsStatus: Array,
-})
+});
 
-const transactionId = ref()
+const transactionId = ref();
 
-const updateStatusDialog = ref(false)
+const updateStatusDialog = ref(false);
 
 const updateStatusForm = useForm({
   transaction_status_id: null,
-})
+});
 
 const updateStatusSubmit = () => {
-  updateStatusForm.put(route('transactions.update', transactionId.value), {
+  updateStatusForm.put(route("transactions.update", transactionId.value), {
     onSuccess: () => {
-      updateStatusDialog.value = false
+      updateStatusDialog.value = false;
     },
-  })
-}
+  });
+};
 
-const updateStatusItems = ref([])
+const updateStatusItems = ref([]);
 
-const overlayMenu = ref()
+const overlayMenu = ref();
 
-const overlayItems = ref([])
+const overlayItems = ref([]);
 
 const overlayToggle = (event, data) => {
-  overlayItems.value = [
-    {
-      label: 'Perbaharui status',
-      icon: 'pi pi-refresh',
-      command() {
-        updateStatusDialog.value = true
-      },
-    },
-    {
-      label: 'Lihat detail',
-      icon: 'pi pi-eye',
-      to: route('transactions.show', data.id),
-    },
-    {
-      label: 'Cetak ulang',
-      icon: 'pi pi-print',
-      command() {},
-    },
-  ]
+  overlayItems.value =
+    data.transactionStatusId == 4
+      ? [
+          {
+            label: "Lihat detail",
+            icon: "pi pi-eye",
+            to: route("transactions.show", data.id),
+          },
+          {
+            label: "Cetak ulang",
+            icon: "pi pi-print",
+            command() {},
+          },
+        ]
+      : [
+          {
+            label: "Perbaharui status",
+            icon: "pi pi-refresh",
+            command() {
+              updateStatusDialog.value = true;
+            },
+          },
+          {
+            label: "Lihat detail",
+            icon: "pi pi-eye",
+            to: route("transactions.show", data.id),
+          },
+          {
+            label: "Cetak ulang",
+            icon: "pi pi-print",
+            command() {},
+          },
+        ];
 
-  updateStatusItems.value = props.transactionsStatus.filter((val) => val.value >= data.transactionStatusId)
+  updateStatusItems.value = props.transactionsStatus.filter(
+    (val) => val.value >= data.transactionStatusId
+  );
 
-  updateStatusForm.transaction_status_id = data.transactionStatusId
+  updateStatusForm.transaction_status_id = data.transactionStatusId;
 
-  transactionId.value = data.id
+  transactionId.value = data.id;
 
-  overlayMenu.value.toggle(event)
-}
+  overlayMenu.value.toggle(event);
+};
 </script>
 
 <template>
@@ -108,8 +124,15 @@ const overlayToggle = (event, data) => {
       >
         <template #body="{ data, field }">
           <template v-if="field === 'transactionStatusName'">
-            <Badge v-if="data['transactionStatusId'] === 1" :value="data[field]"></Badge>
-            <Badge v-else-if="data['transactionStatusId'] === 2" :value="data[field]" severity="warning"></Badge>
+            <Badge
+              v-if="data['transactionStatusId'] === 1"
+              :value="data[field]"
+            ></Badge>
+            <Badge
+              v-else-if="data['transactionStatusId'] === 2"
+              :value="data[field]"
+              severity="warning"
+            ></Badge>
             <Badge v-else :value="data[field]" severity="success"></Badge>
           </template>
           <template v-else-if="field === 'customer'">
@@ -135,7 +158,12 @@ const overlayToggle = (event, data) => {
             aria-controls="overlay_menu"
             @click="overlayToggle($event, slotProps.data)"
           />
-          <AppMenu id="overlay_menu" ref="overlayMenu" :popup="true" :model="overlayItems" />
+          <AppMenu
+            id="overlay_menu"
+            ref="overlayMenu"
+            :popup="true"
+            :model="overlayItems"
+          />
         </template>
       </Column>
     </DataTable>
