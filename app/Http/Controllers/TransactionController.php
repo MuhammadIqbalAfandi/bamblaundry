@@ -13,6 +13,7 @@ use App\Models\TransactionStatus;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class TransactionController extends Controller
 {
@@ -126,6 +127,13 @@ class TransactionController extends Controller
             $thermalPrinting = new ThermalPrinting($transaction);
             $thermalPrinting->startPrinting(2);
 
+            $customer = Customer::find($request->customer_id);
+
+            Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
+                'receiver' => $customer->phone,
+                'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *'.$request->transaction_number.'*',
+            ]);
+
             return to_route('transactions.index')->with('success', __('Transaksi berhasil ditambahkan'));
         } catch (QueryException $e) {
             return back()->with('error', __('Penambahan transaksi gagal'));
@@ -193,6 +201,19 @@ class TransactionController extends Controller
     public function update(UpdateTransactionRequest $request, Transaction $transaction)
     {
         $transaction->update($request->validated());
+
+        if($transaction->transaction_status_id==2) {
+            $status_message = " sudah diproses, harap menunggu sampai pemberitahuan selanjutnya.";
+        } else if($transaction->transaction_status_id==3) {
+            $status_message = " sudah selesai, silahkan diambil.";
+        } else {
+            $status_message = " sudah diambil. Silahkan datang lagi di kemudian hari jika ingin laundry kembali, terima kasih.";
+        }
+
+        Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
+            'receiver' => $transaction->customer->phone,
+            'message' => 'Layanan laundry Anda dengan nomor transaksi *'.$transaction->transaction_number.'*'.$status_message,
+        ]);
 
         return back()->with('success', __('Transaksi berhasil diperbaharui'));
     }
