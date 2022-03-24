@@ -1026,7 +1026,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             onClick: $setup.submit,
             label: "Simpan",
-            icon: "pi pi-check"
+            icon: "pi pi-check",
+            "class": "p-button-text"
           })])];
         }),
         _: 1

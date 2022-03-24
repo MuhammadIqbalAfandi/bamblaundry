@@ -1157,7 +1157,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             modelValue: $setup.form.outlet_number,
             "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
               return $setup.form.outlet_number = $event;
-            })
+            }),
+            placeholder: "id outlet"
           }, null, 8
           /* PROPS */
           , ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
@@ -1213,7 +1214,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             onClick: $setup.submit,
             label: "Simpan",
-            icon: "pi pi-check"
+            icon: "pi pi-check",
+            "class": "p-button-text"
           })])];
         }),
         _: 1

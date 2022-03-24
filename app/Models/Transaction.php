@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Customer;
 use App\Models\Helpers\HasHelper;
+use App\Models\Mutation;
 use App\Models\Outlet;
 use App\Models\TransactionDetail;
 use App\Models\TransactionStatus;
@@ -63,6 +64,11 @@ class Transaction extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function mutations()
+    {
+        return $this->hasMany(Mutation::class);
     }
 
     public function scopeFilter($query, array $filters)

@@ -121,6 +121,12 @@ class TransactionController extends Controller
                 ]);
             }
 
+            $transaction->mutations()->create([
+                'type' => 1,
+                'amount' => $transaction->totalPrice(),
+                'outlet_id' => auth()->user()->outlet_id,
+            ]);
+
             DB::commit();
 
             $transaction = Transaction::latest()->first();
@@ -128,9 +134,9 @@ class TransactionController extends Controller
             $thermalPrinting = new ThermalPrinting($transaction);
             $thermalPrinting->startPrinting(2);
 
-            return to_route('transactions.index')->with('success', __('Transaksi berhasil ditambahkan'));
+            return to_route('transactions.index')->with('success', __('messages.success.store.transaction'));
         } catch (QueryException $e) {
-            return back()->with('error', __('Penambahan transaksi gagal'));
+            return back()->with('error', __('messages.error.store.transaction'));
 
             DB::rollBack();
         }
@@ -196,7 +202,7 @@ class TransactionController extends Controller
     {
         $transaction->update($request->validated());
 
-        return back()->with('success', __('Transaksi berhasil diperbaharui'));
+        return back()->with('success', __('messages.success.update.transaction_status'));
     }
 
     /**

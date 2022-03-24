@@ -49,7 +49,12 @@ watch(
           </div>
 
           <div class="col-12 md:col-4 flex justify-content-end">
-            <AppButton :href="route('laundries.create')" label="Tambah Laundry" icon="pi pi-pencil" />
+            <AppButton
+              :href="route('laundries.create')"
+              label="Tambah Laundry"
+              icon="pi pi-pencil"
+              class="p-button-text"
+            />
           </div>
         </div>
       </template>

@@ -1016,7 +1016,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["modelValue"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             href: _ctx.route('outlets.create'),
             label: "Tambah Outlet",
-            icon: "pi pi-pencil"
+            icon: "pi pi-pencil",
+            "class": "p-button-text"
           }, null, 8
           /* PROPS */
           , ["href"])])])];

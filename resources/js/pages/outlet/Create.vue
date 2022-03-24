@@ -30,7 +30,7 @@ const submit = () => {
           <template #content>
             <div class="grid">
               <div class="col-12 md:col-6">
-                <AppInputText :disabled="true" label="Id Outlet" v-model="form.outlet_number" />
+                <AppInputText :disabled="true" label="Id Outlet" v-model="form.outlet_number" placeholder="id outlet" />
               </div>
 
               <div class="col-12 md:col-6">
@@ -49,7 +49,7 @@ const submit = () => {
 
           <template #footer>
             <div class="flex justify-content-end">
-              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
             </div>
           </template>
         </Card>

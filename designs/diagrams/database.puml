@@ -94,8 +94,8 @@ entity Expense {
 }
 
 Mutation }|--|| Expense
-Mutation }|--|| Transaction
 Mutation ||--|{ Outlet
+Transaction }|--|| Mutation
 Transaction }|--|| TransactionDetail
 Transaction ||--|{ TransactionStatus
 Transaction ||--|{ Outlet

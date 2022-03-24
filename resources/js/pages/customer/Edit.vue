@@ -46,7 +46,12 @@ const onCancel = () => (visibleDialog.value = false)
           <template #content>
             <div class="grid">
               <div class="col-12 md:col-6">
-                <AppInputText :disabled="true" label="Id Customer" v-model="form.customer_number" />
+                <AppInputText
+                  :disabled="true"
+                  label="Id Customer"
+                  v-model="form.customer_number"
+                  placeholder="id customer"
+                />
               </div>
 
               <div class="col-12 md:col-6">
@@ -86,7 +91,7 @@ const onCancel = () => (visibleDialog.value = false)
 
               <Button label="Hapus" icon="pi pi-trash" class="p-button-text p-button-danger" @click="confirmDialog" />
 
-              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
             </div>
           </template>
         </Card>

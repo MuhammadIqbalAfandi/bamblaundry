@@ -1178,7 +1178,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             modelValue: $setup.form.customer_number,
             "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
               return $setup.form.customer_number = $event;
-            })
+            }),
+            placeholder: "id customer"
           }, null, 8
           /* PROPS */
           , ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
@@ -1228,7 +1229,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             onClick: $setup.submit,
             label: "Simpan",
-            icon: "pi pi-check"
+            icon: "pi pi-check",
+            "class": "p-button-text"
           })])];
         }),
         _: 1

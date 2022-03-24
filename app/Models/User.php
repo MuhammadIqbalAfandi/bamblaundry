@@ -59,7 +59,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function status(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $value ? __('Aktif') : __('Non Aktif'),
+            get:fn($value) => $value ? __('words.active') : __('words.not_active'),
         );
     }
 
