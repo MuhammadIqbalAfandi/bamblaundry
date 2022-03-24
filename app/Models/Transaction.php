@@ -70,9 +70,13 @@ class Transaction extends Model
         $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('transaction_number', 'like', '%' . $search . '%')
-                    ->orWhere('customer.customer_number', 'like', '%' . $search . '%')
-                    ->orWhere('phone', 'like', '%' . $search . '%');
+                    ->orWhereHas('customer', function ($query) use ($search) {
+                        $query->where('customer_number', 'like', '%' . $search . '%')
+                            ->orWhere('phone', 'like', '%' . $search . '%');
+                    });
             });
+        })->when($filters['dates'] ?? null, function ($query, $dates) {
+            $query->whereBetween('created_at', $dates);
         });
     }
 

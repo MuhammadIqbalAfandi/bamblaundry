@@ -12,7 +12,7 @@ import StyleClass from 'primevue/styleclass'
 import AutoComplete from 'primevue/autocomplete'
 import Badge from 'primevue/badge'
 import Button from 'primevue/button'
-import Calender from 'primevue/calendar'
+import Calendar from 'primevue/calendar'
 import Card from 'primevue/card'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
@@ -41,7 +41,7 @@ createInertiaApp({
       .component('Button', Button)
       .component('Badge', Badge)
       .component('Card', Card)
-      .component('Calender', Calender)
+      .component('Calendar', Calendar)
       .component('Column', Column)
       .component('DataTable', DataTable)
       .component('Dialog', Dialog)

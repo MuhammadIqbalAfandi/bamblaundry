@@ -28,9 +28,11 @@ class TransactionController extends Controller
         } else {
             $transactions = Transaction::where('outlet_id', Auth::user()->outlet_id)->latest();
         }
+
         return inertia('transaction/Index', [
+            'filters' => request()->all('search', 'dates'),
             'transactions' => $transactions
-                ->filter(request()->only(['search']))
+                ->filter(request()->only('search', 'dates'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($transaction) => [

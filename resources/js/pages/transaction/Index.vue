@@ -1,7 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm } from '@inertiajs/inertia-vue3'
+import throttle from 'lodash/throttle'
+import pickBy from 'lodash/pickBy'
 import AppButton from '@/components/AppButton.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import AppMenu from '@/components/AppMenu.vue'
@@ -13,7 +15,22 @@ import { IndexTable } from './TableHeader'
 const props = defineProps({
   transactions: Object,
   transactionsStatus: Array,
+  filters: Object,
 })
+
+const filterForm = useForm({
+  search: props.filters.search,
+  dates: props.filters.dates,
+})
+
+watch(
+  filterForm,
+  throttle(() => {
+    Inertia.get('/transactions', pickBy({ search: filterForm.search, dates: filterForm.dates }), {
+      preserveState: true,
+    })
+  }, 300)
+)
 
 const transactionId = ref()
 
@@ -37,6 +54,10 @@ const overlayMenu = ref()
 
 const overlayItems = ref([])
 
+const startPrinting = (transactionNumber) => {
+  Inertia.get(`/thermal-printing/${transactionNumber}`)
+}
+
 const overlayToggle = (event, data) => {
   overlayItems.value =
     data.transactionStatusId == 4
@@ -49,7 +70,9 @@ const overlayToggle = (event, data) => {
           {
             label: 'Cetak ulang',
             icon: 'pi pi-print',
-            command() {},
+            command() {
+              startPrinting(data.transactionNumber)
+            },
           },
         ]
       : [
@@ -69,7 +92,7 @@ const overlayToggle = (event, data) => {
             label: 'Cetak ulang',
             icon: 'pi pi-print',
             command() {
-              Inertia.get(`/thermal-printing/${data.transactionNumber}`)
+              startPrinting(data.transactionNumber)
             },
           },
         ]
@@ -96,16 +119,28 @@ const overlayToggle = (event, data) => {
       :stripedRows="true"
     >
       <template #header>
-        <div class="grid">
-          <div class="col-12 md:col-6">
-            <div class="flex align-items-center">
-              <h5 class="mr-3 mb-0">Transaksi</h5>
+        <h5>Transaksi</h5>
 
-              <InputText class="w-full md:w-27rem" placeholder="cari..." />
+        <div class="grid">
+          <div class="col-12 md:col-8">
+            <div class="flex flex-column md:flex-row">
+              <div class="flex align-items-center mr-0 md:mr-2 mb-2 md:mb-0">
+                <InputText class="w-full md:w-16rem" placeholder="cari..." v-model="filterForm.search" />
+              </div>
+
+              <Calendar
+                class="w-full md:w-16rem"
+                v-model="filterForm.dates"
+                selection-mode="range"
+                placeholder="filter waktu..."
+                date-format="dd/mm/yy"
+                :show-button-bar="true"
+                :manual-input="false"
+              />
             </div>
           </div>
 
-          <div class="col-12 md:col-6 flex justify-content-end">
+          <div class="col-12 md:col-4 flex justify-content-end">
             <AppButton
               label="Tambah Transaksi"
               class="p-button-text"

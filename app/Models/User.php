@@ -73,9 +73,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Outlet::class);
     }
 
-    public function scopeFilter($query, $search)
+    public function scopeFilter($query, $filters)
     {
-        $query->when($search ?? null, function ($query, $search) {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('phone', 'like', '%' . $search . '%')

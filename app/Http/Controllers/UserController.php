@@ -24,8 +24,9 @@ class UserController extends Controller
         }
 
         return inertia('user/Index', [
+            'filters' => request()->all('search'),
             'users' => User::latest()
-                ->filter(request()->search)
+                ->filter(request()->only('search'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($user) => [

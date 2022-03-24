@@ -1,14 +1,30 @@
 <script setup>
-import { Head, Link } from '@inertiajs/inertia-vue3'
+import { watch } from 'vue'
+import { Inertia } from '@inertiajs/inertia'
+import { Head, Link, useForm } from '@inertiajs/inertia-vue3'
+import throttle from 'lodash/throttle'
+import pickBy from 'lodash/pickBy'
 import AppButton from '@/components/AppButton.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 
 import TableHeader from './TableHeader'
 
-defineProps({
+const props = defineProps({
   laundries: Object,
+  filters: Object,
 })
+
+const filterForm = useForm({
+  search: props.filters.search,
+})
+
+watch(
+  filterForm,
+  throttle(() => {
+    Inertia.get('/laundries', pickBy({ search: filterForm.search }), { preserveState: true })
+  }, 300)
+)
 </script>
 
 <template>
@@ -23,16 +39,16 @@ defineProps({
       :stripedRows="true"
     >
       <template #header>
-        <div class="grid">
-          <div class="col-12 md:col-6">
-            <div class="flex align-items-center">
-              <h5 class="mr-3 mb-0">Laundry</h5>
+        <h5>Laundry</h5>
 
-              <InputText class="w-full md:w-27rem" placeholder="cari..." />
+        <div class="grid">
+          <div class="col-12 md:col-8">
+            <div class="flex align-items-center">
+              <InputText class="w-full md:w-27rem" placeholder="cari..." v-model="filterForm.search" />
             </div>
           </div>
 
-          <div class="col-12 md:col-6 flex justify-content-end">
+          <div class="col-12 md:col-4 flex justify-content-end">
             <AppButton :href="route('laundries.create')" label="Tambah Laundry" icon="pi pi-pencil" />
           </div>
         </div>

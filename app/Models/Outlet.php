@@ -16,14 +16,12 @@ class Outlet extends Model
         'address',
     ];
 
-    public function scopeFilter($query, $search)
+    public function scopeFilter($query, $filter)
     {
-        $query->when($search ?? null, function ($query, $search) {
+        $query->when($filter['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('outlet_number', 'like', '%' . $search . '%')
-                    ->orWhere('name', 'like', '%' . $search . '%')
-                    ->orWhere('phone', 'like', '%' . $search . '%')
-                    ->orWhere('address', 'like', '%' . $search . '%');
+                    ->orWhere('name', 'like', '%' . $search . '%');
             });
         });
     }

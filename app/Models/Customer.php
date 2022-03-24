@@ -25,9 +25,9 @@ class Customer extends Model
         );
     }
 
-    public function scopeFilter($query, $search)
+    public function scopeFilter($query, $filters)
     {
-        $query->when($search ?? null, function ($query, $search) {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('customer_number', 'like', '%' . $search . '%')
                     ->orWhere('name', 'like', '%' . $search . '%')
