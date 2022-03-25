@@ -293,9 +293,21 @@ __webpack_require__.r(__webpack_exports__);
       type: Number,
       "default": null
     },
+    currency: {
+      type: String,
+      "default": undefined
+    },
+    locale: {
+      type: String,
+      "default": undefined
+    },
     error: {
       type: String,
       "default": null
+    },
+    currencyDisplay: {
+      type: String,
+      "default": undefined
     }
   },
   emits: ['update:modelValue', 'blur'],
@@ -550,7 +562,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  emits: ["menu-toggle"],
+  emits: ['menu-toggle'],
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
@@ -782,10 +794,6 @@ __webpack_require__.r(__webpack_exports__);
 
     var transactionBasketOnClick = function transactionBasketOnClick() {
       form.clearErrors();
-
-      if (!form.customer_id.id) {
-        form.setError('customer_id', 'Customer tidak boleh kosong');
-      }
 
       if (!form.laundry_id.id) {
         form.setError('laundry_id', 'Tipe laundry tidak boleh kosong');
@@ -1155,6 +1163,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       'p-invalid': $setup.isError
     }]),
     "input-class": "w-full",
+    currency: $props.currency,
+    "currency-display": $props.currencyDisplay,
+    locale: $props.locale,
     id: $setup.forLabel,
     "aria-describedby": $setup.ariaDescribedbyLabel,
     type: $props.type,
@@ -1182,7 +1193,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, null, 8
   /* PROPS */
-  , ["class", "id", "aria-describedby", "type", "placeholder", "model-value", "disabled", "prefix", "suffix", "step", "min", "max", "mode", "use-grouping", "show-buttons", "button-layout", "increment-button-class", "decrement-button-class", "increment-button-icon", "decrement-button-icon"]), $props.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
+  , ["currency", "currency-display", "locale", "class", "id", "aria-describedby", "type", "placeholder", "model-value", "disabled", "prefix", "suffix", "step", "min", "max", "mode", "use-grouping", "show-buttons", "button-layout", "increment-button-class", "decrement-button-class", "increment-button-icon", "decrement-button-icon"]), $props.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
     key: 0,
     id: $setup.ariaDescribedbyLabel,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({
@@ -1506,8 +1517,10 @@ var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
   alt: "Logo",
   src: "/images/logo.png",
-  "class": "mr-3"
-}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "BAMB'S LAUNDRY")], -1
+  "class": "md:mr-3"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "md:block hidden"
+}, "BAMB'S LAUNDRY")], -1
 /* HOISTED */
 );
 
@@ -2047,7 +2060,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             label: "Simpan Transaksi",
             icon: "pi pi-check",
             "class": "p-button-text",
-            disabled: $setup.form.processing || $setup.transactionBasket.length === 0,
+            disabled: $setup.form.processing || $setup.transactionBasket.length === 0 || Object.keys($setup.form.customer_id).length === 0,
             onClick: $setup.submit
           }, null, 8
           /* PROPS */
@@ -2234,13 +2247,13 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-shopping-cart',
     to: '/transactions'
   }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    to: '/mutations'
-  }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
     to: '/expenses'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }]
 }, {
   label: 'Master',
@@ -2274,13 +2287,13 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-shopping-cart',
     to: '/transactions'
   }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    to: '/mutations'
-  }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
     to: '/expenses'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }]
 }, {
   label: 'Master',

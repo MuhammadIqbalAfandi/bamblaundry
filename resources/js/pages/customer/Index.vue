@@ -68,13 +68,11 @@ watch(
 
       <Column>
         <template #body="{ data }">
-          <Link
-            as="button"
+          <AppButton
+            icon="pi pi-angle-double-right"
+            class="p-button-icon-only p-button-rounded p-button-text"
             :href="route('customers.edit', data.id)"
-            class="p-button p-component p-button-icon-only p-button-rounded p-button-text"
-          >
-            <i class="pi pi-angle-double-right p-button-icon"></i>
-          </Link>
+          />
         </template>
       </Column>
     </DataTable>

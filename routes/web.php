@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LaundryController;
+use App\Http\Controllers\MutationController;
 use App\Http\Controllers\OutletController;
 use App\Http\Controllers\ThermalPrintingController;
 use App\Http\Controllers\TransactionController;
@@ -32,6 +34,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/laundries', LaundryController::class);
 
     Route::resource('/transactions', TransactionController::class);
+
+    Route::resource('/expenses', ExpenseController::class);
+
+    Route::resource('/mutations', MutationController::class);
 
     Route::get('/thermal-printing/{transaction:transaction_number}', ThermalPrintingController::class);
 });

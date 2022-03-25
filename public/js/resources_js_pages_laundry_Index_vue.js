@@ -225,7 +225,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  emits: ["menu-toggle"],
+  emits: ['menu-toggle'],
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
@@ -792,8 +792,10 @@ var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
   alt: "Logo",
   src: "/images/logo.png",
-  "class": "mr-3"
-}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "BAMB'S LAUNDRY")], -1
+  "class": "md:mr-3"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "md:block hidden"
+}, "BAMB'S LAUNDRY")], -1
 /* HOISTED */
 );
 
@@ -978,13 +980,6 @@ var _hoisted_4 = {
 var _hoisted_5 = {
   "class": "col-12 md:col-4 flex justify-content-end"
 };
-
-var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "pi pi-angle-double-right p-button-icon"
-}, null, -1
-/* HOISTED */
-);
-
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_InputText = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("InputText");
 
@@ -1036,19 +1031,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Column, null, {
             body: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref) {
               var data = _ref.data;
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["Link"], {
-                as: "button",
-                href: _ctx.route('laundries.edit', data.id),
-                "class": "p-button p-component p-button-icon-only p-button-rounded p-button-text"
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [_hoisted_6];
-                }),
-                _: 2
-                /* DYNAMIC */
-
-              }, 1032
-              /* PROPS, DYNAMIC_SLOTS */
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
+                icon: "pi pi-angle-double-right",
+                "class": "p-button-icon-only p-button-rounded p-button-text",
+                href: _ctx.route('laundries.edit', data.id)
+              }, null, 8
+              /* PROPS */
               , ["href"])];
             }),
             _: 1
@@ -1119,13 +1107,13 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-shopping-cart',
     to: '/transactions'
   }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    to: '/mutations'
-  }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
     to: '/expenses'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }]
 }, {
   label: 'Master',
@@ -1160,13 +1148,13 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-shopping-cart',
     to: '/transactions'
   }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    to: '/mutations'
-  }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
     to: '/expenses'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }]
 }, {
   label: 'Master',

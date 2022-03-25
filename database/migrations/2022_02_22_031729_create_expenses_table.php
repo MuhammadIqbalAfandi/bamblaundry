@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->string('expense_number');
             $table->text('description');
             $table->unsignedBigInteger('amount');
             $table->foreignId('user_id')->constrained();

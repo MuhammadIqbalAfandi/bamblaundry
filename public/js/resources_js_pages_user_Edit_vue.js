@@ -386,7 +386,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  emits: ["menu-toggle"],
+  emits: ['menu-toggle'],
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
@@ -1132,8 +1132,10 @@ var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
   alt: "Logo",
   src: "/images/logo.png",
-  "class": "mr-3"
-}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "BAMB'S LAUNDRY")], -1
+  "class": "md:mr-3"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "md:block hidden"
+}, "BAMB'S LAUNDRY")], -1
 /* HOISTED */
 );
 
@@ -1473,13 +1475,13 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-shopping-cart',
     to: '/transactions'
   }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    to: '/mutations'
-  }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
     to: '/expenses'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }]
 }, {
   label: 'Master',
@@ -1513,13 +1515,13 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-shopping-cart',
     to: '/transactions'
   }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    to: '/mutations'
-  }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
     to: '/expenses'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }]
 }, {
   label: 'Master',

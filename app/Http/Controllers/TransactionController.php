@@ -44,7 +44,7 @@ class TransactionController extends Controller
                         'name' => $transaction->customer->name,
                         'phone' => $transaction->customer->phone,
                     ],
-                    'price' => $transaction->totalPriceAsString(),
+                    'price' => $transaction->totalPriceAsFullString(),
                     'outlet' => $transaction->outlet->name,
                     'transactionStatusName' => $transaction->transactionStatus->name,
                     'transactionStatusId' => $transaction->transactionStatus->id,
@@ -124,7 +124,7 @@ class TransactionController extends Controller
             $transaction->mutations()->create([
                 'type' => 1,
                 'amount' => $transaction->totalPrice(),
-                'outlet_id' => auth()->user()->outlet_id,
+                'outlet_id' => $request->user()->outlet_id,
             ]);
 
             DB::commit();
@@ -156,7 +156,7 @@ class TransactionController extends Controller
                 'statusId' => $transaction->transactionStatus->id,
                 'status' => $transaction->transactionStatus->name,
                 'discount' => $transaction->discount,
-                'price' => $transaction->totalPriceAsString(),
+                'price' => $transaction->totalPriceAsFullString(),
                 'dateLaundry' => $transaction->created_at,
             ],
             'customer' => [
@@ -171,11 +171,11 @@ class TransactionController extends Controller
             ],
             'transactionDetails' => $transaction->transactionDetails
                 ->transform(fn($transactionDetail) => [
-                    'laundry' => "{$transactionDetail->laundry->name} {$transactionDetail->laundry->price}/{$transactionDetail->laundry->unit}",
+                    'laundry' => "{$transactionDetail->laundry->name} {$transactionDetail->laundry->getRawOriginal('price')}/{$transactionDetail->laundry->unit}",
                     'quantity' => $transactionDetail->quantity,
                     'discount' => $transactionDetail->discount,
                     'price' => $transactionDetail->price,
-                    'totalPrice' => $transactionDetail->totalPriceAsString(),
+                    'totalPrice' => $transactionDetail->totalPriceAsFullString(),
                 ]),
         ]);
     }

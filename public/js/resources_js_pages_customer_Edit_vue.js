@@ -386,7 +386,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  emits: ["menu-toggle"],
+  emits: ['menu-toggle'],
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
@@ -536,6 +536,12 @@ __webpack_require__.r(__webpack_exports__);
       form.put(route('customers.update', props.customer.id));
     };
 
+    var errors = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
+      return (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.usePage)().props.value.errors;
+    });
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.watch)(errors, function () {
+      form.clearErrors();
+    });
     var visibleDialog = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
 
     var confirmDialog = function confirmDialog() {
@@ -554,14 +560,18 @@ __webpack_require__.r(__webpack_exports__);
       props: props,
       form: form,
       submit: submit,
+      errors: errors,
       visibleDialog: visibleDialog,
       confirmDialog: confirmDialog,
       onAgree: onAgree,
       onCancel: onCancel,
       ref: vue__WEBPACK_IMPORTED_MODULE_0__.ref,
+      watch: vue__WEBPACK_IMPORTED_MODULE_0__.watch,
+      computed: vue__WEBPACK_IMPORTED_MODULE_0__.computed,
       Inertia: _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_1__.Inertia,
       Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.Head,
       useForm: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm,
+      usePage: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.usePage,
       AppButton: _components_AppButton_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
       AppDropdown: _components_AppDropdown_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
       AppInputText: _components_AppInputText_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
@@ -1118,8 +1128,10 @@ var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
   alt: "Logo",
   src: "/images/logo.png",
-  "class": "mr-3"
-}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "BAMB'S LAUNDRY")], -1
+  "class": "md:mr-3"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "md:block hidden"
+}, "BAMB'S LAUNDRY")], -1
 /* HOISTED */
 );
 
@@ -1420,13 +1432,13 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-shopping-cart',
     to: '/transactions'
   }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    to: '/mutations'
-  }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
     to: '/expenses'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }]
 }, {
   label: 'Master',
@@ -1460,13 +1472,13 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-shopping-cart',
     to: '/transactions'
   }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    to: '/mutations'
-  }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
     to: '/expenses'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }]
 }, {
   label: 'Master',

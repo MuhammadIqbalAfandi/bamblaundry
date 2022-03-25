@@ -24,7 +24,6 @@ class StoreOutletRequest extends FormRequest
     public function rules()
     {
         return [
-            'outlet_number' => 'required|string',
             'name' => 'required|string|max:50',
             'phone' => 'required|numeric|min:12|unique:users,phone',
             'address' => 'required|string|max:100',

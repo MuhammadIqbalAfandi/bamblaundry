@@ -1,5 +1,6 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/inertia-vue3'
+import { watch, computed } from 'vue'
+import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppButton from '@/components/AppButton.vue'
 import AppDropdown from '@/components/AppDropdown.vue'
 import AppInputText from '@/components/AppInputText.vue'
@@ -20,6 +21,12 @@ const form = useForm({
 const submit = () => {
   form.post(route('customers.store'))
 }
+
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
 </script>
 
 <template>

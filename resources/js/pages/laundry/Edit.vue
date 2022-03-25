@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
-import { Head, useForm } from '@inertiajs/inertia-vue3'
+import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppButton from '@/components/AppButton.vue'
 import AppInputText from '@/components/AppInputText.vue'
 import AppDialog from '@/components/AppDialog.vue'
@@ -20,6 +20,12 @@ const form = useForm({
 const submit = () => {
   form.put(route('laundries.update', props.laundry.id))
 }
+
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
 
 const visibleDialog = ref(false)
 

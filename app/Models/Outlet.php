@@ -10,7 +10,6 @@ class Outlet extends Model
     use HasFactory;
 
     protected $fillable = [
-        'outlet_number',
         'name',
         'phone',
         'address',
@@ -19,10 +18,7 @@ class Outlet extends Model
     public function scopeFilter($query, $filter)
     {
         $query->when($filter['search'] ?? null, function ($query, $search) {
-            $query->where(function ($query) use ($search) {
-                $query->where('outlet_number', 'like', '%' . $search . '%')
-                    ->orWhere('name', 'like', '%' . $search . '%');
-            });
+            $query->where('name', 'like', '%' . $search . '%');
         });
     }
 }

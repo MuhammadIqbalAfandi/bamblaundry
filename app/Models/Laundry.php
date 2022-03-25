@@ -34,7 +34,7 @@ class Laundry extends Model
     protected function price(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $this->setRupiahFormat($value)
+            get:fn($value) => $this->setRupiahFormat($value, 2, true)
         );
     }
 

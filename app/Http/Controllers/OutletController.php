@@ -29,7 +29,6 @@ class OutletController extends Controller
                 ->withQueryString()
                 ->through(fn($outlet) => [
                     'id' => $outlet->id,
-                    'outlet_number' => $outlet->outlet_number,
                     'name' => $outlet->name,
                     'phone' => $outlet->phone,
                     'address' => $outlet->address,
@@ -48,9 +47,7 @@ class OutletController extends Controller
             return inertia('Access');
         }
 
-        return inertia('outlet/Create', [
-            'outlet_number' => 'OT' . now()->format('YmdHis'),
-        ]);
+        return inertia('outlet/Create');
     }
 
     /**
@@ -92,7 +89,6 @@ class OutletController extends Controller
         return inertia('outlet/Edit', [
             'outlet' => [
                 'id' => $outlet->id,
-                'outlet_number' => $outlet->outlet_number,
                 'name' => $outlet->name,
                 'phone' => $outlet->phone,
                 'address' => $outlet->address,

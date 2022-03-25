@@ -1,5 +1,6 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/inertia-vue3'
+import { watch, computed } from 'vue'
+import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppButton from '@/components/AppButton.vue'
 import AppInputText from '@/components/AppInputText.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
@@ -9,7 +10,6 @@ const props = defineProps({
 })
 
 const form = useForm({
-  outlet_number: props.outlet_number,
   name: '',
   phone: '',
   address: '',
@@ -18,6 +18,12 @@ const form = useForm({
 const submit = () => {
   form.post(route('outlets.store'))
 }
+
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
 </script>
 
 <template>
@@ -29,10 +35,6 @@ const submit = () => {
         <Card>
           <template #content>
             <div class="grid">
-              <div class="col-12 md:col-6">
-                <AppInputText :disabled="true" label="Id Outlet" v-model="form.outlet_number" placeholder="id outlet" />
-              </div>
-
               <div class="col-12 md:col-6">
                 <AppInputText label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
               </div>

@@ -24,7 +24,6 @@ class UpdateOutletRequest extends FormRequest
     public function rules()
     {
         return [
-            'outlet_number' => 'required|string|unique:outlets,outlet_number,' . $this->outlet->id,
             'name' => 'required|string|max:50',
             'phone' => 'required|numeric|min:12|unique:outlets,phone,' . $this->outlet->id,
             'address' => 'required|string|max:100',

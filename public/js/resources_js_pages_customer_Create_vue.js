@@ -342,7 +342,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  emits: ["menu-toggle"],
+  emits: ['menu-toggle'],
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
@@ -456,11 +456,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
-/* harmony import */ var _components_AppButton_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/components/AppButton.vue */ "./resources/js/components/AppButton.vue");
-/* harmony import */ var _components_AppDropdown_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/components/AppDropdown.vue */ "./resources/js/components/AppDropdown.vue");
-/* harmony import */ var _components_AppInputText_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/components/AppInputText.vue */ "./resources/js/components/AppInputText.vue");
-/* harmony import */ var _layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/layouts/AppLayout.vue */ "./resources/js/layouts/AppLayout.vue");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+/* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
+/* harmony import */ var _components_AppButton_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/components/AppButton.vue */ "./resources/js/components/AppButton.vue");
+/* harmony import */ var _components_AppDropdown_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/components/AppDropdown.vue */ "./resources/js/components/AppDropdown.vue");
+/* harmony import */ var _components_AppInputText_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/components/AppInputText.vue */ "./resources/js/components/AppInputText.vue");
+/* harmony import */ var _layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/layouts/AppLayout.vue */ "./resources/js/layouts/AppLayout.vue");
+
 
 
 
@@ -475,7 +477,7 @@ __webpack_require__.r(__webpack_exports__);
     var expose = _ref.expose;
     expose();
     var props = __props;
-    var form = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__.useForm)({
+    var form = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm)({
       customer_number: props.customer_number,
       name: '',
       phone: '',
@@ -486,16 +488,26 @@ __webpack_require__.r(__webpack_exports__);
       form.post(route('customers.store'));
     };
 
+    var errors = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
+      return (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.usePage)().props.value.errors;
+    });
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.watch)(errors, function () {
+      form.clearErrors();
+    });
     var __returned__ = {
       props: props,
       form: form,
       submit: submit,
-      Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__.Head,
-      useForm: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__.useForm,
-      AppButton: _components_AppButton_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-      AppDropdown: _components_AppDropdown_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-      AppInputText: _components_AppInputText_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
-      AppLayout: _layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_4__["default"]
+      errors: errors,
+      watch: vue__WEBPACK_IMPORTED_MODULE_0__.watch,
+      computed: vue__WEBPACK_IMPORTED_MODULE_0__.computed,
+      Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.Head,
+      useForm: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm,
+      usePage: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.usePage,
+      AppButton: _components_AppButton_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+      AppDropdown: _components_AppDropdown_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
+      AppInputText: _components_AppInputText_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
+      AppLayout: _layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_5__["default"]
     };
     Object.defineProperty(__returned__, '__isScriptSetup', {
       enumerable: false,
@@ -968,8 +980,10 @@ var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
   alt: "Logo",
   src: "/images/logo.png",
-  "class": "mr-3"
-}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "BAMB'S LAUNDRY")], -1
+  "class": "md:mr-3"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "md:block hidden"
+}, "BAMB'S LAUNDRY")], -1
 /* HOISTED */
 );
 
@@ -1251,13 +1265,13 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-shopping-cart',
     to: '/transactions'
   }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    to: '/mutations'
-  }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
     to: '/expenses'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }]
 }, {
   label: 'Master',
@@ -1291,13 +1305,13 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-shopping-cart',
     to: '/transactions'
   }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    to: '/mutations'
-  }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
     to: '/expenses'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }]
 }, {
   label: 'Master',

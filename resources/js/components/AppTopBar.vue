@@ -1,20 +1,17 @@
 <script setup>
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from '@inertiajs/inertia-vue3'
 
-defineEmits(["menu-toggle"]);
+defineEmits(['menu-toggle'])
 </script>
 
 <template>
   <div class="layout-topbar">
     <div class="layout-topbar-logo">
-      <img alt="Logo" src="/images/logo.png" class="mr-3" />
-      <span>BAMB'S LAUNDRY</span>
+      <img alt="Logo" src="/images/logo.png" class="md:mr-3" />
+      <span class="md:block hidden">BAMB'S LAUNDRY</span>
     </div>
 
-    <button
-      class="p-link layout-menu-button layout-topbar-button"
-      @click="$emit('menu-toggle')"
-    >
+    <button class="p-link layout-menu-button layout-topbar-button" @click="$emit('menu-toggle')">
       <i class="pi pi-bars"></i>
     </button>
 

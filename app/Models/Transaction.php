@@ -101,6 +101,11 @@ class Transaction extends Model
         return $this->setRupiahFormat($this->totalPrice());
     }
 
+    public function totalPriceAsFullString()
+    {
+        return $this->setRupiahFormat($this->totalPrice(), 2, true);
+    }
+
     public function subTotal()
     {
         $subTotal = $this->transactionDetails->sum(function ($transactionDetail) {

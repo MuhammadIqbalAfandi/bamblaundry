@@ -107,10 +107,6 @@ const transactionBasket = reactive([])
 const transactionBasketOnClick = () => {
   form.clearErrors()
 
-  if (!form.customer_id.id) {
-    form.setError('customer_id', 'Customer tidak boleh kosong')
-  }
-
   if (!form.laundry_id.id) {
     form.setError('laundry_id', 'Tipe laundry tidak boleh kosong')
   }
@@ -373,7 +369,9 @@ const transactionPriceTotal = () => {
                 label="Simpan Transaksi"
                 icon="pi pi-check"
                 class="p-button-text"
-                :disabled="form.processing || transactionBasket.length === 0"
+                :disabled="
+                  form.processing || transactionBasket.length === 0 || Object.keys(form.customer_id).length === 0
+                "
                 @click="submit"
               />
             </div>

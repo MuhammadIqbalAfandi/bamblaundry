@@ -15,7 +15,6 @@ class OutletSeeder extends Seeder
     public function run()
     {
         Outlet::create([
-            'outlet_number' => 'OT' . now()->format('YmdHis'),
             'name' => 'Semua Outlet',
             'address' => '',
             'phone' => '',

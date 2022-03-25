@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('phone')->unique();
             $table->string('email')->unique();
-            $table->boolean('status')->default(true);
+            $table->boolean('status')->default(true); // true(active) false(not active)
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->default(bcrypt('12345678'));
-            $table->enum('gender_id', [1, 2]);
+            $table->enum('gender_id', [1, 2]); // 1(female) 2(male)
             $table->foreignId('role_id')->constrained();
             $table->foreignId('outlet_id')->constrained();
             $table->rememberToken();

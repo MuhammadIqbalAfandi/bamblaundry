@@ -15,5 +15,7 @@ return [
     'not_active' => 'Tidak aktif',
     'male' => 'Laki-laki',
     'female' => 'Perempuan',
+    'income' => 'Pendapatan',
+    'expense' => 'Pengeluaran',
 
 ];

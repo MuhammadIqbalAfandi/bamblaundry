@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('customer_number');
             $table->string('name');
             $table->string('phone');
-            $table->enum('gender_id', [1, 2]);
+            $table->enum('gender_id', [1, 2]); // 1(female) 2(male)
             $table->timestamps();
         });
     }
