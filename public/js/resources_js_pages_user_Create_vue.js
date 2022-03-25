@@ -481,7 +481,6 @@ __webpack_require__.r(__webpack_exports__);
       name: '',
       phone: '',
       email: '',
-      address: '',
       gender_id: '',
       outlet_id: '',
       role_id: ''
@@ -1177,9 +1176,6 @@ var _hoisted_9 = {
   "class": "col-12 md:col-6"
 };
 var _hoisted_10 = {
-  "class": "col-12 md:col-6"
-};
-var _hoisted_11 = {
   "class": "flex justify-content-end"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -1221,43 +1217,33 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             })
           }, null, 8
           /* PROPS */
-          , ["error", "modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
-            label: "Alamat",
-            placeholder: "alamat",
-            error: $setup.form.errors.address,
-            modelValue: $setup.form.address,
-            "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
-              return $setup.form.address = $event;
-            })
-          }, null, 8
-          /* PROPS */
-          , ["error", "modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
+          , ["error", "modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
             label: "Jenis Kelamin",
             placeholder: "pilih satu",
             modelValue: $setup.form.gender_id,
-            "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
+            "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
               return $setup.form.gender_id = $event;
             }),
             options: $props.genders,
             error: $setup.form.errors.gender_id
           }, null, 8
           /* PROPS */
-          , ["modelValue", "options", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
+          , ["modelValue", "options", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
             label: "Hak Akses",
             placeholder: "pilih satu",
             modelValue: $setup.form.role_id,
-            "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
+            "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
               return $setup.form.role_id = $event;
             }),
             options: $props.roles,
             error: $setup.form.errors.role_id
           }, null, 8
           /* PROPS */
-          , ["modelValue", "options", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
+          , ["modelValue", "options", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
             label: "Outlet",
             placeholder: "pilih satu",
             modelValue: $setup.form.outlet_id,
-            "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+            "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
               return $setup.form.outlet_id = $event;
             }),
             options: $props.outlets,
@@ -1267,7 +1253,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["modelValue", "options", "error"])])])];
         }),
         footer: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             label: "Simpan",
             onClick: $setup.submit,
             icon: "pi pi-check",
@@ -1300,30 +1286,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
-  label: "Menu",
+  label: 'Menu',
   items: [{
-    label: "Transaksi",
-    icon: "pi pi-shopping-cart",
-    to: "/transactions"
+    label: 'Transaksi',
+    icon: 'pi pi-shopping-cart',
+    to: '/transactions'
   }, {
-    label: "Laporan",
-    icon: "pi pi-book",
-    to: "/invoices"
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }, {
-    label: "Pengeluaran",
-    icon: "pi pi-wallet",
-    to: "/expenses"
+    label: 'Pengeluaran',
+    icon: 'pi pi-wallet',
+    to: '/expenses'
   }]
 }, {
-  label: "Master",
+  label: 'Master',
   items: [{
-    label: "Customer",
-    icon: "pi pi-users",
-    to: "/customers"
+    label: 'Customer',
+    icon: 'pi pi-users',
+    to: '/customers'
   }, {
-    label: "Laundry",
-    icon: "pi pi-table",
-    to: "/laundries"
+    label: 'Laundry',
+    icon: 'pi pi-table',
+    to: '/laundries'
   }]
 }]);
 
@@ -1340,38 +1326,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
-  label: "Menu",
+  label: 'Menu',
   items: [{
-    label: "Transaksi",
-    icon: "pi pi-shopping-cart",
-    to: "/transactions"
+    label: 'Transaksi',
+    icon: 'pi pi-shopping-cart',
+    to: '/transactions'
   }, {
-    label: "Laporan",
-    icon: "pi pi-book",
-    to: "/invoices"
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }, {
-    label: "Pengeluaran",
-    icon: "pi pi-wallet",
-    to: "/expenses"
+    label: 'Pengeluaran',
+    icon: 'pi pi-wallet',
+    to: '/expenses'
   }]
 }, {
-  label: "Master",
+  label: 'Master',
   items: [{
-    label: "User",
-    icon: "pi pi-user",
-    to: "/users"
+    label: 'User',
+    icon: 'pi pi-user',
+    to: '/users'
   }, {
-    label: "Customer",
-    icon: "pi pi-users",
-    to: "/customers"
+    label: 'Customer',
+    icon: 'pi pi-users',
+    to: '/customers'
   }, {
-    label: "Outlet",
-    icon: "pi pi-share-alt",
-    to: "/outlets"
+    label: 'Outlet',
+    icon: 'pi pi-share-alt',
+    to: '/outlets'
   }, {
-    label: "Laundry",
-    icon: "pi pi-table",
-    to: "/laundries"
+    label: 'Laundry',
+    icon: 'pi pi-table',
+    to: '/laundries'
   }]
 }]);
 

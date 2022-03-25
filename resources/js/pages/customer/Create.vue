@@ -14,7 +14,6 @@ const form = useForm({
   customer_number: props.customer_number,
   name: '',
   phone: '',
-  address: '',
   gender_id: '',
 })
 
@@ -47,10 +46,6 @@ const submit = () => {
 
               <div class="col-12 md:col-6">
                 <AppInputText label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
-              </div>
-
-              <div class="col-12 md:col-6">
-                <AppInputText label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
               </div>
 
               <div class="col-12 md:col-6">

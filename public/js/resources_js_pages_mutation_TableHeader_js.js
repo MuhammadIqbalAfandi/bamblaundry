@@ -1,9 +1,9 @@
 "use strict";
-(self["webpackChunk"] = self["webpackChunk"] || []).push([["resources_js_pages_customer_TableHeader_js"],{
+(self["webpackChunk"] = self["webpackChunk"] || []).push([["resources_js_pages_mutation_TableHeader_js"],{
 
-/***/ "./resources/js/pages/customer/TableHeader.js":
+/***/ "./resources/js/pages/mutation/TableHeader.js":
 /*!****************************************************!*\
-  !*** ./resources/js/pages/customer/TableHeader.js ***!
+  !*** ./resources/js/pages/mutation/TableHeader.js ***!
   \****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -12,17 +12,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
-  field: 'customer_number',
-  header: 'Id Customer'
+  field: 'created_at',
+  header: 'Tanggal'
 }, {
-  field: 'name',
-  header: 'Nama'
+  field: 'income',
+  header: 'Pemasukan'
 }, {
-  field: 'phone',
-  header: 'HP'
+  field: 'expense',
+  header: 'Pengeluaran'
 }, {
-  field: 'gender',
-  header: 'Jenis Kelamin'
+  field: 'outlet',
+  header: 'Outlet'
 }]);
 
 /***/ })

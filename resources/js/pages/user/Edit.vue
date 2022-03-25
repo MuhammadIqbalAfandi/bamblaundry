@@ -19,7 +19,6 @@ const form = useForm({
   name: props.user.name,
   phone: props.user.phone,
   email: props.user.email,
-  address: props.user.address,
   gender_id: props.user.gender_id,
   outlet_id: props.user.outlet_id,
   role_id: props.user.role_id,
@@ -65,10 +64,6 @@ watch(errors, () => {
 
               <div class="col-12 md:col-6">
                 <AppInputText label="Email" placeholder="email" :error="form.errors.email" v-model="form.email" />
-              </div>
-
-              <div class="col-12 md:col-6">
-                <AppInputText label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
               </div>
 
               <div class="col-12 md:col-6">

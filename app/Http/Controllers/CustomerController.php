@@ -27,7 +27,6 @@ class CustomerController extends Controller
                     'customer_number' => $customer->customer_number,
                     'name' => $customer->name,
                     'phone' => $customer->phone,
-                    'address' => $customer->address,
                     'gender' => $customer->gender_id,
                 ]),
         ]);
@@ -91,7 +90,6 @@ class CustomerController extends Controller
                 'customer_number' => $customer->customer_number,
                 'name' => $customer->name,
                 'phone' => $customer->phone,
-                'address' => $customer->address,
                 'gender_id' => $customer->getRawOriginal('gender_id'),
             ],
             'genders' => [

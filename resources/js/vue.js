@@ -28,6 +28,7 @@ import Ripple from 'primevue/ripple'
 import Tooltip from 'primevue/tooltip'
 
 createInertiaApp({
+  title: (title) => `${title} - Bamb's Laundry`,
   resolve: (name) => import(`./pages/${name}`),
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(App, props) })

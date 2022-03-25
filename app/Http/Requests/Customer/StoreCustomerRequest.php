@@ -27,7 +27,6 @@ class StoreCustomerRequest extends FormRequest
             'customer_number' => 'required|string',
             'name' => 'required|string|max:50',
             'phone' => 'required|numeric|min:12|unique:customers,phone',
-            'address' => 'required|string|max:100',
             'gender_id' => 'required|integer',
         ];
 

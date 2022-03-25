@@ -17,7 +17,6 @@ const form = useForm({
   customer_number: props.customer.customer_number,
   name: props.customer.name,
   phone: props.customer.phone,
-  address: props.customer.address,
   gender_id: props.customer.gender_id,
 })
 
@@ -60,10 +59,6 @@ const onCancel = () => (visibleDialog.value = false)
 
               <div class="col-12 md:col-6">
                 <AppInputText label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
-              </div>
-
-              <div class="col-12 md:col-6">
-                <AppInputText label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
               </div>
 
               <div class="col-12 md:col-6">

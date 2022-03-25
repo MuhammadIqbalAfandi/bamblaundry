@@ -45,7 +45,7 @@ class TransactionDetail extends Model
         return $this->belongsTo(Laundry::class);
     }
 
-    public function totalPrice()
+    public function totalPriceAsString()
     {
         $price = $this->getRawOriginal('price') * $this->quantity;
         $totalPrice = $price - $price * ($this->getRawOriginal('discount') / 100);

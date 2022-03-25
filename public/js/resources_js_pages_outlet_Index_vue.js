@@ -1116,30 +1116,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
-  label: "Menu",
+  label: 'Menu',
   items: [{
-    label: "Transaksi",
-    icon: "pi pi-shopping-cart",
-    to: "/transactions"
+    label: 'Transaksi',
+    icon: 'pi pi-shopping-cart',
+    to: '/transactions'
   }, {
-    label: "Laporan",
-    icon: "pi pi-book",
-    to: "/invoices"
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }, {
-    label: "Pengeluaran",
-    icon: "pi pi-wallet",
-    to: "/expenses"
+    label: 'Pengeluaran',
+    icon: 'pi pi-wallet',
+    to: '/expenses'
   }]
 }, {
-  label: "Master",
+  label: 'Master',
   items: [{
-    label: "Customer",
-    icon: "pi pi-users",
-    to: "/customers"
+    label: 'Customer',
+    icon: 'pi pi-users',
+    to: '/customers'
   }, {
-    label: "Laundry",
-    icon: "pi pi-table",
-    to: "/laundries"
+    label: 'Laundry',
+    icon: 'pi pi-table',
+    to: '/laundries'
   }]
 }]);
 
@@ -1157,38 +1157,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
-  label: "Menu",
+  label: 'Menu',
   items: [{
-    label: "Transaksi",
-    icon: "pi pi-shopping-cart",
-    to: "/transactions"
+    label: 'Transaksi',
+    icon: 'pi pi-shopping-cart',
+    to: '/transactions'
   }, {
-    label: "Laporan",
-    icon: "pi pi-book",
-    to: "/invoices"
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    to: '/mutations'
   }, {
-    label: "Pengeluaran",
-    icon: "pi pi-wallet",
-    to: "/expenses"
+    label: 'Pengeluaran',
+    icon: 'pi pi-wallet',
+    to: '/expenses'
   }]
 }, {
-  label: "Master",
+  label: 'Master',
   items: [{
-    label: "User",
-    icon: "pi pi-user",
-    to: "/users"
+    label: 'User',
+    icon: 'pi pi-user',
+    to: '/users'
   }, {
-    label: "Customer",
-    icon: "pi pi-users",
-    to: "/customers"
+    label: 'Customer',
+    icon: 'pi pi-users',
+    to: '/customers'
   }, {
-    label: "Outlet",
-    icon: "pi pi-share-alt",
-    to: "/outlets"
+    label: 'Outlet',
+    icon: 'pi pi-share-alt',
+    to: '/outlets'
   }, {
-    label: "Laundry",
-    icon: "pi pi-table",
-    to: "/laundries"
+    label: 'Laundry',
+    icon: 'pi pi-table',
+    to: '/laundries'
   }]
 }]);
 

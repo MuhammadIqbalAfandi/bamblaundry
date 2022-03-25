@@ -44,7 +44,7 @@ class TransactionController extends Controller
                         'name' => $transaction->customer->name,
                         'phone' => $transaction->customer->phone,
                     ],
-                    'price' => $transaction->totalPrice(),
+                    'price' => $transaction->totalPriceAsString(),
                     'outlet' => $transaction->outlet->name,
                     'transactionStatusName' => $transaction->transactionStatus->name,
                     'transactionStatusId' => $transaction->transactionStatus->id,
@@ -156,7 +156,7 @@ class TransactionController extends Controller
                 'statusId' => $transaction->transactionStatus->id,
                 'status' => $transaction->transactionStatus->name,
                 'discount' => $transaction->discount,
-                'price' => $transaction->totalPrice(),
+                'price' => $transaction->totalPriceAsString(),
                 'dateLaundry' => $transaction->created_at,
             ],
             'customer' => [
@@ -175,7 +175,7 @@ class TransactionController extends Controller
                     'quantity' => $transactionDetail->quantity,
                     'discount' => $transactionDetail->discount,
                     'price' => $transactionDetail->price,
-                    'totalPrice' => $transactionDetail->totalPrice(),
+                    'totalPrice' => $transactionDetail->totalPriceAsString(),
                 ]),
         ]);
     }

@@ -93,9 +93,12 @@ class Transaction extends Model
             return $price - $price * ($transactionDetail->getRawOriginal('discount') / 100);
         });
 
-        $totalPrice = $price - $price * ($this->getRawOriginal('discount') / 100);
+        return $price - $price * ($this->getRawOriginal('discount') / 100);
+    }
 
-        return $this->setRupiahFormat($totalPrice);
+    public function totalPriceAsString()
+    {
+        return $this->setRupiahFormat($this->totalPrice());
     }
 
     public function subTotal()
