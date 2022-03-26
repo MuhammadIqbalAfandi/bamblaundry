@@ -14,20 +14,19 @@ class Customer extends Model
         'customer_number',
         'name',
         'phone',
-        'address',
         'gender_id',
     ];
 
     protected function genderId(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $value == 1 ? __('Perempuan') : __('Laki-laki'),
+            get:fn($value) => $value == 1 ? __('words.female') : __('words.male'),
         );
     }
 
-    public function scopeFilter($query, $search)
+    public function scopeFilter($query, $filters)
     {
-        $query->when($search ?? null, function ($query, $search) {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('customer_number', 'like', '%' . $search . '%')
                     ->orWhere('name', 'like', '%' . $search . '%')

@@ -1,5 +1,6 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/inertia-vue3'
+import { watch, computed } from 'vue'
+import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppButton from '@/components/AppButton.vue'
 import AppDropdown from '@/components/AppDropdown.vue'
 import AppInputText from '@/components/AppInputText.vue'
@@ -14,13 +15,18 @@ const form = useForm({
   customer_number: props.customer_number,
   name: '',
   phone: '',
-  address: '',
   gender_id: '',
 })
 
 const submit = () => {
   form.post(route('customers.store'))
 }
+
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
 </script>
 
 <template>
@@ -33,7 +39,12 @@ const submit = () => {
           <template #content>
             <div class="grid">
               <div class="col-12 md:col-6">
-                <AppInputText :disabled="true" label="Id Customer" v-model="form.customer_number" />
+                <AppInputText
+                  :disabled="true"
+                  label="Id Customer"
+                  v-model="form.customer_number"
+                  placeholder="id customer"
+                />
               </div>
 
               <div class="col-12 md:col-6">
@@ -42,10 +53,6 @@ const submit = () => {
 
               <div class="col-12 md:col-6">
                 <AppInputText label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
-              </div>
-
-              <div class="col-12 md:col-6">
-                <AppInputText label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
               </div>
 
               <div class="col-12 md:col-6">
@@ -62,7 +69,7 @@ const submit = () => {
 
           <template #footer>
             <div class="flex justify-content-end">
-              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
             </div>
           </template>
         </Card>

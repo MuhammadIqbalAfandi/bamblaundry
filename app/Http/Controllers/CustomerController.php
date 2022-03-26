@@ -17,8 +17,9 @@ class CustomerController extends Controller
     public function index()
     {
         return inertia('customer/Index', [
+            'filters' => request()->all('search'),
             'customers' => Customer::latest()
-                ->filter(request()->search)
+                ->filter(request()->only('search'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($customer) => [
@@ -26,7 +27,6 @@ class CustomerController extends Controller
                     'customer_number' => $customer->customer_number,
                     'name' => $customer->name,
                     'phone' => $customer->phone,
-                    'address' => $customer->address,
                     'gender' => $customer->gender_id,
                 ]),
         ]);
@@ -90,7 +90,6 @@ class CustomerController extends Controller
                 'customer_number' => $customer->customer_number,
                 'name' => $customer->name,
                 'phone' => $customer->phone,
-                'address' => $customer->address,
                 'gender_id' => $customer->getRawOriginal('gender_id'),
             ],
             'genders' => [

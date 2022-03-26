@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
-import { Head, useForm } from '@inertiajs/inertia-vue3'
+import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppButton from '@/components/AppButton.vue'
 import AppDropdown from '@/components/AppDropdown.vue'
 import AppInputText from '@/components/AppInputText.vue'
@@ -17,13 +17,18 @@ const form = useForm({
   customer_number: props.customer.customer_number,
   name: props.customer.name,
   phone: props.customer.phone,
-  address: props.customer.address,
   gender_id: props.customer.gender_id,
 })
 
 const submit = () => {
   form.put(route('customers.update', props.customer.id))
 }
+
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
 
 const visibleDialog = ref(false)
 
@@ -46,7 +51,12 @@ const onCancel = () => (visibleDialog.value = false)
           <template #content>
             <div class="grid">
               <div class="col-12 md:col-6">
-                <AppInputText :disabled="true" label="Id Customer" v-model="form.customer_number" />
+                <AppInputText
+                  :disabled="true"
+                  label="Id Customer"
+                  v-model="form.customer_number"
+                  placeholder="id customer"
+                />
               </div>
 
               <div class="col-12 md:col-6">
@@ -55,10 +65,6 @@ const onCancel = () => (visibleDialog.value = false)
 
               <div class="col-12 md:col-6">
                 <AppInputText label="Nomor HP" placeholder="nomor hp" :error="form.errors.phone" v-model="form.phone" />
-              </div>
-
-              <div class="col-12 md:col-6">
-                <AppInputText label="Alamat" placeholder="alamat" :error="form.errors.address" v-model="form.address" />
               </div>
 
               <div class="col-12 md:col-6">
@@ -86,7 +92,7 @@ const onCancel = () => (visibleDialog.value = false)
 
               <Button label="Hapus" icon="pi pi-trash" class="p-button-text p-button-danger" @click="confirmDialog" />
 
-              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
             </div>
           </template>
         </Card>

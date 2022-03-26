@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Customer;
 use App\Models\Helpers\HasHelper;
+use App\Models\Mutation;
 use App\Models\Outlet;
 use App\Models\TransactionDetail;
 use App\Models\TransactionStatus;
@@ -65,14 +66,23 @@ class Transaction extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function mutations()
+    {
+        return $this->hasMany(Mutation::class);
+    }
+
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('transaction_number', 'like', '%' . $search . '%')
-                    ->orWhere('customer.customer_number', 'like', '%' . $search . '%')
-                    ->orWhere('phone', 'like', '%' . $search . '%');
+                    ->orWhereHas('customer', function ($query) use ($search) {
+                        $query->where('customer_number', 'like', '%' . $search . '%')
+                            ->orWhere('phone', 'like', '%' . $search . '%');
+                    });
             });
+        })->when($filters['dates'] ?? null, function ($query, $dates) {
+            $query->whereBetween('created_at', $dates);
         });
     }
 
@@ -83,9 +93,17 @@ class Transaction extends Model
             return $price - $price * ($transactionDetail->getRawOriginal('discount') / 100);
         });
 
-        $totalPrice = $price - $price * ($this->getRawOriginal('discount') / 100);
+        return $price - $price * ($this->getRawOriginal('discount') / 100);
+    }
 
-        return $this->setRupiahFormat($totalPrice);
+    public function totalPriceAsString()
+    {
+        return $this->setRupiahFormat($this->totalPrice());
+    }
+
+    public function totalPriceAsFullString()
+    {
+        return $this->setRupiahFormat($this->totalPrice(), 2, true);
     }
 
     public function subTotal()

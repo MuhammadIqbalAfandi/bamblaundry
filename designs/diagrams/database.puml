@@ -2,7 +2,6 @@
 entity  Outlet {
   * id
   __
-  * outlet_number
   * name
   * address
   * phone
@@ -14,7 +13,6 @@ entity Customer {
   * customer_number
   * name
   * phone
-  * address
   * gender
 }
 
@@ -69,7 +67,6 @@ entity User {
   * name
   * phone
   * email
-  * address
   * status
   * password
   * gender_id
@@ -86,7 +83,6 @@ entity Role {
 entity Expense {
   * id
   __
-  * expense_number
   * description
   * amount
   * user_id
@@ -94,8 +90,8 @@ entity Expense {
 }
 
 Mutation }|--|| Expense
-Mutation }|--|| Transaction
 Mutation ||--|{ Outlet
+Transaction }|--|| Mutation
 Transaction }|--|| TransactionDetail
 Transaction ||--|{ TransactionStatus
 Transaction ||--|{ Outlet

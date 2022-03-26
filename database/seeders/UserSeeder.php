@@ -18,7 +18,6 @@ class UserSeeder extends Seeder
             'name' => 'Admin',
             'phone' => '',
             'email' => 'admin@laundry.com',
-            'address' => '',
             'email_verified_at' => now(),
             'password' => bcrypt('admin'),
             'gender_id' => 2, // 1(female), 2(male)

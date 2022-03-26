@@ -17,8 +17,9 @@ class LaundryController extends Controller
     public function index()
     {
         return inertia('laundry/Index', [
+            'filters' => request()->all('search'),
             'laundries' => Laundry::latest()
-                ->filter(request()->search)
+                ->filter(request()->only('search'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($laundry) => [

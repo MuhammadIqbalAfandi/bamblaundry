@@ -24,8 +24,9 @@ class UserController extends Controller
         }
 
         return inertia('user/Index', [
+            'filters' => request()->all('search'),
             'users' => User::latest()
-                ->filter(request()->search)
+                ->filter(request()->only('search'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($user) => [
@@ -33,9 +34,9 @@ class UserController extends Controller
                     'name' => $user->name,
                     'phone' => $user->phone,
                     'email' => $user->email,
-                    'address' => $user->address,
                     'gender' => $user->gender_id,
                     'role' => $user->role->name,
+                    'outlet' => $user->outlet->name,
                     'status' => $user->status,
                 ]),
         ]);
@@ -97,7 +98,6 @@ class UserController extends Controller
                 'name' => $user->name,
                 'phone' => $user->phone,
                 'email' => $user->email,
-                'address' => $user->address,
                 'gender' => $user->gender_id,
                 'role' => $user->role->name,
                 'outlet' => $user->outlet->name,
@@ -133,7 +133,6 @@ class UserController extends Controller
                 'name' => $user->name,
                 'phone' => $user->phone,
                 'email' => $user->email,
-                'address' => $user->address,
                 'gender_id' => $user->getRawOriginal('gender_id'),
                 'outlet_id' => $user->outlet_id,
                 'role_id' => $user->role_id,

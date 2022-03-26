@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('mutations', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', [1, 2]);
+            $table->enum('type', [1, 2]); // 1(income) 2(expense)
             $table->unsignedBigInteger('amount');
             $table->foreignId('outlet_id')->constrained();
             $table->foreignId('transaction_id')->constrained();
-            $table->foreignId('expense_id')->constrained();
+            $table->foreignId('expense_id')->nullable()->default(null)->constrained();
             $table->timestamps();
         });
     }

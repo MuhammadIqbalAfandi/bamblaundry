@@ -29,9 +29,11 @@ class TransactionController extends Controller
         } else {
             $transactions = Transaction::where('outlet_id', Auth::user()->outlet_id)->latest();
         }
+
         return inertia('transaction/Index', [
+            'filters' => request()->all('search', 'dates'),
             'transactions' => $transactions
-                ->filter(request()->only(['search']))
+                ->filter(request()->only('search', 'dates'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($transaction) => [
@@ -43,7 +45,7 @@ class TransactionController extends Controller
                         'name' => $transaction->customer->name,
                         'phone' => $transaction->customer->phone,
                     ],
-                    'price' => $transaction->totalPrice(),
+                    'price' => $transaction->totalPriceAsFullString(),
                     'outlet' => $transaction->outlet->name,
                     'transactionStatusName' => $transaction->transactionStatus->name,
                     'transactionStatusId' => $transaction->transactionStatus->id,
@@ -120,6 +122,12 @@ class TransactionController extends Controller
                 ]);
             }
 
+            $transaction->mutations()->create([
+                'type' => 1,
+                'amount' => $transaction->totalPrice(),
+                'outlet_id' => $request->user()->outlet_id,
+            ]);
+
             DB::commit();
 
             $transaction = Transaction::latest()->first();
@@ -134,9 +142,9 @@ class TransactionController extends Controller
                 'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *'.$request->transaction_number.'*',
             ]);
 
-            return to_route('transactions.index')->with('success', __('Transaksi berhasil ditambahkan'));
+            return to_route('transactions.index')->with('success', __('messages.success.store.transaction'));
         } catch (QueryException $e) {
-            return back()->with('error', __('Penambahan transaksi gagal'));
+            return back()->with('error', __('messages.error.store.transaction'));
 
             DB::rollBack();
         }
@@ -156,7 +164,7 @@ class TransactionController extends Controller
                 'statusId' => $transaction->transactionStatus->id,
                 'status' => $transaction->transactionStatus->name,
                 'discount' => $transaction->discount,
-                'price' => $transaction->totalPrice(),
+                'price' => $transaction->totalPriceAsFullString(),
                 'dateLaundry' => $transaction->created_at,
             ],
             'customer' => [
@@ -171,11 +179,11 @@ class TransactionController extends Controller
             ],
             'transactionDetails' => $transaction->transactionDetails
                 ->transform(fn($transactionDetail) => [
-                    'laundry' => "{$transactionDetail->laundry->name} {$transactionDetail->laundry->price}/{$transactionDetail->laundry->unit}",
+                    'laundry' => "{$transactionDetail->laundry->name} {$transactionDetail->laundry->getRawOriginal('price')}/{$transactionDetail->laundry->unit}",
                     'quantity' => $transactionDetail->quantity,
                     'discount' => $transactionDetail->discount,
                     'price' => $transactionDetail->price,
-                    'totalPrice' => $transactionDetail->totalPrice(),
+                    'totalPrice' => $transactionDetail->totalPriceAsFullString(),
                 ]),
         ]);
     }
@@ -215,7 +223,7 @@ class TransactionController extends Controller
             'message' => 'Layanan laundry Anda dengan nomor transaksi *'.$transaction->transaction_number.'*'.$status_message,
         ]);
 
-        return back()->with('success', __('Transaksi berhasil diperbaharui'));
+        return back()->with('success', __('messages.success.update.transaction_status'));
     }
 
     /**

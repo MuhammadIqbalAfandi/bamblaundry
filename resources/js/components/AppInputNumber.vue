@@ -74,9 +74,21 @@ const props = defineProps({
     type: Number,
     default: null,
   },
+  currency: {
+    type: String,
+    default: undefined,
+  },
+  locale: {
+    type: String,
+    default: undefined,
+  },
   error: {
     type: String,
     default: null,
+  },
+  currencyDisplay: {
+    type: String,
+    default: undefined,
   },
 })
 
@@ -96,6 +108,9 @@ const ariaDescribedbyLabel = computed(() => props.label.toLowerCase().replace(/\
     <InputNumber
       class="w-full"
       input-class="w-full"
+      :currency="currency"
+      :currency-display="currencyDisplay"
+      :locale="locale"
       :class="{ 'p-invalid': isError }"
       :id="forLabel"
       :aria-describedby="ariaDescribedbyLabel"

@@ -1,17 +1,17 @@
 export default [
   {
-    label: "Menu",
+    label: 'Menu',
     items: [
-      { label: "Transaksi", icon: "pi pi-shopping-cart", to: "/transactions" },
-      { label: "Laporan", icon: "pi pi-book", to: "/invoices" },
-      { label: "Pengeluaran", icon: "pi pi-wallet", to: "/expenses" },
+      { label: 'Transaksi', icon: 'pi pi-shopping-cart', to: '/transactions' },
+      { label: 'Pengeluaran', icon: 'pi pi-wallet', to: '/expenses' },
+      { label: 'Laporan', icon: 'pi pi-book', to: '/mutations' },
     ],
   },
   {
-    label: "Master",
+    label: 'Master',
     items: [
-      { label: "Customer", icon: "pi pi-users", to: "/customers" },
-      { label: "Laundry", icon: "pi pi-table", to: "/laundries" },
+      { label: 'Customer', icon: 'pi pi-users', to: '/customers' },
+      { label: 'Laundry', icon: 'pi pi-table', to: '/laundries' },
     ],
   },
-];
+]

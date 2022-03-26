@@ -4,8 +4,13 @@ namespace App\Models\Helpers;
 
 trait HasHelper
 {
-    protected function setRupiahFormat(int $number)
+    protected function setRupiahFormat(int $number, int $decimal = 0, bool $sign = false)
     {
-        return number_format($number, '0', ',', '.');
+        if ($sign) {
+            return 'Rp ' . number_format($number, $decimal, ',', '.');
+
+        } else {
+            return number_format($number, $decimal, ',', '.');
+        }
     }
 }

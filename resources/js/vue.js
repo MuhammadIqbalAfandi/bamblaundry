@@ -12,13 +12,14 @@ import StyleClass from 'primevue/styleclass'
 import AutoComplete from 'primevue/autocomplete'
 import Badge from 'primevue/badge'
 import Button from 'primevue/button'
-import Calender from 'primevue/calendar'
+import Calendar from 'primevue/calendar'
 import Card from 'primevue/card'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 import Dialog from 'primevue/dialog'
 import Divider from 'primevue/divider'
 import Dropdown from 'primevue/dropdown'
+import Editor from 'primevue/editor'
 import InputNumber from 'primevue/inputnumber'
 import InputText from 'primevue/inputtext'
 import Message from 'primevue/message'
@@ -28,6 +29,7 @@ import Ripple from 'primevue/ripple'
 import Tooltip from 'primevue/tooltip'
 
 createInertiaApp({
+  title: (title) => `${title} - Bamb's Laundry`,
   resolve: (name) => import(`./pages/${name}`),
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(App, props) })
@@ -41,12 +43,13 @@ createInertiaApp({
       .component('Button', Button)
       .component('Badge', Badge)
       .component('Card', Card)
-      .component('Calender', Calender)
+      .component('Calendar', Calendar)
       .component('Column', Column)
       .component('DataTable', DataTable)
       .component('Dialog', Dialog)
       .component('Divider', Divider)
       .component('Dropdown', Dropdown)
+      .component('Editor', Editor)
       .component('InputNumber', InputNumber)
       .component('InputText', InputText)
       .component('Message', Message)

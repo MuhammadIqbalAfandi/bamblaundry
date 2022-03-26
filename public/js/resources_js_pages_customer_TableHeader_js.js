@@ -21,9 +21,6 @@ __webpack_require__.r(__webpack_exports__);
   field: 'phone',
   header: 'HP'
 }, {
-  field: 'address',
-  header: 'Alamat'
-}, {
   field: 'gender',
   header: 'Jenis Kelamin'
 }]);

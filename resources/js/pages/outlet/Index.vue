@@ -1,14 +1,30 @@
 <script setup>
-import { Head, Link } from '@inertiajs/inertia-vue3'
+import { watch } from 'vue'
+import { Inertia } from '@inertiajs/inertia'
+import { Head, Link, useForm } from '@inertiajs/inertia-vue3'
+import throttle from 'lodash/throttle'
+import pickBy from 'lodash/pickBy'
 import AppButton from '@/components/AppButton.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 
 import TableHeader from './TableHeader'
 
-defineProps({
+const props = defineProps({
   outlets: Object,
+  filters: Object,
 })
+
+const filterForm = useForm({
+  search: props.filters.search,
+})
+
+watch(
+  filterForm,
+  throttle(() => {
+    Inertia.get('/outlets', pickBy({ search: filterForm.search }), { preserveState: true })
+  }, 300)
+)
 </script>
 
 <template>
@@ -23,17 +39,22 @@ defineProps({
       :stripedRows="true"
     >
       <template #header>
-        <div class="grid">
-          <div class="col-12 md:col-6">
-            <div class="flex align-items-center">
-              <h5 class="mr-3 mb-0">Outlet</h5>
+        <h5>Outlet</h5>
 
-              <InputText class="w-full md:w-27rem" placeholder="cari..." />
+        <div class="grid">
+          <div class="col-12 md:col-8">
+            <div class="flex align-items-center">
+              <InputText class="w-full md:w-27rem" placeholder="cari..." v-model="filterForm.search" />
             </div>
           </div>
 
-          <div class="col-12 md:col-6 flex justify-content-end">
-            <AppButton :href="route('outlets.create')" label="Tambah Outlet" icon="pi pi-pencil" />
+          <div class="col-12 md:col-4 flex justify-content-end">
+            <AppButton
+              :href="route('outlets.create')"
+              label="Tambah Outlet"
+              icon="pi pi-pencil"
+              class="p-button-text"
+            />
           </div>
         </div>
       </template>
@@ -47,13 +68,11 @@ defineProps({
 
       <Column>
         <template #body="{ data }">
-          <Link
-            as="button"
+          <AppButton
+            icon="pi pi-angle-double-right"
+            class="p-button-icon-only p-button-rounded p-button-text"
             :href="route('outlets.edit', data.id)"
-            class="p-button p-component p-button-icon-only p-button-rounded p-button-text"
-          >
-            <i class="pi pi-angle-double-right p-button-icon"></i>
-          </Link>
+          />
         </template>
       </Column>
     </DataTable>

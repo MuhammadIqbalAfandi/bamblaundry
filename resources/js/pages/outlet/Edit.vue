@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
-import { Head, useForm } from '@inertiajs/inertia-vue3'
+import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppButton from '@/components/AppButton.vue'
 import AppInputText from '@/components/AppInputText.vue'
 import AppDialog from '@/components/AppDialog.vue'
@@ -12,7 +12,6 @@ const props = defineProps({
 })
 
 const form = useForm({
-  outlet_number: props.outlet.outlet_number,
   name: props.outlet.name,
   phone: props.outlet.phone,
   address: props.outlet.address,
@@ -21,6 +20,12 @@ const form = useForm({
 const submit = () => {
   form.put(route('outlets.update', props.outlet.id))
 }
+
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
 
 const visibleDialog = ref(false)
 
@@ -42,10 +47,6 @@ const onCancel = () => (visibleDialog.value = false)
         <Card>
           <template #content>
             <div class="grid">
-              <div class="col-12 md:col-6">
-                <AppInputText :disabled="true" label="Id Outlet" v-model="form.outlet_number" />
-              </div>
-
               <div class="col-12 md:col-6">
                 <AppInputText label="Nama" placeholder="nama" :error="form.errors.name" v-model="form.name" />
               </div>
@@ -73,7 +74,7 @@ const onCancel = () => (visibleDialog.value = false)
 
               <Button label="Hapus" icon="pi pi-trash" class="p-button-text p-button-danger" @click="confirmDialog" />
 
-              <AppButton @click="submit" label="Simpan" icon="pi pi-check" />
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
             </div>
           </template>
         </Card>

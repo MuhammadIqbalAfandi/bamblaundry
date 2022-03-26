@@ -22,7 +22,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'phone',
         'email',
-        'address',
         'status',
         'password',
         'gender_id',
@@ -59,7 +58,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function status(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $value ? __('Aktif') : __('Non Aktif'),
+            get:fn($value) => $value ? __('words.active') : __('words.not_active'),
         );
     }
 
@@ -73,9 +72,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Outlet::class);
     }
 
-    public function scopeFilter($query, $search)
+    public function scopeFilter($query, $filters)
     {
-        $query->when($search ?? null, function ($query, $search) {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('phone', 'like', '%' . $search . '%')

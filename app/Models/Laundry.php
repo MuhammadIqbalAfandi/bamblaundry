@@ -34,13 +34,13 @@ class Laundry extends Model
     protected function price(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $this->setRupiahFormat($value)
+            get:fn($value) => $this->setRupiahFormat($value, 2, true)
         );
     }
 
-    public function scopeFilter($query, $search)
+    public function scopeFilter($query, $filters)
     {
-        $query->when($search ?? null, function ($query, $search) {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('price', 'like', '%' . $search . '%')

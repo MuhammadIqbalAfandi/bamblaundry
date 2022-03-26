@@ -22,13 +22,13 @@ class OutletController extends Controller
         }
 
         return inertia('outlet/Index', [
+            'filters' => request()->all('search'),
             'outlets' => Outlet::latest()
-                ->filter(request()->search)
+                ->filter(request()->only('search'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($outlet) => [
                     'id' => $outlet->id,
-                    'outlet_number' => $outlet->outlet_number,
                     'name' => $outlet->name,
                     'phone' => $outlet->phone,
                     'address' => $outlet->address,
@@ -47,9 +47,7 @@ class OutletController extends Controller
             return inertia('Access');
         }
 
-        return inertia('outlet/Create', [
-            'outlet_number' => 'OT' . now()->format('YmdHis'),
-        ]);
+        return inertia('outlet/Create');
     }
 
     /**
@@ -91,7 +89,6 @@ class OutletController extends Controller
         return inertia('outlet/Edit', [
             'outlet' => [
                 'id' => $outlet->id,
-                'outlet_number' => $outlet->outlet_number,
                 'name' => $outlet->name,
                 'phone' => $outlet->phone,
                 'address' => $outlet->address,
