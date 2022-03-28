@@ -1,0 +1,17 @@
+{
+  "name": "gen781/print_server",
+  "description": "Printer server for ESCPOS using websocket",
+  "require": {
+    "hoa/websocket": "^3.17",
+    "mike42/escpos-php": "^3.0"
+  },
+  "authors": [
+    {
+      "name": "Rahmat Ade Saputra",
+      "email": "gen781@googlemail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": { "Escpos\\": "/" }
+  }
+}

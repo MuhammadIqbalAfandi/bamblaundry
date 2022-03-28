@@ -15,6 +15,8 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Hoa\Websocket\Client as WebsocketClient;
+use Hoa\Socket\Client as SocketClient;
 
 class TransactionController extends Controller
 {
@@ -136,10 +138,34 @@ class TransactionController extends Controller
 
             DB::commit();
 
-            $transaction = Transaction::latest()->first();
+            $transaction = Transaction::with(['outlet','customer','transactionDetails.laundry'])->latest()->first();
 
-            $thermalPrinting = new ThermalPrinting($transaction);
-            $thermalPrinting->startPrinting(2);
+            $discountAsString = $transaction->discountAsString();
+            $subTotalAsString = $transaction->subTotalAsString();
+            $totalPriceAsString = $transaction->totalPriceAsString();
+            foreach ($transaction->transactionDetails as $transactionDetail) {
+                $totalPriceAsStringDetail = $transactionDetail->totalPriceAsString();
+                $transactionDetail->totalPriceAsString = $totalPriceAsStringDetail;
+            }
+
+            $transaction->discountAsString = $discountAsString;
+            $transaction->subTotalAsString = $subTotalAsString;
+            $transaction->totalPriceAsString = $totalPriceAsString;
+
+            // $thermalPrinting = new ThermalPrinting($transaction);
+            // $thermalPrinting->startPrinting(2);
+            $socket = new WebsocketClient(
+                new SocketClient('ws://127.0.0.1:5544')
+            );
+            $socket->setHost('escpos-server');
+            // dd($socket->getConnection()->getCurrentNode());
+            try {
+                $socket->connect();
+            } catch (Exception $e) {
+                return back()->with('error', __('messages.error.store.transaction'));
+            }
+            $socket->send(json_encode($transaction));
+            $socket->close();
 
             $customer = Customer::find($request->customer_id);
 
