@@ -83,6 +83,8 @@ class Transaction extends Model
             });
         })->when($filters['dates'] ?? null, function ($query, $dates) {
             $query->whereBetween('created_at', $dates);
+        })->when($filters['outlet'] ?? null, function ($query, $outlet) {
+            $query->where('outlet_id', $outlet);
         });
     }
 

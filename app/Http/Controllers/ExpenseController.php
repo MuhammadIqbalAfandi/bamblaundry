@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Expense;
+use App\Models\Outlet;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
@@ -15,9 +16,9 @@ class ExpenseController extends Controller
     public function index()
     {
         return inertia('expense/Index', [
-            'filters' => request()->all('dates'),
+            'filters' => request()->all('dates', 'outlet'),
             'expenses' => Expense::latest()
-                ->filter(request()->only('dates'))
+                ->filter(request()->only('dates', 'outlet'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($expense) => [
@@ -27,6 +28,11 @@ class ExpenseController extends Controller
                     'outlet' => $expense->outlet->name,
                     'user' => $expense->user->name,
                     'description' => $expense->description,
+                ]),
+            'outlets' => Outlet::all()
+                ->transform(fn($outlet) => [
+                    'label' => $outlet->name,
+                    'value' => $outlet->id,
                 ]),
         ]);
     }

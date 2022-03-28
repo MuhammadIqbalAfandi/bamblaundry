@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mutation;
+use App\Models\Outlet;
 use Illuminate\Http\Request;
 
 class MutationController extends Controller
@@ -16,9 +17,9 @@ class MutationController extends Controller
     public function index()
     {
         return inertia('mutation/Index', [
-            'filters' => request()->all('dates'),
+            'filters' => request()->all('dates', 'outlet'),
             'mutations' => Mutation::latest()
-                ->filter(request()->only('dates'))
+                ->filter(request()->only('dates', 'outlet'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($mutation) => [
@@ -26,6 +27,11 @@ class MutationController extends Controller
                     'outlet' => $mutation->outlet->name,
                     'amount' => $mutation->amount,
                     'type' => $mutation->type,
+                ]),
+            'outlets' => Outlet::all()
+                ->transform(fn($outlet) => [
+                    'label' => $outlet->name,
+                    'value' => $outlet->id,
                 ]),
         ]);
     }

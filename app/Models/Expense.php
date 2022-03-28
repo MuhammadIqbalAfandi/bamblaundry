@@ -32,6 +32,8 @@ class Expense extends Model
     {
         $query->when($filters['dates'] ?? null, function ($query, $dates) {
             $query->whereBetween('created_at', $dates);
+        })->when($filters['outlet'] ?? null, function ($query, $outlet) {
+            $query->where('outlet_id', $outlet);
         });
     }
 }

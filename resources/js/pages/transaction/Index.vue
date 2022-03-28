@@ -1,110 +1,124 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { Inertia } from '@inertiajs/inertia'
-import { Head, useForm } from '@inertiajs/inertia-vue3'
-import throttle from 'lodash/throttle'
-import pickBy from 'lodash/pickBy'
-import AppButton from '@/components/AppButton.vue'
-import AppPagination from '@/components/AppPagination.vue'
-import AppMenu from '@/components/AppMenu.vue'
-import AppDropdown from '@/components/AppDropdown.vue'
-import AppLayout from '@/layouts/AppLayout.vue'
+import { ref, watch, computed } from "vue";
+import { Inertia } from "@inertiajs/inertia";
+import { Head, useForm, usePage } from "@inertiajs/inertia-vue3";
+import throttle from "lodash/throttle";
+import pickBy from "lodash/pickBy";
+import AppButton from "@/components/AppButton.vue";
+import AppPagination from "@/components/AppPagination.vue";
+import AppMenu from "@/components/AppMenu.vue";
+import AppDropdown from "@/components/AppDropdown.vue";
+import AppLayout from "@/layouts/AppLayout.vue";
 
-import { IndexTable } from './TableHeader'
+import { IndexTable } from "./TableHeader";
 
 const props = defineProps({
   transactions: Object,
   transactionsStatus: Array,
   filters: Object,
-})
+  outlets: Array,
+});
 
 const filterForm = useForm({
   search: props.filters.search,
   dates: props.filters.dates,
-})
+  outlet: props.filters.outlet,
+});
+
+const isAdmin = computed(() => usePage().props.value.isAdmin);
 
 watch(
   filterForm,
   throttle(() => {
-    Inertia.get('/transactions', pickBy({ search: filterForm.search, dates: filterForm.dates }), {
-      preserveState: true,
-    })
+    Inertia.get(
+      "/transactions",
+      pickBy({
+        search: filterForm.search,
+        dates: filterForm.dates,
+        outlet: filterForm.outlet,
+      }),
+      {
+        preserveState: true,
+      }
+    );
   }, 300)
-)
+);
 
-const transactionId = ref()
+const transactionId = ref();
 
-const updateStatusDialog = ref(false)
+const updateStatusDialog = ref(false);
 
 const updateStatusForm = useForm({
   transaction_status_id: null,
-})
+});
 
 const updateStatusSubmit = () => {
-  updateStatusForm.put(route('transactions.update', transactionId.value), {
+  updateStatusForm.put(route("transactions.update", transactionId.value), {
     onSuccess: () => {
-      updateStatusDialog.value = false
+      updateStatusDialog.value = false;
     },
-  })
-}
+  });
+};
 
-const updateStatusItems = ref([])
+const updateStatusItems = ref([]);
 
-const overlayMenu = ref()
+const overlayMenu = ref();
 
-const overlayItems = ref([])
+const overlayItems = ref([]);
 
 const startPrinting = (transactionNumber) => {
-  Inertia.get(`/thermal-printing/${transactionNumber}`)
-}
+  Inertia.get(`/thermal-printing/${transactionNumber}`);
+};
 
 const overlayToggle = (event, data) => {
   overlayItems.value =
     data.transactionStatusId == 4
       ? [
           {
-            label: 'Lihat detail',
-            icon: 'pi pi-eye',
-            to: route('transactions.show', data.id),
+            label: "Lihat detail",
+            icon: "pi pi-eye",
+            to: route("transactions.show", data.id),
           },
           {
-            label: 'Cetak ulang',
-            icon: 'pi pi-print',
+            label: "Cetak ulang",
+            icon: "pi pi-print",
             command() {
-              startPrinting(data.transactionNumber)
+              startPrinting(data.transactionNumber);
             },
           },
         ]
       : [
           {
-            label: 'Perbaharui status',
-            icon: 'pi pi-refresh',
+            label: "Perbaharui status",
+            icon: "pi pi-refresh",
             command() {
-              updateStatusDialog.value = true
+              updateStatusDialog.value = true;
             },
           },
           {
-            label: 'Lihat detail',
-            icon: 'pi pi-eye',
-            to: route('transactions.show', data.id),
+            label: "Lihat detail",
+            icon: "pi pi-eye",
+            to: route("transactions.show", data.id),
           },
           {
-            label: 'Cetak ulang',
-            icon: 'pi pi-print',
+            label: "Cetak ulang",
+            icon: "pi pi-print",
             command() {
-              startPrinting(data.transactionNumber)
+              startPrinting(data.transactionNumber);
             },
           },
-        ]
+        ];
 
-  updateStatusItems.value = props.transactionsStatus.filter((val) => val.value >= data.transactionStatusId)
+  updateStatusItems.value = props.transactionsStatus.filter(
+    (val) => val.value >= data.transactionStatusId
+  );
 
-  updateStatusForm.transaction_status_id = data.transactionStatusId
+  updateStatusForm.transaction_status_id = data.transactionStatusId;
 
-  transactionId.value = data.id
+  transactionId.value = data.id;
 
-  overlayMenu.value.toggle(event)
-}
+  overlayMenu.value.toggle(event);
+};
 </script>
 
 <template>
@@ -125,17 +139,30 @@ const overlayToggle = (event, data) => {
           <div class="col-12 md:col-8">
             <div class="flex flex-column md:flex-row">
               <div class="flex align-items-center mr-0 md:mr-2 mb-2 md:mb-0">
-                <InputText class="w-full md:w-16rem" placeholder="cari..." v-model="filterForm.search" />
+                <InputText
+                  class="w-full md:w-16rem"
+                  placeholder="cari..."
+                  v-model="filterForm.search"
+                />
               </div>
 
-              <Calendar
-                class="w-full md:w-16rem"
-                v-model="filterForm.dates"
-                selection-mode="range"
-                placeholder="filter waktu..."
-                date-format="dd/mm/yy"
-                :show-button-bar="true"
-                :manual-input="false"
+              <div class="flex align-items-center mr-0 md:mr-2 mb-2 md:mb-0">
+                <Calendar
+                  class="w-full md:w-16rem"
+                  v-model="filterForm.dates"
+                  selection-mode="range"
+                  placeholder="filter waktu..."
+                  date-format="dd/mm/yy"
+                  :show-button-bar="true"
+                  :manual-input="false"
+                />
+              </div>
+
+              <AppDropdown
+                v-if="isAdmin"
+                placeholder="pilih outlet"
+                v-model="filterForm.outlet"
+                :options="outlets"
               />
             </div>
           </div>
@@ -159,8 +186,15 @@ const overlayToggle = (event, data) => {
       >
         <template #body="{ data, field }">
           <template v-if="field === 'transactionStatusName'">
-            <Badge v-if="data['transactionStatusId'] === 1" :value="data[field]"></Badge>
-            <Badge v-else-if="data['transactionStatusId'] === 2" :value="data[field]" severity="warning"></Badge>
+            <Badge
+              v-if="data['transactionStatusId'] === 1"
+              :value="data[field]"
+            ></Badge>
+            <Badge
+              v-else-if="data['transactionStatusId'] === 2"
+              :value="data[field]"
+              severity="warning"
+            ></Badge>
             <Badge v-else :value="data[field]" severity="success"></Badge>
           </template>
           <template v-else-if="field === 'customer'">
@@ -186,7 +220,12 @@ const overlayToggle = (event, data) => {
             aria-controls="overlay_menu"
             @click="overlayToggle($event, slotProps.data)"
           />
-          <AppMenu id="overlay_menu" ref="overlayMenu" :popup="true" :model="overlayItems" />
+          <AppMenu
+            id="overlay_menu"
+            ref="overlayMenu"
+            :popup="true"
+            :model="overlayItems"
+          />
         </template>
       </Column>
     </DataTable>

@@ -10,6 +10,7 @@ use App\Models\Customer;
 use App\Models\Laundry;
 use App\Models\Transaction;
 use App\Models\TransactionStatus;
+use App\Models\Outlet;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -31,9 +32,9 @@ class TransactionController extends Controller
         }
 
         return inertia('transaction/Index', [
-            'filters' => request()->all('search', 'dates'),
+            'filters' => request()->all('search', 'dates', 'outlet'),
             'transactions' => $transactions
-                ->filter(request()->only('search', 'dates'))
+                ->filter(request()->only('search', 'dates', 'outlet'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($transaction) => [
@@ -54,6 +55,11 @@ class TransactionController extends Controller
                 ->transform(fn($transactionStatus) => [
                     'label' => $transactionStatus->name,
                     'value' => $transactionStatus->id,
+                ]),
+            'outlets' => Outlet::all()
+                ->transform(fn($outlet) => [
+                    'label' => $outlet->name,
+                    'value' => $outlet->id,
                 ]),
         ]);
     }

@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
+import { usePage } from "@inertiajs/inertia-vue3";
 import AppTopBar from "@/components/AppTopBar.vue";
 import AppSidebar from "@/components/AppSidebar.vue";
 import AppFooter from "@/components/AppFooter.vue";
@@ -27,6 +28,8 @@ const menuClick = ref(false);
 
 const isDesktop = () => window.innerWidth >= 992;
 
+const isAdmin = computed(() => usePage().props.value.isAdmin);
+
 const onMenuToggle = () => {
   menuClick.value = true;
 
@@ -51,7 +54,7 @@ const onWrapperClick = () => {
     <AppTopBar @menu-toggle="onMenuToggle" />
 
     <div class="layout-sidebar">
-      <AppSidebar :model="$page.props.isAdmin ? menuAdmin : menu" />
+      <AppSidebar :model="isAdmin ? menuAdmin : menu" />
     </div>
 
     <div class="layout-main-container">

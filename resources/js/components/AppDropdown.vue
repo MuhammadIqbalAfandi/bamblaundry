@@ -1,18 +1,18 @@
 <script setup>
-import { computed } from 'vue'
+import { computed } from "vue";
 
 const props = defineProps({
   optionLabel: {
     type: String,
-    default: 'label',
+    default: "label",
   },
   optionValue: {
     type: String,
-    default: 'value',
+    default: "value",
   },
   optionDisabled: {
     type: String,
-    default: 'disabled',
+    default: "disabled",
   },
   options: {
     type: Array,
@@ -20,7 +20,7 @@ const props = defineProps({
   },
   label: {
     type: String,
-    required: true,
+    required: false,
   },
   placeholder: {
     type: String,
@@ -31,26 +31,32 @@ const props = defineProps({
     default: null,
   },
   modelValue: null,
-})
+});
 
-defineEmits(['update:modelValue'])
+defineEmits(["update:modelValue"]);
 
-const isError = computed(() => (props.error ? true : false))
+const isError = computed(() => (props.error ? true : false));
 
-const forLabel = computed(() => props.label.toLowerCase().replace(/\s+/g, '-'))
+const forLabel = computed(() =>
+  props.label ? props.label.toLowerCase().replace(/\s+/g, "-") : null
+);
 
-const ariaDescribedbyLabel = computed(() => props.label.toLowerCase().replace(/\s+/g, '-') + '-help')
+const ariaDescribedbyLabel = computed(() =>
+  props.label ? props.label.toLowerCase().replace(/\s+/g, "-") + "-help" : null
+);
 
 const selectedDropdownLabel = (value) => {
-  const result = props.options.find((option) => option[props.optionValue] == value)
+  const result = props.options.find(
+    (option) => option[props.optionValue] == value
+  );
   if (result) {
-    return result[props.optionLabel]
+    return result[props.optionLabel];
   }
-}
+};
 </script>
 
 <template>
-  <label :for="forLabel">{{ label }}</label>
+  <label v-if="label" :for="forLabel">{{ label }}</label>
 
   <Dropdown
     class="w-full mt-2"
@@ -80,7 +86,11 @@ const selectedDropdownLabel = (value) => {
     </template>
   </Dropdown>
 
-  <small v-if="error" :id="ariaDescribedbyLabel" :class="{ 'p-error': isError }">
+  <small
+    v-if="error"
+    :id="ariaDescribedbyLabel"
+    :class="{ 'p-error': isError }"
+  >
     {{ error }}
   </small>
 </template>
