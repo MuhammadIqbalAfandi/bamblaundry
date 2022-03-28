@@ -21,9 +21,9 @@ class Transaction extends Model
     protected $fillable = [
         'transaction_number',
         'discount',
+        'customer_number',
         'transaction_status_id',
         'user_id',
-        'customer_id',
         'outlet_id',
     ];
 
@@ -48,7 +48,7 @@ class Transaction extends Model
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'customer_number', 'customer_number');
     }
 
     public function outlet()
@@ -82,6 +82,10 @@ class Transaction extends Model
                     });
             });
         })->when($filters['dates'] ?? null, function ($query, $dates) {
+            // $datess = [];
+            // foreach ($dates as $date) {
+            //     array_push($datess, Carbon::parse($date)->translatedFormat('d/m/Y'));
+            // }
             $query->whereBetween('created_at', $dates);
         })->when($filters['outlet'] ?? null, function ($query, $outlet) {
             $query->where('outlet_id', $outlet);

@@ -23,14 +23,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  href: {
-    type: String,
-    default: null,
-  },
-  labelHref: {
-    type: String,
-    default: null,
-  },
   placeholder: {
     type: String,
     required: true,
@@ -87,9 +79,7 @@ const ariaDescribedbyLabel = computed(() => props.label.toLowerCase().replace(/\
       </small>
 
       <small v-if="suggestions.length === 0 || (modelValue.length === 0 && empty)" class="mt-1">
-        <Link v-if="href && labelHref" :href="href">{{ labelHref }}</Link>
-
-        <slot v-else name="empty" />
+        <slot v-if="empty" name="empty" />
       </small>
     </div>
   </div>

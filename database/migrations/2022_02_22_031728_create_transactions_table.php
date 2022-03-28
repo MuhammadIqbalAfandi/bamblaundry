@@ -17,9 +17,10 @@ return new class extends Migration
             $table->id();
             $table->string('transaction_number');
             $table->unsignedInteger('discount');
+            $table->string('customer_number');
+            $table->foreign('customer_number')->references('customer_number')->on('customers');
             $table->foreignId('transaction_status_id')->constrained();
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('customer_id')->constrained();
             $table->foreignId('outlet_id')->constrained();
             $table->timestamps();
         });

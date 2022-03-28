@@ -22,32 +22,21 @@ const props = defineProps({
   genders: Array,
 })
 
-const form = useForm({
-  transaction_number: props.transactionNumber,
-  customer_id: '',
-  laundry_id: '',
-  discount_all: 0,
-  quantity: 0,
-})
-
-const submit = () => {
-  form
-    .transform((data) => ({
-      transaction_number: data.transaction_number,
-      discount_all: data.discount_all,
-      customer_id: data.customer_id.id,
-      laundries: transactionBasket,
-    }))
-    .post(route('transactions.store'))
-}
-
-const customerDialog = ref(false)
-
 const errors = computed(() => usePage().props.value.errors)
 
 watch(errors, () => {
   form.clearErrors()
 })
+
+const customerDialogShow = ref(false)
+
+const customerDialogOnShow = () => {
+  Inertia.reload({
+    only: ['customerNumber'],
+  })
+
+  formCustomer.customer_number = props.customerNumber
+}
 
 const customerDialogOnHide = () => {
   formCustomer.reset()
@@ -55,8 +44,6 @@ const customerDialogOnHide = () => {
   formCustomer.clearErrors()
 
   usePage().props.value.errors = {}
-
-  usePage().props.value.flash.success = null
 
   usePage().props.value.flash.error = null
 }
@@ -69,7 +56,7 @@ const customerOnComplete = (event) => {
 }
 
 const customerOnSelected = (event) => {
-  form.customer_id = event.value
+  form.customer = event.value
 }
 
 const formCustomer = useForm({
@@ -84,9 +71,15 @@ const formCustomer = useForm({
 const submitCustomer = () => {
   formCustomer.post(route('customers.store'), {
     onSuccess: () => {
+      form.customer = {
+        name: formCustomer.name,
+        customerNumber: formCustomer.customer_number,
+        phone: formCustomer.phone,
+      }
+
       formCustomer.reset()
 
-      formCustomer.customer_number = props.customerNumber
+      customerDialogShow.value = !customerDialogShow.value
     },
   })
 }
@@ -99,19 +92,19 @@ const laundryOnComplete = (event) => {
 }
 
 const laundryOnSelected = (event) => {
-  form.laundry_id = event.value
+  form.laundry = event.value
 }
 
 const transactionBasket = reactive([])
 
-const transactionBasketOnClick = () => {
+const addTransactionBasket = () => {
   form.clearErrors()
 
-  if (!form.laundry_id.id) {
+  if (!form.laundry.id) {
     form.setError('laundry_id', 'Tipe laundry tidak boleh kosong')
   }
 
-  if (!form.quantity && form.laundry_id.id) {
+  if (!form.quantity && form.laundry.id) {
     form.setError('quantity', 'Kuantitas tidak boleh 0 atau kosong')
   }
 
@@ -120,12 +113,12 @@ const transactionBasketOnClick = () => {
   }
 
   transactionBasket.push({
-    laundryId: form.laundry_id.id,
-    laundry: `${form.laundry_id.name} ${form.laundry_id.price}/${form.laundry_id.unit}`,
+    laundryId: form.laundry.id,
+    laundry: `${form.laundry.name} ${form.laundry.price}/${form.laundry.unit}`,
     quantity: form.quantity,
     discount: 0,
-    price: form.laundry_id.price,
-    totalPrice: form.quantity * form.laundry_id.price,
+    price: form.laundry.price,
+    totalPrice: form.quantity * form.laundry.price,
   })
 
   form.reset('laundry_id', 'quantity')
@@ -147,12 +140,31 @@ const transactionBasketOnDelete = (id) => {
 }
 
 const transactionPriceTotal = () => {
-  form.discount_all = form.discount_all ?? 0
+  form.discountAll = form.discountAll ?? 0
 
   const totalPrice = transactionBasket.reduce((prev, current) => prev + current.totalPrice, 0)
-  const totalPriceAfterDiscount = totalPrice - totalPrice * (form.discount_all / 100)
+  const totalPriceAfterDiscount = totalPrice - totalPrice * (form.discountAll / 100)
 
   return IDRCurrencyFormat(totalPriceAfterDiscount)
+}
+
+const form = useForm({
+  transactionNumber: props.transactionNumber,
+  customer: '',
+  laundry: '',
+  discountAll: 0,
+  quantity: 0,
+})
+
+const submit = () => {
+  form
+    .transform((data) => ({
+      transaction_number: data.transactionNumber,
+      discount_all: data.discountAll,
+      customer_number: data.customer.customerNumber,
+      laundries: transactionBasket,
+    }))
+    .post(route('transactions.store'))
 }
 </script>
 
@@ -170,7 +182,7 @@ const transactionPriceTotal = () => {
                   disabled
                   label="Id Transaksi"
                   placeholder="id transaksi"
-                  v-model="form.transaction_number"
+                  v-model="form.transactionNumber"
                 />
               </div>
 
@@ -182,8 +194,8 @@ const transactionPriceTotal = () => {
                   label="Customer"
                   field="customerNumber"
                   placeholder="Customer"
-                  v-model="form.customer_id"
-                  :error="form.errors.customer_id"
+                  v-model="form.customer"
+                  :error="form.errors.customer"
                   :suggestions="customers"
                   @complete="customerOnComplete"
                   @item-select="customerOnSelected"
@@ -202,7 +214,7 @@ const transactionPriceTotal = () => {
                     <span
                       class="cursor-pointer"
                       style="color: var(--primary-color)"
-                      @click="customerDialog = !customerDialog"
+                      @click="customerDialogShow = !customerDialogShow"
                     >
                       Tambah Customer
                     </span>
@@ -216,7 +228,7 @@ const transactionPriceTotal = () => {
                   label="Tipe Laundry"
                   field="name"
                   placeholder="Tipe Laundry"
-                  v-model="form.laundry_id"
+                  v-model="form.laundry"
                   :error="form.errors.laundry_id"
                   :suggestions="laundries"
                   @complete="laundryOnComplete"
@@ -239,8 +251,8 @@ const transactionPriceTotal = () => {
                   placeholder="kuantitas"
                   v-model="form.quantity"
                   :use-grouping="false"
-                  :label="form.laundry_id.id ? `Jumlah (${form.laundry_id.unit})` : '-'"
-                  :disabled="!form.laundry_id.id"
+                  :label="form.laundry.id ? `Jumlah (${form.laundry.unit})` : '-'"
+                  :disabled="!form.laundry.id"
                   :error="form.errors.quantity"
                   :step="0.1"
                   :min="0"
@@ -252,7 +264,7 @@ const transactionPriceTotal = () => {
                   label="Tambahkan"
                   class="p-button-text"
                   icon="pi pi-shopping-cart"
-                  @click="transactionBasketOnClick"
+                  @click="addTransactionBasket"
                 />
               </div>
 
@@ -277,8 +289,8 @@ const transactionPriceTotal = () => {
                   <template #header>
                     <span>Info Customer</span>
                     <div class="mt-2">
-                      <span class="mr-3">Nama : {{ form.customer_id.name }}</span>
-                      <span>HP : {{ form.customer_id.phone }}</span>
+                      <span class="mr-3">Nama : {{ form.customer.name }}</span>
+                      <span>HP : {{ form.customer.phone }}</span>
                     </div>
                   </template>
 
@@ -290,15 +302,12 @@ const transactionPriceTotal = () => {
                   >
                     <template #body="{ data, field }">
                       <template v-if="field === 'discount'"> {{ data[field] }}% </template>
-
                       <template v-else-if="field === 'price'">
                         {{ IDRCurrencyFormat(data[field]) }}
                       </template>
-
                       <template v-else-if="field === 'totalPrice'">
                         {{ IDRCurrencyFormat(data[field]) }}
                       </template>
-
                       <template v-else>
                         {{ data[field] }}
                       </template>
@@ -315,15 +324,12 @@ const transactionPriceTotal = () => {
                           :max="100"
                         />
                       </template>
-
                       <template v-else-if="field === 'price'">
                         {{ IDRCurrencyFormat(data[field]) }}
                       </template>
-
                       <template v-else-if="field === 'totalPrice'">
                         {{ IDRCurrencyFormat(data[field]) }}
                       </template>
-
                       <template v-else>
                         {{ data[field] }}
                       </template>
@@ -349,7 +355,7 @@ const transactionPriceTotal = () => {
                   <InputNumber
                     id="discount"
                     input-class="w-4rem ml-2"
-                    v-model="form.discount_all"
+                    v-model="form.discountAll"
                     suffix="%"
                     :min="0"
                     :max="100"
@@ -369,9 +375,7 @@ const transactionPriceTotal = () => {
                 label="Simpan Transaksi"
                 icon="pi pi-check"
                 class="p-button-text"
-                :disabled="
-                  form.processing || transactionBasket.length === 0 || Object.keys(form.customer_id).length === 0
-                "
+                :disabled="form.processing || transactionBasket.length === 0 || Object.keys(form.customer).length === 0"
                 @click="submit"
               />
             </div>
@@ -382,12 +386,13 @@ const transactionPriceTotal = () => {
 
     <Dialog
       modal
-      v-model:visible="customerDialog"
+      v-model:visible="customerDialogShow"
       class="p-fluid"
       header="Tambah Customer"
       :style="{ width: '450px' }"
       :breakpoints="{ '960px': '75vw' }"
       @hide="customerDialogOnHide"
+      @show="customerDialogOnShow"
     >
       <div class="grid">
         <div class="col-12 md:col-6">
@@ -404,15 +409,6 @@ const transactionPriceTotal = () => {
             placeholder="nomor hp"
             v-model="formCustomer.phone"
             :error="formCustomer.errors.phone"
-          />
-        </div>
-
-        <div class="col-12 md:col-6">
-          <AppInputText
-            label="Alamat"
-            placeholder="alamat"
-            v-model="formCustomer.address"
-            :error="formCustomer.errors.address"
           />
         </div>
 
