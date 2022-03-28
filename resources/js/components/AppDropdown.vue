@@ -1,18 +1,18 @@
 <script setup>
-import { computed } from "vue";
+import { computed } from 'vue'
 
 const props = defineProps({
   optionLabel: {
     type: String,
-    default: "label",
+    default: 'label',
   },
   optionValue: {
     type: String,
-    default: "value",
+    default: 'value',
   },
   optionDisabled: {
     type: String,
-    default: "disabled",
+    default: 'disabled',
   },
   options: {
     type: Array,
@@ -31,28 +31,24 @@ const props = defineProps({
     default: null,
   },
   modelValue: null,
-});
+})
 
-defineEmits(["update:modelValue"]);
+defineEmits(['update:modelValue'])
 
-const isError = computed(() => (props.error ? true : false));
+const isError = computed(() => (props.error ? true : false))
 
-const forLabel = computed(() =>
-  props.label ? props.label.toLowerCase().replace(/\s+/g, "-") : null
-);
+const forLabel = computed(() => (props.label ? props.label.toLowerCase().replace(/\s+/g, '-') : null))
 
 const ariaDescribedbyLabel = computed(() =>
-  props.label ? props.label.toLowerCase().replace(/\s+/g, "-") + "-help" : null
-);
+  props.label ? props.label.toLowerCase().replace(/\s+/g, '-') + '-help' : null
+)
 
 const selectedDropdownLabel = (value) => {
-  const result = props.options.find(
-    (option) => option[props.optionValue] == value
-  );
+  const result = props.options.find((option) => option[props.optionValue] == value)
   if (result) {
-    return result[props.optionLabel];
+    return result[props.optionLabel]
   }
-};
+}
 </script>
 
 <template>
@@ -86,11 +82,7 @@ const selectedDropdownLabel = (value) => {
     </template>
   </Dropdown>
 
-  <small
-    v-if="error"
-    :id="ariaDescribedbyLabel"
-    :class="{ 'p-error': isError }"
-  >
+  <small v-if="error" :id="ariaDescribedbyLabel" :class="{ 'p-error': isError }">
     {{ error }}
   </small>
 </template>

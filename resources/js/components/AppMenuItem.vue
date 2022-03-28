@@ -1,35 +1,3 @@
-<template>
-  <li :class="containerClass" role="none" :style="item.style" v-if="visible()">
-    <template v-if="!template">
-      <Link
-        v-if="item.to && !disabled(item)"
-        v-ripple
-        role="menuitem"
-        :href="item.to"
-        :class="linkClass(item)"
-        @click="onClick($event, navigate)"
-      >
-        <span :class="['p-menuitem-icon', item.icon]"></span>
-        <span class="p-menuitem-text">{{ label() }}</span>
-      </Link>
-      <a
-        v-else
-        :href="item.url"
-        :class="linkClass(item)"
-        @click="onClick"
-        :target="item.target"
-        role="menuitem"
-        :tabindex="disabled(item) ? null : '0'"
-        v-ripple
-      >
-        <span :class="['p-menuitem-icon', item.icon]"></span>
-        <span class="p-menuitem-text">{{ label() }}</span>
-      </a>
-    </template>
-    <component v-else :is="template" :item="item"></component>
-  </li>
-</template>
-
 <script>
 import Ripple from 'primevue/ripple'
 import { Link } from '@inertiajs/inertia-vue3'
@@ -81,3 +49,35 @@ export default {
   },
 }
 </script>
+
+<template>
+  <li :class="containerClass" role="none" :style="item.style" v-if="visible()">
+    <template v-if="!template">
+      <Link
+        v-if="item.to && !disabled(item)"
+        v-ripple
+        role="menuitem"
+        :href="item.to"
+        :class="linkClass(item)"
+        @click="onClick($event, navigate)"
+      >
+        <span :class="['p-menuitem-icon', item.icon]"></span>
+        <span class="p-menuitem-text">{{ label() }}</span>
+      </Link>
+      <a
+        v-else
+        :href="item.url"
+        :class="linkClass(item)"
+        @click="onClick"
+        :target="item.target"
+        role="menuitem"
+        :tabindex="disabled(item) ? null : '0'"
+        v-ripple
+      >
+        <span :class="['p-menuitem-icon', item.icon]"></span>
+        <span class="p-menuitem-text">{{ label() }}</span>
+      </a>
+    </template>
+    <component v-else :is="template" :item="item"></component>
+  </li>
+</template>

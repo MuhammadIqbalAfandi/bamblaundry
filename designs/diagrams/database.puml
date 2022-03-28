@@ -33,7 +33,7 @@ entity Transaction {
   discount
   * transaction_status_id
   * user_id
-  * customer_id
+  * customer_number
   * outlet_id
 }
 

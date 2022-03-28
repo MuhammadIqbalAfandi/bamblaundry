@@ -1,37 +1,35 @@
 <script setup>
-import { ref, watch, computed } from "vue";
-import { Inertia } from "@inertiajs/inertia";
-import { Head, useForm, usePage } from "@inertiajs/inertia-vue3";
-import throttle from "lodash/throttle";
-import pickBy from "lodash/pickBy";
-import AppButton from "@/components/AppButton.vue";
-import AppPagination from "@/components/AppPagination.vue";
-import AppMenu from "@/components/AppMenu.vue";
-import AppDropdown from "@/components/AppDropdown.vue";
-import AppLayout from "@/layouts/AppLayout.vue";
+import { ref, watch, computed, onMounted } from 'vue'
+import { Inertia } from '@inertiajs/inertia'
+import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
+import throttle from 'lodash/throttle'
+import pickBy from 'lodash/pickBy'
+import AppButton from '@/components/AppButton.vue'
+import AppPagination from '@/components/AppPagination.vue'
+import AppMenu from '@/components/AppMenu.vue'
+import AppDropdown from '@/components/AppDropdown.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
 
-import { IndexTable } from "./TableHeader";
+import { IndexTable } from './TableHeader'
 
 const props = defineProps({
   transactions: Object,
   transactionsStatus: Array,
   filters: Object,
   outlets: Array,
-});
+})
 
 const filterForm = useForm({
   search: props.filters.search,
   dates: props.filters.dates,
   outlet: props.filters.outlet,
-});
-
-const isAdmin = computed(() => usePage().props.value.isAdmin);
+})
 
 watch(
   filterForm,
   throttle(() => {
     Inertia.get(
-      "/transactions",
+      '/transactions',
       pickBy({
         search: filterForm.search,
         dates: filterForm.dates,
@@ -40,85 +38,85 @@ watch(
       {
         preserveState: true,
       }
-    );
+    )
   }, 300)
-);
+)
 
-const transactionId = ref();
+const transactionId = ref()
 
-const updateStatusDialog = ref(false);
+const updateStatusDialogShow = ref(false)
 
 const updateStatusForm = useForm({
   transaction_status_id: null,
-});
+})
 
 const updateStatusSubmit = () => {
-  updateStatusForm.put(route("transactions.update", transactionId.value), {
+  updateStatusForm.put(route('transactions.update', transactionId.value), {
     onSuccess: () => {
-      updateStatusDialog.value = false;
+      updateStatusDialogShow.value = false
     },
-  });
-};
+  })
+}
 
-const updateStatusItems = ref([]);
+const updateStatusItems = ref([])
 
-const overlayMenu = ref();
+const overlayMenu = ref()
 
-const overlayItems = ref([]);
+const overlayItems = ref([])
 
 const startPrinting = (transactionNumber) => {
-  Inertia.get(`/thermal-printing/${transactionNumber}`);
-};
+  Inertia.get(`/thermal-printing/${transactionNumber}`)
+}
 
 const overlayToggle = (event, data) => {
   overlayItems.value =
     data.transactionStatusId == 4
       ? [
           {
-            label: "Lihat detail",
-            icon: "pi pi-eye",
-            to: route("transactions.show", data.id),
+            label: 'Lihat detail',
+            icon: 'pi pi-eye',
+            to: route('transactions.show', data.id),
           },
           {
-            label: "Cetak ulang",
-            icon: "pi pi-print",
+            label: 'Cetak ulang',
+            icon: 'pi pi-print',
             command() {
-              startPrinting(data.transactionNumber);
+              startPrinting(data.transactionNumber)
             },
           },
         ]
       : [
           {
-            label: "Perbaharui status",
-            icon: "pi pi-refresh",
+            label: 'Perbaharui status',
+            icon: 'pi pi-refresh',
             command() {
-              updateStatusDialog.value = true;
+              updateStatusDialogShow.value = true
             },
           },
           {
-            label: "Lihat detail",
-            icon: "pi pi-eye",
-            to: route("transactions.show", data.id),
+            label: 'Lihat detail',
+            icon: 'pi pi-eye',
+            to: route('transactions.show', data.id),
           },
           {
-            label: "Cetak ulang",
-            icon: "pi pi-print",
+            label: 'Cetak ulang',
+            icon: 'pi pi-print',
             command() {
-              startPrinting(data.transactionNumber);
+              startPrinting(data.transactionNumber)
             },
           },
-        ];
+        ]
 
-  updateStatusItems.value = props.transactionsStatus.filter(
-    (val) => val.value >= data.transactionStatusId
-  );
+  updateStatusItems.value = props.transactionsStatus.filter((val) => val.value >= data.transactionStatusId)
 
-  updateStatusForm.transaction_status_id = data.transactionStatusId;
+  updateStatusForm.transaction_status_id = data.transactionStatusId
 
-  transactionId.value = data.id;
+  transactionId.value = data.id
 
-  overlayMenu.value.toggle(event);
-};
+  overlayMenu.value.toggle(event)
+}
+
+const isAdmin = computed(() => usePage().props.value.isAdmin)
 </script>
 
 <template>
@@ -126,29 +124,25 @@ const overlayToggle = (event, data) => {
 
   <AppLayout>
     <DataTable
-      responsiveLayout="scroll"
-      columnResizeMode="expand"
+      responsive-layout="scroll"
+      column-resize-mode="expand"
       :value="transactions.data"
-      :rowHover="true"
-      :stripedRows="true"
+      :row-hover="true"
+      :striped-rows="true"
     >
       <template #header>
         <h5>Transaksi</h5>
 
         <div class="grid">
           <div class="col-12 md:col-8">
-            <div class="flex flex-column md:flex-row">
-              <div class="flex align-items-center mr-0 md:mr-2 mb-2 md:mb-0">
-                <InputText
-                  class="w-full md:w-16rem"
-                  placeholder="cari..."
-                  v-model="filterForm.search"
-                />
+            <div class="grid">
+              <div class="col-12 md:col-4">
+                <InputText class="w-full" placeholder="cari..." v-model="filterForm.search" />
               </div>
 
-              <div class="flex align-items-center mr-0 md:mr-2 mb-2 md:mb-0">
+              <div class="col-12 md:col-4">
                 <Calendar
-                  class="w-full md:w-16rem"
+                  class="w-full"
                   v-model="filterForm.dates"
                   selection-mode="range"
                   placeholder="filter waktu..."
@@ -158,19 +152,23 @@ const overlayToggle = (event, data) => {
                 />
               </div>
 
-              <AppDropdown
-                v-if="isAdmin"
-                placeholder="pilih outlet"
-                v-model="filterForm.outlet"
-                :options="outlets"
-              />
+              <div class="col-12 md:col-4">
+                <Dropdown
+                  v-if="isAdmin"
+                  class="w-full"
+                  placeholder="pilih outlet"
+                  v-model="filterForm.outlet"
+                  option-label="label"
+                  option-value="value"
+                  :options="outlets"
+                />
+              </div>
             </div>
           </div>
-
           <div class="col-12 md:col-4 flex justify-content-end">
             <AppButton
               label="Tambah Transaksi"
-              class="p-button-text"
+              class="p-button-text md:w-16rem"
               icon="pi pi-pencil"
               :href="route('transactions.create')"
             />
@@ -185,26 +183,19 @@ const overlayToggle = (event, data) => {
         :key="indexTable.field"
       >
         <template #body="{ data, field }">
-          <template v-if="field === 'transactionStatusName'">
-            <Badge
-              v-if="data['transactionStatusId'] === 1"
-              :value="data[field]"
-            ></Badge>
-            <Badge
-              v-else-if="data['transactionStatusId'] === 2"
-              :value="data[field]"
-              severity="warning"
-            ></Badge>
-            <Badge v-else :value="data[field]" severity="success"></Badge>
+          <template v-if="field === 'transactionNumber'">
+            <p class="font-bold">{{ data[field] }}</p>
+            <p>{{ data.dateLaundry }}</p>
           </template>
           <template v-else-if="field === 'customer'">
             <p class="font-bold">{{ data.customer.number }}</p>
             <p>{{ data.customer.name }}</p>
             <p>{{ data.customer.phone }}</p>
           </template>
-          <template v-else-if="field === 'transactionNumber'">
-            <p class="font-bold">{{ data[field] }}</p>
-            <p>{{ data.dateLaundry }}</p>
+          <template v-else-if="field === 'transactionStatusName'">
+            <Badge v-if="data['transactionStatusId'] === 1" :value="data[field]"></Badge>
+            <Badge v-else-if="data['transactionStatusId'] === 2" :value="data[field]" severity="warning"></Badge>
+            <Badge v-else :value="data[field]" severity="success"></Badge>
           </template>
           <template v-else>
             {{ data[field] }}
@@ -220,12 +211,7 @@ const overlayToggle = (event, data) => {
             aria-controls="overlay_menu"
             @click="overlayToggle($event, slotProps.data)"
           />
-          <AppMenu
-            id="overlay_menu"
-            ref="overlayMenu"
-            :popup="true"
-            :model="overlayItems"
-          />
+          <AppMenu id="overlay_menu" ref="overlayMenu" :popup="true" :model="overlayItems" />
         </template>
       </Column>
     </DataTable>
@@ -234,12 +220,12 @@ const overlayToggle = (event, data) => {
 
     <Dialog
       modal
-      v-model:visible="updateStatusDialog"
+      v-model:visible="updateStatusDialogShow"
       class="p-fluid"
       header="Perbaharui Status"
       :style="{ width: '450px' }"
       :breakpoints="{ '960px': '75vw' }"
-      @hide="updateStatusDialog"
+      @hide="updateStatusDialogShow"
     >
       <div class="grid">
         <div class="col-12">

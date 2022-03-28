@@ -8,9 +8,9 @@ use App\Http\Requests\Transaction\StoreTransactionRequest;
 use App\Http\Requests\Transaction\UpdateTransactionRequest;
 use App\Models\Customer;
 use App\Models\Laundry;
+use App\Models\Outlet;
 use App\Models\Transaction;
 use App\Models\TransactionStatus;
-use App\Models\Outlet;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -79,7 +79,6 @@ class TransactionController extends Controller
                 ->filter(request('customer'))
                 ->get()
                 ->transform(fn($customer) => [
-                    'id' => $customer->id,
                     'name' => $customer->name,
                     'customerNumber' => $customer->customer_number,
                     'phone' => $customer->phone,
@@ -116,8 +115,8 @@ class TransactionController extends Controller
                 'transaction_number' => $request->transaction_number,
                 'discount' => $request->discount_all,
                 'transaction_status_id' => 1,
+                'customer_number' => $request->customer_number,
                 'user_id' => $request->user()->id,
-                'customer_id' => $request->customer_id,
                 'outlet_id' => $request->user()->outlet_id,
             ]);
 
@@ -167,12 +166,12 @@ class TransactionController extends Controller
             $socket->send(json_encode($transaction));
             $socket->close();
 
-            $customer = Customer::find($request->customer_id);
+            // $customer = Customer::find('customer_number', $request->customer_number);
 
-            Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
-                'receiver' => $customer->phone,
-                'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *'.$request->transaction_number.'*',
-            ]);
+            // Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
+            //     'receiver' => $customer->phone,
+            //     'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transaction_number . '*',
+            // ]);
 
             return to_route('transactions.index')->with('success', __('messages.success.store.transaction'));
         } catch (QueryException $e) {
@@ -242,9 +241,9 @@ class TransactionController extends Controller
     {
         $transaction->update($request->validated());
 
-        if($transaction->transaction_status_id==2) {
+        if ($transaction->transaction_status_id == 2) {
             $status_message = " sudah diproses, harap menunggu sampai pemberitahuan selanjutnya.";
-        } else if($transaction->transaction_status_id==3) {
+        } else if ($transaction->transaction_status_id == 3) {
             $status_message = " sudah selesai, silahkan diambil.";
         } else {
             $status_message = " sudah diambil. Silahkan datang lagi di kemudian hari jika ingin laundry kembali, terima kasih.";
@@ -252,7 +251,7 @@ class TransactionController extends Controller
 
         Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
             'receiver' => $transaction->customer->phone,
-            'message' => 'Layanan laundry Anda dengan nomor transaksi *'.$transaction->transaction_number.'*'.$status_message,
+            'message' => 'Layanan laundry Anda dengan nomor transaksi *' . $transaction->transaction_number . '*' . $status_message,
         ]);
 
         return back()->with('success', __('messages.success.update.transaction_status'));

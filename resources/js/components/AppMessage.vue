@@ -28,16 +28,16 @@ watch(
 <template>
   <div class="grid">
     <div class="col-12 lg:col-8">
-      <Message v-if="$page.props.flash.success" severity="success" :style="messageDisplay" @close="onClose()">
+      <Message v-if="$page.props.flash.success" severity="success" :style="messageDisplay" @close="onClose">
         {{ $page.props.flash.success }}
       </Message>
 
       <template v-if="$page.props.flash.error || Object.keys($page.props.errors).length > 0">
-        <Message v-if="$page.props.flash.error" severity="error" :style="messageDisplay" @close="onClose()">
+        <Message v-if="$page.props.flash.error" severity="error" :style="messageDisplay" @close="onClose">
           {{ $page.props.flash.error }}
         </Message>
 
-        <Message v-else severity="error" :style="messageDisplay" @close="onClose()">
+        <Message v-else severity="error" :style="messageDisplay" @close="onClose">
           <div v-if="Object.keys($page.props.errors).length === 1">Ditemukan satu error pada form</div>
           <div v-else>Ditemukan {{ Object.keys($page.props.errors).length }} error pada form</div>
         </Message>

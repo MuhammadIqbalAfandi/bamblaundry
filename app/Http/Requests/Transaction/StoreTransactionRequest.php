@@ -25,7 +25,7 @@ class StoreTransactionRequest extends FormRequest
     {
         return [
             'transaction_number' => 'required',
-            'customer_id' => 'required',
+            'customer_number' => 'required',
             'discount_all' => 'required',
             'laundries' => 'required',
         ];
