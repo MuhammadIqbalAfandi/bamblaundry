@@ -154,11 +154,11 @@ class TransactionController extends Controller
             // $thermalPrinting = new ThermalPrinting($transaction);
             // $thermalPrinting->startPrinting(2);
             try {
-                $socket->connect();
                 $socket = new WebsocketClient(
                     new SocketClient('ws://127.0.0.1:5544')
                 );
                 $socket->setHost('escpos-server');
+                $socket->connect();
                 $socket->send(json_encode($transaction));
                 $socket->close();
                 // dd($socket->getConnection()->getCurrentNode());
