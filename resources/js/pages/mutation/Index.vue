@@ -1,44 +1,70 @@
 <script setup>
-import { Inertia } from "@inertiajs/inertia";
-import { watch, computed } from "vue";
-import { Head, useForm, usePage } from "@inertiajs/inertia-vue3";
-import throttle from "lodash/throttle";
-import pickBy from "lodash/pickBy";
-import AppLayout from "@/layouts/AppLayout.vue";
-import AppPagination from "@/components/AppPagination.vue";
-import AppButton from "@/components/AppButton.vue";
-import AppDropdown from "@/components/AppDropdown.vue";
+import { Inertia } from '@inertiajs/inertia'
+import { watch, computed, onMounted } from 'vue'
+import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
+import dayjs from 'dayjs'
+import throttle from 'lodash/throttle'
+import pickBy from 'lodash/pickBy'
+import AppLayout from '@/layouts/AppLayout.vue'
+import AppPagination from '@/components/AppPagination.vue'
+import AppButton from '@/components/AppButton.vue'
 
-import TableHeader from "./TableHeader";
+import TableHeader from './TableHeader'
 
 const props = defineProps({
   mutations: Object,
   filters: Object,
   outlets: Array,
-});
+})
 
 const filterForm = useForm({
-  dates: props.filters.dates,
+  dates: null,
+  startDate: props.filters.startDate,
+  endDate: props.filters.endDate,
   outlet: props.filters.outlet,
-});
+})
 
-const isAdmin = computed(() => usePage().props.value.isAdmin);
+onMounted(() => {
+  if (props.filters.startDate || props.filters.endDate) {
+    if (props.filters.endDate) {
+      filterForm.dates = [new Date(props.filters.startDate), new Date(props.filters.endDate)]
+    } else {
+      filterForm.dates = [new Date(props.filters.startDate), null]
+    }
+  }
+})
 
 watch(
   filterForm,
   throttle(() => {
+    if (filterForm.dates) {
+      if (filterForm.dates[1]) {
+        filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
+        filterForm.endDate = dayjs(filterForm.dates[1]).format('YYYY-MM-DD')
+      } else {
+        filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
+        filterForm.endDate = null
+      }
+    } else {
+      filterForm.endDate = null
+      filterForm.startDate = null
+    }
+
     Inertia.get(
-      "/mutations",
+      '/mutations',
       pickBy({
-        dates: filterForm.dates,
+        startDate: filterForm.startDate,
+        endDate: filterForm.endDate,
         outlet: filterForm.outlet,
       }),
       {
         preserveState: true,
       }
-    );
+    )
   }, 300)
-);
+)
+
+const isAdmin = computed(() => usePage().props.value.isAdmin)
 </script>
 
 <template>
@@ -70,10 +96,13 @@ watch(
                 />
               </div>
               <div class="col-12 md:col-4">
-                <AppDropdown
+                <Dropdown
                   v-if="isAdmin"
+                  class="w-full"
                   placeholder="pilih outlet"
                   v-model="filterForm.outlet"
+                  option-label="label"
+                  option-value="value"
                   :options="outlets"
                 />
               </div>
@@ -91,12 +120,7 @@ watch(
 
       <Column>
         <template #body="{ data }">
-          <AppButton
-            icon="pi pi-link"
-            class="
-              p-button-text p-button-icon-only p-button-rounded p-button-text
-            "
-          />
+          <AppButton icon="pi pi-link" class="p-button-text p-button-icon-only p-button-rounded p-button-text" />
         </template>
       </Column>
     </DataTable>

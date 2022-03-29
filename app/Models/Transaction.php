@@ -81,12 +81,10 @@ class Transaction extends Model
                             ->orWhere('phone', 'like', '%' . $search . '%');
                     });
             });
-        })->when($filters['dates'] ?? null, function ($query, $dates) {
-            // $datess = [];
-            // foreach ($dates as $date) {
-            //     array_push($datess, Carbon::parse($date)->translatedFormat('d/m/Y'));
-            // }
-            $query->whereBetween('created_at', $dates);
+        })->when($filters['startDate'] ?? null, function ($query, $date) {
+            $query->whereDate('created_at', '>=', $date);
+        })->when($filters['endDate'] ?? null, function ($query, $date) {
+            $query->whereDate('created_at', '<=', $date);
         })->when($filters['outlet'] ?? null, function ($query, $outlet) {
             $query->where('outlet_id', $outlet);
         });

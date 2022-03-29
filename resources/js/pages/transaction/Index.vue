@@ -2,6 +2,7 @@
 import { ref, watch, computed, onMounted } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
+import dayjs from 'dayjs'
 import throttle from 'lodash/throttle'
 import pickBy from 'lodash/pickBy'
 import AppButton from '@/components/AppButton.vue'
@@ -21,18 +22,44 @@ const props = defineProps({
 
 const filterForm = useForm({
   search: props.filters.search,
-  dates: props.filters.dates,
+  dates: null,
+  startDate: props.filters.startDate,
+  endDate: props.filters.endDate,
   outlet: props.filters.outlet,
+})
+
+onMounted(() => {
+  if (props.filters.startDate || props.filters.endDate) {
+    if (props.filters.endDate) {
+      filterForm.dates = [new Date(props.filters.startDate), new Date(props.filters.endDate)]
+    } else {
+      filterForm.dates = [new Date(props.filters.startDate), null]
+    }
+  }
 })
 
 watch(
   filterForm,
   throttle(() => {
+    if (filterForm.dates) {
+      if (filterForm.dates[1]) {
+        filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
+        filterForm.endDate = dayjs(filterForm.dates[1]).format('YYYY-MM-DD')
+      } else {
+        filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
+        filterForm.endDate = null
+      }
+    } else {
+      filterForm.endDate = null
+      filterForm.startDate = null
+    }
+
     Inertia.get(
       '/transactions',
       pickBy({
         search: filterForm.search,
-        dates: filterForm.dates,
+        startDate: filterForm.startDate,
+        endDate: filterForm.endDate,
         outlet: filterForm.outlet,
       }),
       {

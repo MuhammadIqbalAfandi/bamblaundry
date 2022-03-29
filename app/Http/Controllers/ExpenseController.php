@@ -16,9 +16,9 @@ class ExpenseController extends Controller
     public function index()
     {
         return inertia('expense/Index', [
-            'filters' => request()->all('dates', 'outlet'),
+            'filters' => request()->all('startDate', 'endDate', 'outlet'),
             'expenses' => Expense::latest()
-                ->filter(request()->only('dates', 'outlet'))
+                ->filter(request()->only('startDate', 'endDate', 'outlet'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($expense) => [

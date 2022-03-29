@@ -11,12 +11,12 @@ use App\Models\Laundry;
 use App\Models\Outlet;
 use App\Models\Transaction;
 use App\Models\TransactionStatus;
+use Hoa\Socket\Client as SocketClient;
+use Hoa\Websocket\Client as WebsocketClient;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Hoa\Websocket\Client as WebsocketClient;
-use Hoa\Socket\Client as SocketClient;
 
 class TransactionController extends Controller
 {
@@ -34,9 +34,9 @@ class TransactionController extends Controller
         }
 
         return inertia('transaction/Index', [
-            'filters' => request()->all('search', 'dates', 'outlet'),
+            'filters' => request()->all('search', 'startDate', 'endDate', 'outlet'),
             'transactions' => $transactions
-                ->filter(request()->only('search', 'dates', 'outlet'))
+                ->filter(request()->only('search', 'startDate', 'endDate', 'outlet'))
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($transaction) => [
@@ -137,7 +137,7 @@ class TransactionController extends Controller
 
             DB::commit();
 
-            $transaction = Transaction::with(['outlet','customer','transactionDetails.laundry'])->latest()->first();
+            $transaction = Transaction::with(['outlet', 'customer', 'transactionDetails.laundry'])->latest()->first();
 
             $discountAsString = $transaction->discountAsString();
             $subTotalAsString = $transaction->subTotalAsString();

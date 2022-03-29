@@ -30,8 +30,10 @@ class Expense extends Model
 
     public function scopeFilter($query, array $filters)
     {
-        $query->when($filters['dates'] ?? null, function ($query, $dates) {
-            $query->whereBetween('created_at', $dates);
+        $query->when($filters['startDate'] ?? null, function ($query, $date) {
+            $query->whereDate('created_at', '>=', $date);
+        })->when($filters['endDate'] ?? null, function ($query, $date) {
+            $query->whereDate('created_at', '<=', $date);
         })->when($filters['outlet'] ?? null, function ($query, $outlet) {
             $query->where('outlet_id', $outlet);
         });
