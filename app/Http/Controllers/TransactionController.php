@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Helpers\ThermalPrinting;
+// use App\Http\Controllers\Helpers\ThermalPrinting;
 use App\Http\Requests\Transaction\StoreTransactionRequest;
 use App\Http\Requests\Transaction\UpdateTransactionRequest;
 use App\Models\Customer;
@@ -153,25 +153,25 @@ class TransactionController extends Controller
 
             // $thermalPrinting = new ThermalPrinting($transaction);
             // $thermalPrinting->startPrinting(2);
-            $socket = new WebsocketClient(
-                new SocketClient('ws://127.0.0.1:5544')
-            );
-            $socket->setHost('escpos-server');
-            // dd($socket->getConnection()->getCurrentNode());
             try {
                 $socket->connect();
+                $socket = new WebsocketClient(
+                    new SocketClient('ws://127.0.0.1:5544')
+                );
+                $socket->setHost('escpos-server');
+                $socket->send(json_encode($transaction));
+                $socket->close();
+                // dd($socket->getConnection()->getCurrentNode());
             } catch (Exception $e) {
                 return back()->with('error', __('messages.error.store.transaction'));
             }
-            $socket->send(json_encode($transaction));
-            $socket->close();
 
-            // $customer = Customer::find('customer_number', $request->customer_number);
+            $customer = Customer::find('customer_number', $request->customer_number);
 
-            // Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
-            //     'receiver' => $customer->phone,
-            //     'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transaction_number . '*',
-            // ]);
+            Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
+                'receiver' => $customer->phone,
+                'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transaction_number . '*',
+            ]);
 
             return to_route('transactions.index')->with('success', __('messages.success.store.transaction'));
         } catch (QueryException $e) {

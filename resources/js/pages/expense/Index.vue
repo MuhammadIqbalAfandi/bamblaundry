@@ -69,12 +69,14 @@ watch(
                   :manual-input="false"
                 />
               </div>
-              <AppDropdown
-                v-if="isAdmin"
-                placeholder="pilih outlet"
-                v-model="filterForm.outlet"
-                :options="outlets"
-              />
+              <div class="col-12 md:col-4">
+                <AppDropdown
+                  v-if="isAdmin"
+                  placeholder="pilih outlet"
+                  v-model="filterForm.outlet"
+                  :options="outlets"
+                />
+              </div>
             </div>
           </div>
           <div class="col-12 md:col-4 flex justify-content-end">

@@ -57,10 +57,10 @@ watch(
 
         <div class="grid">
           <div class="col-12 md:col-8">
-            <div class="flex flex-column md:flex-row">
-              <div class="flex align-items-center mr-0 md:mr-2 mb-2 md:mb-0">
+            <div class="grid">
+              <div class="col-12 md:col-4">
                 <Calendar
-                  class="w-full md:w-27rem"
+                  class="w-full"
                   v-model="filterForm.dates"
                   selection-mode="range"
                   placeholder="filter waktu..."
@@ -69,12 +69,14 @@ watch(
                   :manual-input="false"
                 />
               </div>
-              <AppDropdown
-                v-if="isAdmin"
-                placeholder="pilih outlet"
-                v-model="filterForm.outlet"
-                :options="outlets"
-              />
+              <div class="col-12 md:col-4">
+                <AppDropdown
+                  v-if="isAdmin"
+                  placeholder="pilih outlet"
+                  v-model="filterForm.outlet"
+                  :options="outlets"
+                />
+              </div>
             </div>
           </div>
         </div>
