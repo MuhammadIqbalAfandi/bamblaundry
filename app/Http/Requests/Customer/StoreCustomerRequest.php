@@ -27,7 +27,7 @@ class StoreCustomerRequest extends FormRequest
             'customer_number' => 'required|string',
             'name' => 'required|string|max:50',
             'phone' => 'required|numeric|min:12|unique:customers,phone',
-            'gender_id' => 'required|integer',
+            'gender_id' => 'required|numeric',
         ];
 
         if ($this->transaction_number) {

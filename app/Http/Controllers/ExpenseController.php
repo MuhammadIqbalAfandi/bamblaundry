@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Expense\StoreExpenseRequest;
 use App\Models\Expense;
 use App\Models\Outlet;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class ExpenseController extends Controller
 {
@@ -27,7 +32,6 @@ class ExpenseController extends Controller
                     'amount' => $expense->amount,
                     'outlet' => $expense->outlet->name,
                     'user' => $expense->user->name,
-                    'description' => $expense->description,
                 ]),
             'outlets' => Outlet::all()
                 ->transform(fn($outlet) => [
@@ -53,20 +57,55 @@ class ExpenseController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreExpenseRequest $request)
     {
-        dd($request);
+        DB::beginTransaction();
+
+        try {
+            $expense = Expense::create([
+                'description' => $request->description,
+                'amount' => $request->amount,
+                'user_id' => $request->user()->id,
+                'outlet_id' => $request->user()->outlet_id,
+            ]);
+
+            $expense->mutation()->create([
+                'type' => 2,
+                'amount' => $expense->getRawOriginal('amount'),
+                'outlet_id' => $request->user()->outlet_id,
+            ]);
+
+            DB::commit();
+
+            return to_route('expenses.index')->with('success', __('messages.success.store.expense'));
+        } catch (QueryException $e) {
+
+            DB::rollBack();
+
+            return back()->with('error', __('messages.error.store.expense'));
+        }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  Expense  $expense
+     * @return \Inertia\Response
      */
-    public function show($id)
+    public function show(Expense $expense)
     {
-        //
+        return inertia('expense/Show', [
+            'expense' => [
+                'created_at' => $expense->created_at,
+                'amount' => $expense->amount,
+                'description' => $expense->description,
+                'user' => [
+                    'name' => $expense->user->name,
+                    'phone' => $expense->user->phone,
+                    'email' => $expense->user->email,
+                ],
+            ],
+        ]);
     }
 
     /**

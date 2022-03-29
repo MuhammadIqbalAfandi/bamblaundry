@@ -25,7 +25,7 @@ class UpdateLaundryRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:50',
-            'price' => 'required|integer|numeric',
+            'price' => 'required|numeric',
             'unit' => 'required|string|max:50',
         ];
     }

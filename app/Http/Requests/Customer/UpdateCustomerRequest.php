@@ -27,7 +27,7 @@ class UpdateCustomerRequest extends FormRequest
             'customer_number' => 'required|string|unique:customers,customer_number,' . $this->customer->id,
             'name' => 'required|string|max:50',
             'phone' => 'required|numeric|min:12|unique:customers,phone,' . $this->customer->id,
-            'gender_id' => 'required|integer',
+            'gender_id' => 'required|numeric',
         ];
     }
 }

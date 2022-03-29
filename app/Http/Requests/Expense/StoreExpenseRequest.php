@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Laundry;
+namespace App\Http\Requests\Expense;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreLaundryRequest extends FormRequest
+class StoreExpenseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,8 @@ class StoreLaundryRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:50',
-            'price' => 'required|numeric',
-            'unit' => 'required|string|max:50',
+            'description' => 'required|string',
+            'amount' => 'required|numeric',
         ];
     }
 }

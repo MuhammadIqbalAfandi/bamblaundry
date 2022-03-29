@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-// use App\Http\Controllers\Helpers\ThermalPrinting;
+// use App\Http\Requests\Transaction\StoreTransactionRequest;
 use App\Http\Requests\Transaction\StoreTransactionRequest;
 use App\Http\Requests\Transaction\UpdateTransactionRequest;
 use App\Models\Customer;
@@ -129,7 +129,7 @@ class TransactionController extends Controller
                 ]);
             }
 
-            $transaction->mutations()->create([
+            $transaction->mutation()->create([
                 'type' => 1,
                 'amount' => $transaction->totalPrice(),
                 'outlet_id' => $request->user()->outlet_id,
@@ -173,9 +173,9 @@ class TransactionController extends Controller
 
             return to_route('transactions.index')->with('success', __('messages.success.store.transaction'));
         } catch (QueryException $e) {
-            return back()->with('error', __('messages.error.store.transaction'));
-
             DB::rollBack();
+
+            return back()->with('error', __('messages.error.store.transaction'));
         }
     }
 

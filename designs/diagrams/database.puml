@@ -89,9 +89,9 @@ entity Expense {
   * outlet_id
 }
 
-Mutation }|--|| Expense
+Mutation ||--|| Expense
 Mutation ||--|{ Outlet
-Transaction }|--|| Mutation
+Mutation ||--|| Transaction
 Transaction }|--|| TransactionDetail
 Transaction ||--|{ TransactionStatus
 Transaction ||--|{ Outlet

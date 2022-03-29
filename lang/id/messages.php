@@ -22,6 +22,7 @@ return [
             'verify_email' => 'Link verifikasi email berhasil terkirim',
         ],
         'store' => [
+            'expense' => 'Pengeluaran berhasil ditambahkan',
             'transaction' => 'Transaksi berhasil ditambahkan',
             'user' => 'Akun user berhasil ditambahkan',
             'customer' => 'Akun customer berhasil ditambahkan',
@@ -45,6 +46,7 @@ return [
 
     'error' => [
         'store' => [
+            'expense' => 'Pengeluaran gagal ditambahkan',
             'transaction' => 'Transaksi gagal ditambahkan',
         ],
     ],

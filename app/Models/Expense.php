@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Helpers\HasHelper;
+use App\Models\Mutation;
 use App\Models\Outlet;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Expense extends Model
 {
-    use HasFactory;
+    use HasFactory, HasHelper;
 
     protected $fillable = [
         'description',
@@ -17,6 +21,20 @@ class Expense extends Model
         'user_id',
         'outlet_id',
     ];
+
+    public function createdAt(): Attribute
+    {
+        return Attribute::make(
+            get:fn($value) => Carbon::parse($value)->translatedFormat('l d/m/Y')
+        );
+    }
+
+    public function amount(): Attribute
+    {
+        return Attribute::make(
+            get:fn($value) => $this->setRupiahFormat($value, 2, true)
+        );
+    }
 
     public function outlet()
     {
@@ -26,6 +44,11 @@ class Expense extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function mutation()
+    {
+        return $this->hasOne(Mutation::class);
     }
 
     public function scopeFilter($query, array $filters)

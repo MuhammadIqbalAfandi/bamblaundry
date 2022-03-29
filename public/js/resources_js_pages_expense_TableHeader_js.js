@@ -23,9 +23,6 @@ __webpack_require__.r(__webpack_exports__);
 }, {
   field: 'user',
   header: 'User'
-}, {
-  field: 'description',
-  header: 'Keterangan'
 }]);
 
 /***/ })

@@ -66,9 +66,9 @@ class Transaction extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function mutations()
+    public function mutation()
     {
-        return $this->hasMany(Mutation::class);
+        return $this->hasOne(Mutation::class);
     }
 
     public function scopeFilter($query, array $filters)

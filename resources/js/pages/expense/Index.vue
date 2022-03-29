@@ -129,7 +129,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
       <Column>
         <template #body="{ data }">
           <AppButton
-            icon="pi pi-link"
+            icon="pi pi-angle-double-right"
             class="p-button-text p-button-icon-only p-button-rounded p-button-text"
             :href="route('expenses.show', data.id)"
           />

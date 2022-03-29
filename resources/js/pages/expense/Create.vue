@@ -20,8 +20,14 @@ const submit = () => {
       <template #content>
         <div class="grid">
           <div class="col-12 md:col-3">
-            <AppInputNumber v-model="form.amount" label="Pengeluaran" placeholder="pengeluaran" />
+            <AppInputNumber
+              v-model="form.amount"
+              label="Pengeluaran"
+              placeholder="pengeluaran"
+              :error="form.errors.amount"
+            />
           </div>
+
           <div class="col-12">
             <Editor v-model="form.description" editorStyle="height: 320px" placeholder="tulis keterangan disini...">
               <template #toolbar>

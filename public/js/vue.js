@@ -57044,6 +57044,14 @@ var map = {
 		"./resources/js/pages/expense/Index.vue",
 		"resources_js_pages_expense_Index_vue"
 	],
+	"./expense/Show": [
+		"./resources/js/pages/expense/Show.vue",
+		"resources_js_pages_expense_Show_vue"
+	],
+	"./expense/Show.vue": [
+		"./resources/js/pages/expense/Show.vue",
+		"resources_js_pages_expense_Show_vue"
+	],
 	"./expense/TableHeader": [
 		"./resources/js/pages/expense/TableHeader.js",
 		"resources_js_pages_expense_TableHeader_js"
@@ -57321,7 +57329,7 @@ module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"P
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_pages_Access_vue":"f8bbe21f8e264f5e","resources_js_pages_auth_ForgotPassword_vue":"9db08b886f3acf35","resources_js_pages_auth_Login_vue":"8066395135ce093d","resources_js_pages_auth_ResetPassword_vue":"3191258dc6d8a4b7","resources_js_pages_auth_VerifyEmail_vue":"632c69e9e8e9c0af","resources_js_pages_customer_Create_vue":"79ffe9353bfb6214","resources_js_pages_customer_Edit_vue":"e8f7f29bdff055da","resources_js_pages_customer_Index_vue":"8f1e9cfb699af82b","resources_js_pages_customer_TableHeader_js":"5a71001a3c75e000","resources_js_pages_expense_Create_vue":"e21e1ecb07e3be70","resources_js_pages_expense_Index_vue":"02ce31188e32ac00","resources_js_pages_expense_TableHeader_js":"01ba1a5fb8eecd28","resources_js_pages_laundry_Create_vue":"117cceea83629ff4","resources_js_pages_laundry_Edit_vue":"ffdbf6e4abc81541","resources_js_pages_laundry_Index_vue":"57aba92f7352c9a0","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Index_vue":"cfa4ae18dfa9652f","resources_js_pages_mutation_TableHeader_js":"831017a8dedc0b22","resources_js_pages_outlet_Create_vue":"cfc0149876db10a3","resources_js_pages_outlet_Edit_vue":"96461d572841ca3a","resources_js_pages_outlet_Index_vue":"51d4f235ff7bb890","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_transaction_Create_vue":"d9683715132cfd20","resources_js_pages_transaction_Index_vue":"eee54924aa3e4887","resources_js_pages_transaction_Show_vue":"013af021e4446e49","resources_js_pages_transaction_TableHeader_js":"8b928867ad174e10","resources_js_pages_user_Create_vue":"6531c0e253a6166c","resources_js_pages_user_Edit_vue":"f05142ef37da634c","resources_js_pages_user_Index_vue":"2a06d772e7878860","resources_js_pages_user_Show_vue":"26decc7e50578ff3","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
+/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_pages_Access_vue":"f8bbe21f8e264f5e","resources_js_pages_auth_ForgotPassword_vue":"9db08b886f3acf35","resources_js_pages_auth_Login_vue":"8066395135ce093d","resources_js_pages_auth_ResetPassword_vue":"3191258dc6d8a4b7","resources_js_pages_auth_VerifyEmail_vue":"632c69e9e8e9c0af","resources_js_pages_customer_Create_vue":"fb990839d7812c0d","resources_js_pages_customer_Edit_vue":"38fea728adbd3632","resources_js_pages_customer_Index_vue":"d44cabed843cad56","resources_js_pages_customer_TableHeader_js":"5a71001a3c75e000","resources_js_pages_expense_Create_vue":"0c553db9a06cfa16","resources_js_pages_expense_Index_vue":"0afa5080b31e3cc4","resources_js_pages_expense_Show_vue":"2376042e6e85a839","resources_js_pages_expense_TableHeader_js":"72e3dee74175b1c0","resources_js_pages_laundry_Create_vue":"9c55a0bf7aa5c778","resources_js_pages_laundry_Edit_vue":"01cca9abb4a1bfda","resources_js_pages_laundry_Index_vue":"0a1e25cb43861c8c","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Index_vue":"0455778ae430364b","resources_js_pages_mutation_TableHeader_js":"831017a8dedc0b22","resources_js_pages_outlet_Create_vue":"f50bcb1c5c044957","resources_js_pages_outlet_Edit_vue":"a485d53b8dad646e","resources_js_pages_outlet_Index_vue":"9fbae84b989ca86c","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_transaction_Create_vue":"d19169c693512ace","resources_js_pages_transaction_Index_vue":"4a8ab2a1d28620bb","resources_js_pages_transaction_Show_vue":"87df61d934c620a2","resources_js_pages_transaction_TableHeader_js":"8b928867ad174e10","resources_js_pages_user_Create_vue":"0d021c143ab6e992","resources_js_pages_user_Edit_vue":"ec47d8bd85f1663c","resources_js_pages_user_Index_vue":"5eabb615e830e0e2","resources_js_pages_user_Show_vue":"6b3171f99b004dd6","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
 /******/ 		};
 /******/ 	})();
 /******/ 	

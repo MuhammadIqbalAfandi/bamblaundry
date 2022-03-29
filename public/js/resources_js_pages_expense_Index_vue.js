@@ -519,8 +519,9 @@ var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 /* HOISTED */
 );
 
+var _hoisted_4 = [_hoisted_2, _hoisted_3];
 function render(_ctx, _cache) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <img alt=\"Logo\" src=\"/images/logo-dark.svg\" height=\"20\" class=\"mr-2\" /> "), _hoisted_2, _hoisted_3]);
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, _hoisted_4);
 }
 
 /***/ }),
@@ -1097,7 +1098,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             body: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref) {
               var data = _ref.data;
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
-                icon: "pi pi-link",
+                icon: "pi pi-angle-double-right",
                 "class": "p-button-text p-button-icon-only p-button-rounded p-button-text",
                 href: _ctx.route('expenses.show', data.id)
               }, null, 8
@@ -1153,9 +1154,6 @@ __webpack_require__.r(__webpack_exports__);
 }, {
   field: 'user',
   header: 'User'
-}, {
-  field: 'description',
-  header: 'Keterangan'
 }]);
 
 /***/ }),

@@ -27,6 +27,8 @@ class MutationController extends Controller
                     'outlet' => $mutation->outlet->name,
                     'amount' => $mutation->amount,
                     'type' => $mutation->type,
+                    'transactionId' => $mutation->transaction_id,
+                    'expenseId' => $mutation->expense_id,
                 ]),
             'outlets' => Outlet::all()
                 ->transform(fn($outlet) => [

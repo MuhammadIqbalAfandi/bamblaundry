@@ -549,8 +549,9 @@ var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 /* HOISTED */
 );
 
+var _hoisted_4 = [_hoisted_2, _hoisted_3];
 function render(_ctx, _cache) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <img alt=\"Logo\" src=\"/images/logo-dark.svg\" height=\"20\" class=\"mr-2\" /> "), _hoisted_2, _hoisted_3]);
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, _hoisted_4);
 }
 
 /***/ }),
@@ -1101,10 +1102,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               return $setup.form.amount = $event;
             }),
             label: "Pengeluaran",
-            placeholder: "pengeluaran"
+            placeholder: "pengeluaran",
+            error: $setup.form.errors.amount
           }, null, 8
           /* PROPS */
-          , ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Editor, {
+          , ["modelValue", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Editor, {
             modelValue: $setup.form.description,
             "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
               return $setup.form.description = $event;
