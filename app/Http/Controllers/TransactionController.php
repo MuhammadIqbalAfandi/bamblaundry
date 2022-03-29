@@ -166,10 +166,8 @@ class TransactionController extends Controller
                 return back()->with('error', __('messages.error.store.transaction'));
             }
 
-            $customer = Customer::find('customer_number', $request->customer_number);
-
             Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
-                'receiver' => $customer->phone,
+                'receiver' => $transaction->customer->phone,
                 'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transaction_number . '*',
             ]);
 
