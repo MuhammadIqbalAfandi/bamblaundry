@@ -154,11 +154,11 @@ class TransactionController extends Controller
             // $thermalPrinting = new ThermalPrinting($transaction);
             // $thermalPrinting->startPrinting(2);
             try {
-                $socket->connect();
                 $socket = new WebsocketClient(
                     new SocketClient('ws://43.230.131.149:5544')
                 );
                 $socket->setHost('escpos-server');
+                $socket->connect();
                 $socket->send(json_encode($transaction));
                 $socket->close();
                 // dd($socket->getConnection()->getCurrentNode());
@@ -166,10 +166,8 @@ class TransactionController extends Controller
                 return back()->with('error', __('messages.error.store.transaction'));
             }
 
-            $customer = Customer::find('customer_number', $request->customer_number);
-
             Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
-                'receiver' => $customer->phone,
+                'receiver' => $transaction->customer->phone,
                 'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transaction_number . '*',
             ]);
 

@@ -136,8 +136,8 @@ __webpack_require__.r(__webpack_exports__);
     var expose = _ref.expose;
     expose();
     var form = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_0__.useForm)({
-      email: 'admin@laundry.com',
-      password: 'admin',
+      email: '',
+      password: '',
       remember: false
     });
 

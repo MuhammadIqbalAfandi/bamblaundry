@@ -4,8 +4,8 @@ import AuthSessionSuccess from '@/components/AuthSessionSuccess.vue'
 import AuthValidationErrors from '@/components/AuthValidationErrors.vue'
 
 const form = useForm({
-  email: 'admin@laundry.com',
-  password: 'admin',
+  email: '',
+  password: '',
   remember: false,
 })
 
@@ -84,3 +84,4 @@ const submit = () => {
     </div>
   </div>
 </template>
+
