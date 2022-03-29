@@ -156,7 +156,7 @@ class TransactionController extends Controller
             try {
                 $socket->connect();
                 $socket = new WebsocketClient(
-                    new SocketClient('ws://127.0.0.1:5544')
+                    new SocketClient('ws://43.230.131.149:5544')
                 );
                 $socket->setHost('escpos-server');
                 $socket->send(json_encode($transaction));
