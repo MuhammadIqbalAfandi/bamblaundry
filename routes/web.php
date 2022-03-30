@@ -3,8 +3,9 @@
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LaundryController;
-use App\Http\Controllers\MutationController;
 use App\Http\Controllers\OutletController;
+use App\Http\Controllers\ReportMutationController;
+use App\Http\Controllers\ReportTransactionController;
 use App\Http\Controllers\ThermalPrintingController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
@@ -37,7 +38,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('/expenses', ExpenseController::class);
 
-    Route::resource('/reports/mutations', MutationController::class);
+    Route::get('/reports/mutations', [ReportMutationController::class, 'index']);
+    Route::get('/reports/mutations/export/excel', [ReportMutationController::class, 'exportExcel'])->name('mutations.excel');
+
+    Route::get('/reports/transactions', [ReportTransactionController::class, 'index']);
+    Route::get('/reports/transactions/export/excel', [ReportTransactionController::class, 'exportExcel'])->name('transactions.excel');
 
     Route::get('/thermal-printing/{transaction:transaction_number}', ThermalPrintingController::class);
 });

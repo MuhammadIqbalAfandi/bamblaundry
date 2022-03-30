@@ -7,7 +7,7 @@ import AppFooter from '@/components/AppFooter.vue'
 import AppMessage from '@/components/AppMessage.vue'
 
 import menu from '@/utils/menu'
-import menuAdmin from '@/utils/menu_admin'
+import menuAdmin from '@/utils/menu-admin'
 
 const containerClass = computed(() => {
   return [

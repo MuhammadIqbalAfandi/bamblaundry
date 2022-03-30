@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use App\Models\Helpers\HasHelper;
+use App\Models\Helpers\CurrencyFormat;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Laundry extends Model
 {
-    use HasFactory, HasHelper;
+    use HasFactory, CurrencyFormat;
 
     protected $fillable = [
         'name',

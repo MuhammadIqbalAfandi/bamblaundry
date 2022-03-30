@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\Customer;
-use App\Models\Helpers\HasHelper;
+use App\Models\Helpers\CurrencyFormat;
 use App\Models\Mutation;
 use App\Models\Outlet;
 use App\Models\TransactionDetail;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
-    use HasFactory, HasHelper;
+    use HasFactory, CurrencyFormat;
 
     protected $fillable = [
         'transaction_number',

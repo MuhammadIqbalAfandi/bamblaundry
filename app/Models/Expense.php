@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Helpers\HasHelper;
+use App\Models\Helpers\CurrencyFormat;
 use App\Models\Mutation;
 use App\Models\Outlet;
 use App\Models\User;
@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Expense extends Model
 {
-    use HasFactory, HasHelper;
+    use HasFactory, CurrencyFormat;
 
     protected $fillable = [
         'description',
@@ -32,7 +32,7 @@ class Expense extends Model
     public function amount(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $this->setRupiahFormat($value, 2, true)
+            get:fn($value) => '- ' . $this->setRupiahFormat($value, 2, true)
         );
     }
 

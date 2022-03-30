@@ -11,6 +11,7 @@ use App\Models\Laundry;
 use App\Models\Outlet;
 use App\Models\Transaction;
 use App\Models\TransactionStatus;
+use Exception;
 use Hoa\Socket\Client as SocketClient;
 use Hoa\Websocket\Client as WebsocketClient;
 use Illuminate\Database\QueryException;

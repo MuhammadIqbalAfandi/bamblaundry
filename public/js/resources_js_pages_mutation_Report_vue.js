@@ -16,7 +16,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     icon: String,
-    label: String
+    label: String,
+    inertiaLink: {
+      type: Boolean,
+      "default": true
+    }
   },
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
@@ -303,7 +307,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_AppFooter_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/components/AppFooter.vue */ "./resources/js/components/AppFooter.vue");
 /* harmony import */ var _components_AppMessage_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/components/AppMessage.vue */ "./resources/js/components/AppMessage.vue");
 /* harmony import */ var _utils_menu__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/utils/menu */ "./resources/js/utils/menu.js");
-/* harmony import */ var _utils_menu_admin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/utils/menu_admin */ "./resources/js/utils/menu_admin.js");
+/* harmony import */ var _utils_menu_admin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/utils/menu-admin */ "./resources/js/utils/menu-admin.js");
 
 
 
@@ -453,25 +457,40 @@ __webpack_require__.r(__webpack_exports__);
         filterForm.startDate = null;
       }
 
-      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_0__.Inertia.get('/mutations', lodash_pickBy__WEBPACK_IMPORTED_MODULE_5___default()({
+      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_0__.Inertia.get('/reports/mutations', lodash_pickBy__WEBPACK_IMPORTED_MODULE_5___default()({
         startDate: filterForm.startDate,
         endDate: filterForm.endDate,
         outlet: filterForm.outlet
       }), {
         preserveState: true
       });
+      var params = window.location.search;
+      exportExcelLink.value = "/reports/mutations/export/excel".concat(params);
     }, 300));
+
+    var linkReference = function linkReference(data) {
+      if (data.transactionId) {
+        return route('transactions.show', data.transactionId);
+      } else {
+        return route('expenses.show', data.expenseId);
+      }
+    };
+
+    var exportExcelLink = (0,vue__WEBPACK_IMPORTED_MODULE_1__.ref)('/reports/mutations/export/excel');
     var isAdmin = (0,vue__WEBPACK_IMPORTED_MODULE_1__.computed)(function () {
       return (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.usePage)().props.value.isAdmin;
     });
     var __returned__ = {
       props: props,
       filterForm: filterForm,
+      linkReference: linkReference,
+      exportExcelLink: exportExcelLink,
       isAdmin: isAdmin,
       Inertia: _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_0__.Inertia,
       watch: vue__WEBPACK_IMPORTED_MODULE_1__.watch,
       computed: vue__WEBPACK_IMPORTED_MODULE_1__.computed,
       onMounted: vue__WEBPACK_IMPORTED_MODULE_1__.onMounted,
+      ref: vue__WEBPACK_IMPORTED_MODULE_1__.ref,
       Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.Head,
       useForm: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm,
       usePage: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.usePage,
@@ -510,8 +529,17 @@ var _hoisted_1 = {
   key: 1,
   "class": "p-button-label"
 };
+var _hoisted_2 = {
+  key: 1,
+  "class": "p-button p-component"
+};
+var _hoisted_3 = {
+  key: 1,
+  "class": "p-button-label"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
+  return $props.inertiaLink ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
+    key: 0,
     "class": "p-button p-component",
     as: "button",
     type: "button"
@@ -529,7 +557,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  });
+  })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", _hoisted_2, [$props.icon ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+    key: 0,
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["p-button-icon p-button-icon-left", $props.icon])
+  }, null, 2
+  /* CLASS */
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.label ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.label), 1
+  /* TEXT */
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]));
 }
 
 /***/ }),
@@ -1104,6 +1139,9 @@ var _hoisted_5 = {
 var _hoisted_6 = {
   "class": "col-12 md:col-4"
 };
+var _hoisted_7 = {
+  "class": "col-12 md:col-4 flex justify-content-end"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Calendar = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Calendar");
 
@@ -1141,7 +1179,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [$setup.isAdmin ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Dropdown, {
             key: 0,
             "class": "w-full",
-            placeholder: "pilih outlet",
+            placeholder: "pilih outlet...",
             modelValue: $setup.filterForm.outlet,
             "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
               return $setup.filterForm.outlet = $event;
@@ -1151,7 +1189,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             options: $props.outlets
           }, null, 8
           /* PROPS */
-          , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])];
+          , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [$props.mutations.data.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["AppButton"], {
+            key: 0,
+            label: "Export excel",
+            "class": "p-button-text md:w-16rem",
+            icon: "pi pi-file-excel",
+            "inertia-link": false,
+            href: $setup.exportExcelLink
+          }, null, 8
+          /* PROPS */
+          , ["href"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])];
         }),
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.TableHeader, function (tableHeader) {
@@ -1169,8 +1216,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               var data = _ref.data;
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
                 icon: "pi pi-link",
-                "class": "p-button-text p-button-icon-only p-button-rounded p-button-text"
-              })];
+                "class": "p-button-text p-button-icon-only p-button-rounded p-button-text",
+                href: $setup.linkReference(data)
+              }, null, 8
+              /* PROPS */
+              , ["href"])];
             }),
             _: 1
             /* STABLE */
@@ -1223,64 +1273,9 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/utils/menu.js":
-/*!************************************!*\
-  !*** ./resources/js/utils/menu.js ***!
-  \************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
-  label: 'Menu',
-  items: [{
-    label: 'Transaksi',
-    icon: 'pi pi-shopping-cart',
-    to: '/transactions',
-    component: 'transaction/Index'
-  }, {
-    label: 'Pengeluaran',
-    icon: 'pi pi-wallet',
-    to: '/expenses',
-    component: 'expense/Index'
-  }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    items: [{
-      label: 'Mutasi',
-      icon: 'pi pi-circle',
-      to: '/reports/mutations',
-      component: 'mutation/Report'
-    }, {
-      label: 'Transaksi',
-      icon: 'pi pi-circle',
-      to: '/reports/transactions',
-      component: 'transaction/Report'
-    }]
-  }]
-}, {
-  label: 'Master',
-  items: [{
-    label: 'Customer',
-    icon: 'pi pi-users',
-    to: '/customers',
-    component: 'customer/Index'
-  }, {
-    label: 'Laundry',
-    icon: 'pi pi-table',
-    to: '/laundries',
-    component: 'laundry/Index'
-  }]
-}]);
-
-/***/ }),
-
-/***/ "./resources/js/utils/menu_admin.js":
+/***/ "./resources/js/utils/menu-admin.js":
 /*!******************************************!*\
-  !*** ./resources/js/utils/menu_admin.js ***!
+  !*** ./resources/js/utils/menu-admin.js ***!
   \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -1333,6 +1328,61 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-share-alt',
     to: '/outlets',
     component: 'outlet/Index'
+  }, {
+    label: 'Laundry',
+    icon: 'pi pi-table',
+    to: '/laundries',
+    component: 'laundry/Index'
+  }]
+}]);
+
+/***/ }),
+
+/***/ "./resources/js/utils/menu.js":
+/*!************************************!*\
+  !*** ./resources/js/utils/menu.js ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
+  label: 'Menu',
+  items: [{
+    label: 'Transaksi',
+    icon: 'pi pi-shopping-cart',
+    to: '/transactions',
+    component: 'transaction/Index'
+  }, {
+    label: 'Pengeluaran',
+    icon: 'pi pi-wallet',
+    to: '/expenses',
+    component: 'expense/Index'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    items: [{
+      label: 'Mutasi',
+      icon: 'pi pi-circle',
+      to: '/reports/mutations',
+      component: 'mutation/Report'
+    }, {
+      label: 'Transaksi',
+      icon: 'pi pi-circle',
+      to: '/reports/transactions',
+      component: 'transaction/Report'
+    }]
+  }]
+}, {
+  label: 'Master',
+  items: [{
+    label: 'Customer',
+    icon: 'pi pi-users',
+    to: '/customers',
+    component: 'customer/Index'
   }, {
     label: 'Laundry',
     icon: 'pi pi-table',

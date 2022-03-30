@@ -99,7 +99,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
                 <Dropdown
                   v-if="isAdmin"
                   class="w-full"
-                  placeholder="pilih outlet"
+                  placeholder="pilih outlet..."
                   v-model="filterForm.outlet"
                   option-label="label"
                   option-value="value"

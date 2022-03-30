@@ -232,7 +232,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_AppFooter_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/components/AppFooter.vue */ "./resources/js/components/AppFooter.vue");
 /* harmony import */ var _components_AppMessage_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/components/AppMessage.vue */ "./resources/js/components/AppMessage.vue");
 /* harmony import */ var _utils_menu__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/utils/menu */ "./resources/js/utils/menu.js");
-/* harmony import */ var _utils_menu_admin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/utils/menu_admin */ "./resources/js/utils/menu_admin.js");
+/* harmony import */ var _utils_menu_admin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/utils/menu-admin */ "./resources/js/utils/menu-admin.js");
 
 
 
@@ -969,63 +969,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
-/***/ "./resources/js/utils/menu.js":
-/*!************************************!*\
-  !*** ./resources/js/utils/menu.js ***!
-  \************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
-  label: 'Menu',
-  items: [{
-    label: 'Transaksi',
-    icon: 'pi pi-shopping-cart',
-    to: '/transactions',
-    component: 'transaction/Index'
-  }, {
-    label: 'Pengeluaran',
-    icon: 'pi pi-wallet',
-    to: '/expenses',
-    component: 'expense/Index'
-  }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    items: [{
-      label: 'Mutasi',
-      icon: 'pi pi-circle',
-      to: '/reports/mutations',
-      component: 'mutation/Report'
-    }, {
-      label: 'Transaksi',
-      icon: 'pi pi-circle',
-      to: '/reports/transactions',
-      component: 'transaction/Report'
-    }]
-  }]
-}, {
-  label: 'Master',
-  items: [{
-    label: 'Customer',
-    icon: 'pi pi-users',
-    to: '/customers',
-    component: 'customer/Index'
-  }, {
-    label: 'Laundry',
-    icon: 'pi pi-table',
-    to: '/laundries',
-    component: 'laundry/Index'
-  }]
-}]);
-
-/***/ }),
-
-/***/ "./resources/js/utils/menu_admin.js":
+/***/ "./resources/js/utils/menu-admin.js":
 /*!******************************************!*\
-  !*** ./resources/js/utils/menu_admin.js ***!
+  !*** ./resources/js/utils/menu-admin.js ***!
   \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -1077,6 +1023,60 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-share-alt',
     to: '/outlets',
     component: 'outlet/Index'
+  }, {
+    label: 'Laundry',
+    icon: 'pi pi-table',
+    to: '/laundries',
+    component: 'laundry/Index'
+  }]
+}]);
+
+/***/ }),
+
+/***/ "./resources/js/utils/menu.js":
+/*!************************************!*\
+  !*** ./resources/js/utils/menu.js ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
+  label: 'Menu',
+  items: [{
+    label: 'Transaksi',
+    icon: 'pi pi-shopping-cart',
+    to: '/transactions',
+    component: 'transaction/Index'
+  }, {
+    label: 'Pengeluaran',
+    icon: 'pi pi-wallet',
+    to: '/expenses',
+    component: 'expense/Index'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    items: [{
+      label: 'Mutasi',
+      icon: 'pi pi-circle',
+      to: '/reports/mutations',
+      component: 'mutation/Report'
+    }, {
+      label: 'Transaksi',
+      icon: 'pi pi-circle',
+      to: '/reports/transactions',
+      component: 'transaction/Report'
+    }]
+  }]
+}, {
+  label: 'Master',
+  items: [{
+    label: 'Customer',
+    icon: 'pi pi-users',
+    to: '/customers',
+    component: 'customer/Index'
   }, {
     label: 'Laundry',
     icon: 'pi pi-table',

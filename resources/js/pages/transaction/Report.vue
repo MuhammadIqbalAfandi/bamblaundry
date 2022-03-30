@@ -9,10 +9,10 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import AppPagination from '@/components/AppPagination.vue'
 import AppButton from '@/components/AppButton.vue'
 
-import TableHeader from './TableHeader'
+import { TransactionReportTable } from './TableHeader'
 
 const props = defineProps({
-  mutations: Object,
+  transactions: Object,
   filters: Object,
   outlets: Array,
 })
@@ -51,7 +51,7 @@ watch(
     }
 
     Inertia.get(
-      '/reports/mutations',
+      '/reports/transactions',
       pickBy({
         startDate: filterForm.startDate,
         endDate: filterForm.endDate,
@@ -63,36 +63,32 @@ watch(
     )
 
     const params = window.location.search
-    exportExcelLink.value = `/reports/mutations/export/excel${params}`
+    exportExcelLink.value = `/reports/transactions/export/excel${params}`
   }, 300)
 )
 
 const linkReference = (data) => {
-  if (data.transactionId) {
-    return route('transactions.show', data.transactionId)
-  } else {
-    return route('expenses.show', data.expenseId)
-  }
+  return route('transactions.show', data.id)
 }
 
-const exportExcelLink = ref('/reports/mutations/export/excel')
+const exportExcelLink = ref('/reports/transactions/export/excel')
 
 const isAdmin = computed(() => usePage().props.value.isAdmin)
 </script>
 
 <template>
   <AppLayout>
-    <Head title="Laporan Mutasi" />
+    <Head title="Laporan Transaksi" />
 
     <DataTable
       responsive-layout="scroll"
       column-resize-mode="expand"
-      :value="mutations.data"
+      :value="transactions.data"
       :row-hover="true"
       :striped-rows="true"
     >
       <template #header>
-        <h5>Laporan Mutasi</h5>
+        <h5>Laporan Transaksi</h5>
 
         <div class="grid">
           <div class="col-12 md:col-8">
@@ -123,7 +119,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
           </div>
           <div class="col-12 md:col-4 flex justify-content-end">
             <AppButton
-              v-if="mutations.data.length"
+              v-if="transactions.data.length"
               label="Export excel"
               class="p-button-text md:w-16rem"
               icon="pi pi-file-excel"
@@ -135,11 +131,26 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
       </template>
 
       <Column
-        v-for="tableHeader in TableHeader"
+        v-for="tableHeader in TransactionReportTable"
         :field="tableHeader.field"
         :header="tableHeader.header"
         :key="tableHeader.field"
-      />
+      >
+        <template #body="{ data, field }">
+          <template v-if="field === 'transactionNumber'">
+            <p class="font-bold">{{ data[field] }}</p>
+            <p>{{ data.createdAt }}</p>
+          </template>
+          <template v-else-if="field === 'transactionStatusName'">
+            <Badge v-if="data['transactionStatusId'] === 1" :value="data[field]"></Badge>
+            <Badge v-else-if="data['transactionStatusId'] === 2" :value="data[field]" severity="warning"></Badge>
+            <Badge v-else :value="data[field]" severity="success"></Badge>
+          </template>
+          <template v-else>
+            {{ data[field] }}
+          </template>
+        </template>
+      </Column>
 
       <Column>
         <template #body="{ data }">
@@ -152,6 +163,6 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
       </Column>
     </DataTable>
 
-    <AppPagination :links="mutations.links" />
+    <AppPagination :links="transactions.links" />
   </AppLayout>
 </template>

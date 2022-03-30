@@ -10,7 +10,7 @@ import AppAutocompleteBasic from '@/components/AppAutocompleteBasic.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 
 import { TransactionBasketTable } from './TableHeader.js'
-import { IDRCurrencyFormat } from '@/utils/helpers'
+import { IDRCurrencyFormat } from '@/utils/currency-format'
 
 const props = defineProps({
   transactionNumber: String,

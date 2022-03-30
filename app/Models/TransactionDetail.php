@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Helpers\HasHelper;
+use App\Models\Helpers\CurrencyFormat;
 use App\Models\Laundry;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransactionDetail extends Model
 {
-    use HasFactory, HasHelper;
+    use HasFactory, CurrencyFormat;
 
     protected $fillable = [
         'price',

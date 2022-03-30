@@ -16,7 +16,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     icon: String,
-    label: String
+    label: String,
+    inertiaLink: {
+      type: Boolean,
+      "default": true
+    }
   },
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
@@ -507,7 +511,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_AppFooter_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/components/AppFooter.vue */ "./resources/js/components/AppFooter.vue");
 /* harmony import */ var _components_AppMessage_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/components/AppMessage.vue */ "./resources/js/components/AppMessage.vue");
 /* harmony import */ var _utils_menu__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/utils/menu */ "./resources/js/utils/menu.js");
-/* harmony import */ var _utils_menu_admin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/utils/menu_admin */ "./resources/js/utils/menu_admin.js");
+/* harmony import */ var _utils_menu_admin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/utils/menu-admin */ "./resources/js/utils/menu-admin.js");
 
 
 
@@ -696,8 +700,17 @@ var _hoisted_1 = {
   key: 1,
   "class": "p-button-label"
 };
+var _hoisted_2 = {
+  key: 1,
+  "class": "p-button p-component"
+};
+var _hoisted_3 = {
+  key: 1,
+  "class": "p-button-label"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
+  return $props.inertiaLink ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
+    key: 0,
     "class": "p-button p-component",
     as: "button",
     type: "button"
@@ -715,7 +728,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  });
+  })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", _hoisted_2, [$props.icon ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+    key: 0,
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["p-button-icon p-button-icon-left", $props.icon])
+  }, null, 2
+  /* CLASS */
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.label ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.label), 1
+  /* TEXT */
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]));
 }
 
 /***/ }),
@@ -1518,63 +1538,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
-/***/ "./resources/js/utils/menu.js":
-/*!************************************!*\
-  !*** ./resources/js/utils/menu.js ***!
-  \************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
-  label: 'Menu',
-  items: [{
-    label: 'Transaksi',
-    icon: 'pi pi-shopping-cart',
-    to: '/transactions',
-    component: 'transaction/Index'
-  }, {
-    label: 'Pengeluaran',
-    icon: 'pi pi-wallet',
-    to: '/expenses',
-    component: 'expense/Index'
-  }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    items: [{
-      label: 'Mutasi',
-      icon: 'pi pi-circle',
-      to: '/reports/mutations',
-      component: 'mutation/Report'
-    }, {
-      label: 'Transaksi',
-      icon: 'pi pi-circle',
-      to: '/reports/transactions',
-      component: 'transaction/Report'
-    }]
-  }]
-}, {
-  label: 'Master',
-  items: [{
-    label: 'Customer',
-    icon: 'pi pi-users',
-    to: '/customers',
-    component: 'customer/Index'
-  }, {
-    label: 'Laundry',
-    icon: 'pi pi-table',
-    to: '/laundries',
-    component: 'laundry/Index'
-  }]
-}]);
-
-/***/ }),
-
-/***/ "./resources/js/utils/menu_admin.js":
+/***/ "./resources/js/utils/menu-admin.js":
 /*!******************************************!*\
-  !*** ./resources/js/utils/menu_admin.js ***!
+  !*** ./resources/js/utils/menu-admin.js ***!
   \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -1626,6 +1592,60 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-share-alt',
     to: '/outlets',
     component: 'outlet/Index'
+  }, {
+    label: 'Laundry',
+    icon: 'pi pi-table',
+    to: '/laundries',
+    component: 'laundry/Index'
+  }]
+}]);
+
+/***/ }),
+
+/***/ "./resources/js/utils/menu.js":
+/*!************************************!*\
+  !*** ./resources/js/utils/menu.js ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
+  label: 'Menu',
+  items: [{
+    label: 'Transaksi',
+    icon: 'pi pi-shopping-cart',
+    to: '/transactions',
+    component: 'transaction/Index'
+  }, {
+    label: 'Pengeluaran',
+    icon: 'pi pi-wallet',
+    to: '/expenses',
+    component: 'expense/Index'
+  }, {
+    label: 'Laporan',
+    icon: 'pi pi-book',
+    items: [{
+      label: 'Mutasi',
+      icon: 'pi pi-circle',
+      to: '/reports/mutations',
+      component: 'mutation/Report'
+    }, {
+      label: 'Transaksi',
+      icon: 'pi pi-circle',
+      to: '/reports/transactions',
+      component: 'transaction/Report'
+    }]
+  }]
+}, {
+  label: 'Master',
+  items: [{
+    label: 'Customer',
+    icon: 'pi pi-users',
+    to: '/customers',
+    component: 'customer/Index'
   }, {
     label: 'Laundry',
     icon: 'pi pi-table',
