@@ -11,6 +11,12 @@ const props = defineProps({
   genders: Array,
 })
 
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
+
 const form = useForm({
   customer_number: props.customer_number,
   name: '',
@@ -21,12 +27,6 @@ const form = useForm({
 const submit = () => {
   form.post(route('customers.store'))
 }
-
-const errors = computed(() => usePage().props.value.errors)
-
-watch(errors, () => {
-  form.clearErrors()
-})
 </script>
 
 <template>

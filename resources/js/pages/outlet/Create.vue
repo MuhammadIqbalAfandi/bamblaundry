@@ -9,6 +9,12 @@ const props = defineProps({
   outlet_number: String,
 })
 
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
+
 const form = useForm({
   name: '',
   phone: '',
@@ -18,12 +24,6 @@ const form = useForm({
 const submit = () => {
   form.post(route('outlets.store'))
 }
-
-const errors = computed(() => usePage().props.value.errors)
-
-watch(errors, () => {
-  form.clearErrors()
-})
 </script>
 
 <template>

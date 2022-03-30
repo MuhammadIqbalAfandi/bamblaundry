@@ -4,6 +4,7 @@ import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppButton from '@/components/AppButton.vue'
 import AppInputText from '@/components/AppInputText.vue'
+import AppInputNumber from '@/components/AppInputNumber.vue'
 import AppDialog from '@/components/AppDialog.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 
@@ -52,7 +53,7 @@ const onCancel = () => (visibleDialog.value = false)
               </div>
 
               <div class="col-12 md:col-6">
-                <AppInputText label="Harga" placeholder="harga" :error="form.errors.price" v-model="form.price" />
+                <AppInputNumber label="Harga" placeholder="harga" :error="form.errors.price" v-model="form.price" />
               </div>
 
               <div class="col-12 md:col-6">

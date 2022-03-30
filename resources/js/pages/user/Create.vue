@@ -12,6 +12,12 @@ defineProps({
   roles: Array,
 })
 
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
+
 const form = useForm({
   name: '',
   phone: '',
@@ -24,12 +30,6 @@ const form = useForm({
 const submit = () => {
   form.post(route('users.store'))
 }
-
-const errors = computed(() => usePage().props.value.errors)
-
-watch(errors, () => {
-  form.clearErrors()
-})
 </script>
 
 <template>

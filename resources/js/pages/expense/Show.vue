@@ -12,8 +12,8 @@ defineProps({
   <AppLayout>
     <div class="grid px-2">
       <div class="col-auto mr-7">
-        <h2 class="mb-4">
-          <span class="text-base"> <i class="pi pi-user" /> Nama User</span>
+        <h2>
+          <span class="text-base"> <i class="pi pi-user" /> User</span>
 
           <br />
 
@@ -22,7 +22,7 @@ defineProps({
       </div>
 
       <div class="col-auto mr-7">
-        <h2 class="mb-4">
+        <h2>
           <span class="text-base"> <i class="pi pi-mobile" /> No HP</span>
 
           <br />
@@ -32,7 +32,7 @@ defineProps({
       </div>
 
       <div class="col-auto mr-7">
-        <h2 class="mb-4">
+        <h2>
           <span class="text-base"> <i class="pi pi-at" /> Email</span>
 
           <br />
@@ -43,7 +43,7 @@ defineProps({
 
       <div class="col-auto">
         <h2 class="mb-4">
-          <span class="text-base text-pink-700">
+          <span class="text-base">
             <i class="pi pi-wallet red-700" />
             Pengeluaran
           </span>
@@ -56,8 +56,8 @@ defineProps({
     </div>
 
     <div class="grid">
-      <div class="col-8">
-        <Card class="bg-primary">
+      <div class="col-12 md:col-8">
+        <Card>
           <template #content>
             <h5>Keterangan</h5>
             <p v-html="expense.description"></p>

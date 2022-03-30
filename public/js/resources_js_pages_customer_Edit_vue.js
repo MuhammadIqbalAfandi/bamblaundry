@@ -92,6 +92,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
+    label: {
+      type: String,
+      required: true
+    },
     optionLabel: {
       type: String,
       "default": 'label'
@@ -107,10 +111,6 @@ __webpack_require__.r(__webpack_exports__);
     options: {
       type: Array,
       required: true
-    },
-    label: {
-      type: String,
-      required: false
     },
     placeholder: {
       type: String,
@@ -306,10 +306,29 @@ __webpack_require__.r(__webpack_exports__);
   props: {
     model: Array
   },
+  emits: ['menuitem-click'],
   setup: function setup(__props, _ref) {
-    var expose = _ref.expose;
+    var expose = _ref.expose,
+        emits = _ref.emit;
     expose();
+
+    var onKeyDown = function onKeyDown(event) {
+      var nodeElement = event.target;
+
+      if (event.code === 'Enter' || event.code === 'Space') {
+        nodeElement.click();
+        event.preventDefault();
+      }
+    };
+
+    var onMenuItemClick = function onMenuItemClick(event) {
+      emits('menuitem-click', event);
+    };
+
     var __returned__ = {
+      emits: emits,
+      onKeyDown: onKeyDown,
+      onMenuItemClick: onMenuItemClick,
       AppSubSidebar: _components_AppSubSidebar_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
     };
     Object.defineProperty(__returned__, '__isScriptSetup', {
@@ -344,22 +363,46 @@ __webpack_require__.r(__webpack_exports__);
       "default": false
     }
   },
+  emits: ['menuitem-click'],
   setup: function setup(__props, _ref) {
-    var expose = _ref.expose;
+    var expose = _ref.expose,
+        emits = _ref.emit;
     expose();
     var activeIndex = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(null);
 
     var onMenuItemClick = function onMenuItemClick(event, item, index) {
-      if (!item.to) {
+      if (item.disabled) {
+        event.preventDefault();
+        return;
+      }
+
+      if (!item.to && !item.url) {
         event.preventDefault();
       }
 
+      if (item.command) {
+        item.command({
+          originalEvent: event,
+          item: item
+        });
+      }
+
       activeIndex.value = index === activeIndex.value ? null : index;
+      emits('menuitem-click', {
+        originalEvent: event,
+        item: item
+      });
+    };
+
+    var visible = function visible(item) {
+      return typeof item.visible === 'function' ? item.visible() : item.visible !== false;
     };
 
     var __returned__ = {
+      emits: emits,
       activeIndex: activeIndex,
       onMenuItemClick: onMenuItemClick,
+      visible: visible,
       ref: vue__WEBPACK_IMPORTED_MODULE_0__.ref,
       Link: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.Link
     };
@@ -434,9 +477,9 @@ __webpack_require__.r(__webpack_exports__);
     var expose = _ref.expose;
     expose();
     var containerClass = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
-      return ["layout-wrapper", "layout-static", {
-        "layout-static-sidebar-inactive": staticMenuInactive.value,
-        "layout-mobile-sidebar-active": mobileMenuActive.value
+      return ['layout-wrapper', 'layout-static', {
+        'layout-static-sidebar-inactive': staticMenuInactive.value,
+        'layout-mobile-sidebar-active': mobileMenuActive.value
       }];
     });
     var mobileMenuActive = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
@@ -446,10 +489,6 @@ __webpack_require__.r(__webpack_exports__);
     var isDesktop = function isDesktop() {
       return window.innerWidth >= 992;
     };
-
-    var isAdmin = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
-      return (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.usePage)().props.value.isAdmin;
-    });
 
     var onMenuToggle = function onMenuToggle() {
       menuClick.value = true;
@@ -469,15 +508,18 @@ __webpack_require__.r(__webpack_exports__);
       menuClick.value = false;
     };
 
+    var isAdmin = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
+      return (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.usePage)().props.value.isAdmin;
+    });
     var __returned__ = {
       containerClass: containerClass,
       mobileMenuActive: mobileMenuActive,
       staticMenuInactive: staticMenuInactive,
       menuClick: menuClick,
       isDesktop: isDesktop,
-      isAdmin: isAdmin,
       onMenuToggle: onMenuToggle,
       onWrapperClick: onWrapperClick,
+      isAdmin: isAdmin,
       ref: vue__WEBPACK_IMPORTED_MODULE_0__.ref,
       computed: vue__WEBPACK_IMPORTED_MODULE_0__.computed,
       usePage: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.usePage,
@@ -727,24 +769,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
-var _hoisted_1 = ["for"];
-var _hoisted_2 = {
+var _hoisted_1 = {
+  "class": "field"
+};
+var _hoisted_2 = ["for"];
+var _hoisted_3 = {
   key: 0
 };
-var _hoisted_3 = {
+var _hoisted_4 = {
   key: 1
 };
-var _hoisted_4 = ["id"];
+var _hoisted_5 = ["id"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Dropdown = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Dropdown");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [$props.label ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [$props.label ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
     key: 0,
     "for": $setup.forLabel
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.label), 9
   /* TEXT, PROPS */
-  , _hoisted_1)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Dropdown, {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["w-full mt-2", {
+  , _hoisted_2)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Dropdown, {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["w-full", {
       'p-invalid': $setup.isError
     }]),
     id: $setup.forLabel,
@@ -760,9 +805,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, {
     value: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (slotProps) {
-      return [slotProps.value ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.selectedDropdownLabel(slotProps.value)), 1
+      return [slotProps.value ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.selectedDropdownLabel(slotProps.value)), 1
       /* TEXT */
-      )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(slotProps.placeholder), 1
+      )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(slotProps.placeholder), 1
       /* TEXT */
       ))];
     }),
@@ -787,9 +832,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.error), 11
   /* TEXT, CLASS, PROPS */
-  , _hoisted_4)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64
-  /* STABLE_FRAGMENT */
-  );
+  , _hoisted_5)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
 }
 
 /***/ }),
@@ -857,7 +900,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }]),
     id: $setup.forLabel,
     "aria-describedby": $setup.ariaDescribedbyLabel,
-    "model-value": $props.type,
+    "model-value": $props.modelValue,
+    type: $props.type,
     placeholder: $props.placeholder,
     value: $props.modelValue,
     disabled: $props.disabled,
@@ -866,7 +910,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, null, 8
   /* PROPS */
-  , ["class", "id", "aria-describedby", "model-value", "placeholder", "value", "disabled"]), $props.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
+  , ["class", "id", "aria-describedby", "model-value", "type", "placeholder", "value", "disabled"]), $props.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
     key: 0,
     id: $setup.ariaDescribedbyLabel,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({
@@ -980,9 +1024,11 @@ var _hoisted_1 = {
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppSubSidebar"], {
+    "class": "layout-menu",
     items: $props.model,
     root: true,
-    "class": "layout-menu"
+    onKeydown: $setup.onKeyDown,
+    onMenuitemClick: $setup.onMenuItemClick
   }, null, 8
   /* PROPS */
   , ["items"])]);
@@ -1008,24 +1054,27 @@ var _hoisted_1 = {
 var _hoisted_2 = ["aria-label"];
 var _hoisted_3 = {
   key: 0,
-  "class": "pi pi-angle-down menuitem-toggle-icon"
+  "class": "pi pi-fw pi-angle-down menuitem-toggle-icon"
 };
-var _hoisted_4 = ["href", "onClick", "aria-label"];
+var _hoisted_4 = ["href", "target", "aria-label", "onClick"];
 var _hoisted_5 = {
   key: 0,
-  "class": "pi pi-angle-down menuitem-toggle-icon"
+  "class": "pi pi-fw pi-angle-down menuitem-toggle-icon"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_AppSubSidebar = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("AppSubSidebar", true);
 
+  var _component_Badge = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Badge");
+
   var _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("ripple");
 
   return $props.items ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("ul", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.items, function (item, i) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [$setup.visible(item) && !item.separator ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+      role: "none",
       key: item.label || i,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([{
         'layout-menuitem-category': $props.root,
-        'active-menuitem': $setup.activeIndex === i && !item.to
+        'active-menuitem': $setup.activeIndex === i && !item.to && !item.disabled
       }])
     }, [$props.root ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: 0
@@ -1035,24 +1084,30 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.label), 9
     /* TEXT, PROPS */
     , _hoisted_2), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_AppSubSidebar, {
-      items: item.items
+      items: $setup.visible(item) && item.items,
+      onMenuitemClick: _cache[0] || (_cache[0] = function ($event) {
+        return _ctx.$emit('menuitem-click', $event);
+      })
     }, null, 8
     /* PROPS */
     , ["items"])], 64
     /* STABLE_FRAGMENT */
     )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: 1
-    }, [item.to ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
+    }, [item.to ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
       key: 0,
+      role: "menuitem",
       href: item.to,
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["p-ripple", {
-        'router-link-active': $setup.activeIndex,
-        'router-link-exact-active': $setup.activeIndex
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([item["class"], 'p-ripple', {
+        'p-disabled': item.disabled,
+        'router-link-exact-active': _ctx.$page.component === item.component
       }]),
+      style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)(item.style),
+      target: item.target,
+      "aria-label": item.label,
       onClick: function onClick($event) {
         return $setup.onMenuItemClick($event, item, i);
-      },
-      "aria-label": item.label
+      }
     }, {
       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
         return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
@@ -1061,35 +1116,53 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         /* CLASS */
         ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.label), 1
         /* TEXT */
-        ), item.items ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+        ), item.items ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), item.badge ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Badge, {
+          key: 1,
+          value: item.badge
+        }, null, 8
+        /* PROPS */
+        , ["value"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
       }),
       _: 2
       /* DYNAMIC */
 
     }, 1032
     /* PROPS, DYNAMIC_SLOTS */
-    , ["href", "class", "onClick", "aria-label"])), [[_directive_ripple]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !item.to ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+    , ["href", "class", "style", "target", "aria-label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !item.to ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
       key: 1,
+      role: "menuitem",
       href: item.url || '#',
-      "class": "p-ripple",
+      style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)(item.style),
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([item["class"], 'p-ripple', {
+        'p-disabled': item.disabled
+      }]),
+      target: item.target,
+      "aria-label": item.label,
       onClick: function onClick($event) {
         return $setup.onMenuItemClick($event, item, i);
-      },
-      "aria-label": item.label
+      }
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(item.icon)
     }, null, 2
     /* CLASS */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.label), 1
     /* TEXT */
-    ), item.items ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_5)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 8
+    ), item.items ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_5)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), item.badge ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Badge, {
+      key: 1,
+      value: item.badge
+    }, null, 8
     /* PROPS */
+    , ["value"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 14
+    /* CLASS, STYLE, PROPS */
     , _hoisted_4)), [[_directive_ripple]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
       name: "layout-submenu-wrapper"
     }, {
       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
         return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_AppSubSidebar, {
-          items: item.items
+          items: $setup.visible(item) && item.items,
+          onMenuitemClick: _cache[1] || (_cache[1] = function ($event) {
+            return _ctx.$emit('menuitem-click', $event);
+          })
         }, null, 8
         /* PROPS */
         , ["items"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.activeIndex === i]])];
@@ -1103,9 +1176,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* STABLE_FRAGMENT */
     ))], 2
     /* CLASS */
+    )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $setup.visible(item) && item.separator ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+      role: "separator",
+      "class": "p-menu-separator",
+      style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)(item.style),
+      key: 'separator' + i
+    }, null, 4
+    /* STYLE */
+    )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64
+    /* STABLE_FRAGMENT */
     );
-  }), 128
-  /* KEYED_FRAGMENT */
+  }), 256
+  /* UNKEYED_FRAGMENT */
   ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true);
 }
 
@@ -1434,26 +1516,40 @@ __webpack_require__.r(__webpack_exports__);
   items: [{
     label: 'Transaksi',
     icon: 'pi pi-shopping-cart',
-    to: '/transactions'
+    to: '/transactions',
+    component: 'transaction/Index'
   }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
-    to: '/expenses'
+    to: '/expenses',
+    component: 'expense/Index'
   }, {
     label: 'Laporan',
     icon: 'pi pi-book',
-    to: '/mutations'
+    items: [{
+      label: 'Mutasi',
+      icon: 'pi pi-circle',
+      to: '/reports/mutations',
+      component: 'mutation/Report'
+    }, {
+      label: 'Transaksi',
+      icon: 'pi pi-circle',
+      to: '/reports/transactions',
+      component: 'transaction/Report'
+    }]
   }]
 }, {
   label: 'Master',
   items: [{
     label: 'Customer',
     icon: 'pi pi-users',
-    to: '/customers'
+    to: '/customers',
+    component: 'customer/Index'
   }, {
     label: 'Laundry',
     icon: 'pi pi-table',
-    to: '/laundries'
+    to: '/laundries',
+    component: 'laundry/Index'
   }]
 }]);
 
@@ -1474,34 +1570,50 @@ __webpack_require__.r(__webpack_exports__);
   items: [{
     label: 'Transaksi',
     icon: 'pi pi-shopping-cart',
-    to: '/transactions'
+    to: '/transactions',
+    component: 'transaction/Index'
   }, {
     label: 'Pengeluaran',
     icon: 'pi pi-wallet',
-    to: '/expenses'
+    to: '/expenses',
+    component: 'expense/Index'
   }, {
     label: 'Laporan',
     icon: 'pi pi-book',
-    to: '/mutations'
+    items: [{
+      label: 'Mutasi',
+      icon: 'pi pi-circle',
+      to: '/reports/mutations',
+      component: 'mutation/Report'
+    }, {
+      label: 'Transaksi',
+      icon: 'pi pi-circle',
+      to: '/reports/transactions',
+      component: 'transaction/Report'
+    }]
   }]
 }, {
   label: 'Master',
   items: [{
     label: 'User',
     icon: 'pi pi-user',
-    to: '/users'
+    to: '/users',
+    component: 'user/Index'
   }, {
     label: 'Customer',
     icon: 'pi pi-users',
-    to: '/customers'
+    to: '/customers',
+    component: 'customer/Index'
   }, {
     label: 'Outlet',
     icon: 'pi pi-share-alt',
-    to: '/outlets'
+    to: '/outlets',
+    component: 'outlet/Index'
   }, {
     label: 'Laundry',
     icon: 'pi pi-table',
-    to: '/laundries'
+    to: '/laundries',
+    component: 'laundry/Index'
   }]
 }]);
 

@@ -3,8 +3,8 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
-use Inertia\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -40,10 +40,7 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'auth' => function () use ($request) {
                 return [
-                    'user' => $request->user() ? [
-                        'id' => $request->user()->id,
-                        'name' => $request->user()->name,
-                    ] : null,
+                    'user' => $request->user() ?? null,
                 ];
             },
             'flash' => function () use ($request) {

@@ -1,6 +1,6 @@
 <script setup>
-import { ref } from "vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { ref } from 'vue'
+import { Link } from '@inertiajs/inertia-vue3'
 
 defineProps({
   items: Array,
@@ -8,79 +8,111 @@ defineProps({
     type: Boolean,
     default: false,
   },
-});
+})
 
-const activeIndex = ref(null);
+const emits = defineEmits(['menuitem-click'])
+
+const activeIndex = ref(null)
 
 const onMenuItemClick = (event, item, index) => {
-  if (!item.to) {
-    event.preventDefault();
+  if (item.disabled) {
+    event.preventDefault()
+    return
+  }
+  if (!item.to && !item.url) {
+    event.preventDefault()
   }
 
-  activeIndex.value = index === activeIndex.value ? null : index;
-};
+  if (item.command) {
+    item.command({ originalEvent: event, item: item })
+  }
+
+  activeIndex.value = index === activeIndex.value ? null : index
+
+  emits('menuitem-click', {
+    originalEvent: event,
+    item: item,
+  })
+}
+
+const visible = (item) => {
+  return typeof item.visible === 'function' ? item.visible() : item.visible !== false
+}
 </script>
 
 <template>
   <ul v-if="items">
-    <li
-      v-for="(item, i) of items"
-      :key="item.label || i"
-      :class="[
-        {
-          'layout-menuitem-category': root,
-          'active-menuitem': activeIndex === i && !item.to,
-        },
-      ]"
-    >
-      <template v-if="root">
-        <div class="layout-menuitem-root-text" :aria-label="item.label">
-          {{ item.label }}
-        </div>
+    <template v-for="(item, i) of items">
+      <li
+        v-if="visible(item) && !item.separator"
+        role="none"
+        :key="item.label || i"
+        :class="[
+          { 'layout-menuitem-category': root, 'active-menuitem': activeIndex === i && !item.to && !item.disabled },
+        ]"
+      >
+        <template v-if="root">
+          <div class="layout-menuitem-root-text" :aria-label="item.label">{{ item.label }}</div>
 
-        <AppSubSidebar :items="item.items" />
-      </template>
-      <template v-else>
-        <Link
-          v-if="item.to"
-          :href="item.to"
-          class="p-ripple"
-          :class="{
-            'router-link-active': activeIndex,
-            'router-link-exact-active': activeIndex,
-          }"
-          @click="onMenuItemClick($event, item, i)"
-          :aria-label="item.label"
-          v-ripple
-        >
-          <i :class="item.icon"></i>
-          <span>{{ item.label }}</span>
-          <i
-            v-if="item.items"
-            class="pi pi-angle-down menuitem-toggle-icon"
-          ></i>
-        </Link>
+          <AppSubSidebar :items="visible(item) && item.items" @menuitem-click="$emit('menuitem-click', $event)" />
+        </template>
+        <template v-else>
+          <Link
+            v-if="item.to"
+            role="menuitem"
+            :href="item.to"
+            :class="[
+              item.class,
+              'p-ripple',
+              {
+                'p-disabled': item.disabled,
+                'router-link-exact-active': $page.component === item.component,
+              },
+            ]"
+            :style="item.style"
+            :target="item.target"
+            :aria-label="item.label"
+            @click="onMenuItemClick($event, item, i)"
+          >
+            <i :class="item.icon"></i>
+            <span>{{ item.label }}</span>
+            <i v-if="item.items" class="pi pi-fw pi-angle-down menuitem-toggle-icon"></i>
+            <Badge v-if="item.badge" :value="item.badge"></Badge>
+          </Link>
 
-        <a
-          v-if="!item.to"
-          :href="item.url || '#'"
-          class="p-ripple"
-          @click="onMenuItemClick($event, item, i)"
-          :aria-label="item.label"
-          v-ripple
-        >
-          <i :class="item.icon"></i>
-          <span>{{ item.label }}</span>
-          <i
-            v-if="item.items"
-            class="pi pi-angle-down menuitem-toggle-icon"
-          ></i>
-        </a>
+          <a
+            v-if="!item.to"
+            v-ripple
+            role="menuitem"
+            :href="item.url || '#'"
+            :style="item.style"
+            :class="[item.class, 'p-ripple', { 'p-disabled': item.disabled }]"
+            :target="item.target"
+            :aria-label="item.label"
+            @click="onMenuItemClick($event, item, i)"
+          >
+            <i :class="item.icon"></i>
+            <span>{{ item.label }}</span>
+            <i v-if="item.items" class="pi pi-fw pi-angle-down menuitem-toggle-icon"></i>
+            <Badge v-if="item.badge" :value="item.badge"></Badge>
+          </a>
 
-        <Transition name="layout-submenu-wrapper">
-          <AppSubSidebar v-show="activeIndex === i" :items="item.items" />
-        </Transition>
-      </template>
-    </li>
+          <transition name="layout-submenu-wrapper">
+            <AppSubSidebar
+              v-show="activeIndex === i"
+              :items="visible(item) && item.items"
+              @menuitem-click="$emit('menuitem-click', $event)"
+            />
+          </transition>
+        </template>
+      </li>
+      <li
+        v-if="visible(item) && item.separator"
+        role="separator"
+        class="p-menu-separator"
+        :style="item.style"
+        :key="'separator' + i"
+      ></li>
+    </template>
   </ul>
 </template>

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 // use App\Models\Transaction;
+use App\Models\Transaction;
+use Exception;
 use Hoa\Socket\Client as SocketClient;
 use Hoa\Websocket\Client as WebsocketClient;
 
@@ -13,6 +15,7 @@ class ThermalPrintingController extends Controller
     {
         // $thermalPrinting = new ThermalPrinting($transaction);
         // $thermalPrinting->startPrinting(1);
+
         $transaction->load(['outlet', 'customer', 'transactionDetails.laundry']);
         $discountAsString = $transaction->discountAsString();
         $subTotalAsString = $transaction->subTotalAsString();

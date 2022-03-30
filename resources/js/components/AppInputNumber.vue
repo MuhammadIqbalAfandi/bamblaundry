@@ -70,10 +70,6 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  modelValue: {
-    type: Number,
-    default: null,
-  },
   currency: {
     type: String,
     default: undefined,
@@ -90,9 +86,10 @@ const props = defineProps({
     type: String,
     default: undefined,
   },
+  modelValue: null,
 })
 
-defineEmits(['update:modelValue', 'blur'])
+defineEmits(['update:modelValue'])
 
 const isError = computed(() => (props.error ? true : false))
 
@@ -132,7 +129,6 @@ const ariaDescribedbyLabel = computed(() => props.label.toLowerCase().replace(/\
       :increment-button-icon="incrementButtonIcon"
       :decrement-button-icon="decrementButtonIcon"
       @input="$emit('update:modelValue', $event.value)"
-      @blur="$emit('blur', $event.value)"
     />
 
     <small v-if="error" :id="ariaDescribedbyLabel" :class="{ 'p-error': isError }">

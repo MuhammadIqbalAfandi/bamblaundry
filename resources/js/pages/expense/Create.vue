@@ -1,12 +1,20 @@
 <script setup>
-import { useForm } from '@inertiajs/inertia-vue3'
+import { computed, watch } from 'vue'
+import { useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import AppButton from '@/components/AppButton.vue'
 import AppInputNumber from '@/components/AppInputNumber.vue'
+import AppEditor from '@/components/AppEditor.vue'
+
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+})
 
 const form = useForm({
   description: null,
-  amount: 0,
+  amount: null,
 })
 
 const submit = () => {
@@ -29,7 +37,13 @@ const submit = () => {
           </div>
 
           <div class="col-12">
-            <Editor v-model="form.description" editorStyle="height: 320px" placeholder="tulis keterangan disini...">
+            <AppEditor
+              label="Keterangan"
+              v-model="form.description"
+              editor-style="height: 320px"
+              placeholder="tulis keterangan disini"
+              :error="form.errors.description"
+            >
               <template #toolbar>
                 <span class="q-formats">
                   <button class="ql-bold" v-tooltip.bottom="'Bold'"></button>
@@ -41,7 +55,7 @@ const submit = () => {
                   <button class="ql-list" value="bullet" v-tooltip.bottom="'Bullet'"></button>
                 </span>
               </template>
-            </Editor>
+            </AppEditor>
           </div>
         </div>
       </template>

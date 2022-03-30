@@ -193,7 +193,7 @@ const submit = () => {
                   complete-on-focus
                   label="Customer"
                   field="customerNumber"
-                  placeholder="Customer"
+                  placeholder="customer"
                   v-model="form.customer"
                   :error="form.errors.customer"
                   :suggestions="customers"
@@ -227,7 +227,7 @@ const submit = () => {
                   dropdown
                   label="Tipe Laundry"
                   field="name"
-                  placeholder="Tipe Laundry"
+                  placeholder="tipe Laundry"
                   v-model="form.laundry"
                   :error="form.errors.laundry_id"
                   :suggestions="laundries"

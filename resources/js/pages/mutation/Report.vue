@@ -69,7 +69,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
 
 <template>
   <AppLayout>
-    <Head title="Laporan" />
+    <Head title="Laporan Mutasi" />
 
     <DataTable
       responsive-layout="scroll"
@@ -79,7 +79,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
       :striped-rows="true"
     >
       <template #header>
-        <h5>Laporan</h5>
+        <h5>Laporan Mutasi</h5>
 
         <div class="grid">
           <div class="col-12 md:col-8">

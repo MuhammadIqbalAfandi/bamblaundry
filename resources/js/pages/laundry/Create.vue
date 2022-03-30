@@ -2,24 +2,25 @@
 import { watch, computed } from 'vue'
 import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppButton from '@/components/AppButton.vue'
+import AppInputNumber from '@/components/AppInputNumber.vue'
 import AppInputText from '@/components/AppInputText.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
-
-const form = useForm({
-  name: '',
-  price: '',
-  unit: '',
-})
-
-const submit = () => {
-  form.post(route('laundries.store'))
-}
 
 const errors = computed(() => usePage().props.value.errors)
 
 watch(errors, () => {
   form.clearErrors()
 })
+
+const form = useForm({
+  name: null,
+  price: null,
+  unit: null,
+})
+
+const submit = () => {
+  form.post(route('laundries.store'))
+}
 </script>
 
 <template>
@@ -36,7 +37,7 @@ watch(errors, () => {
               </div>
 
               <div class="col-12 md:col-6">
-                <AppInputText label="Harga" placeholder="harga" :error="form.errors.price" v-model="form.price" />
+                <AppInputNumber label="Harga" placeholder="harga" :error="form.errors.price" v-model="form.price" />
               </div>
 
               <div class="col-12 md:col-6">

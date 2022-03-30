@@ -37,7 +37,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('/expenses', ExpenseController::class);
 
-    Route::resource('/mutations', MutationController::class);
+    Route::resource('/reports/mutations', MutationController::class);
 
     Route::get('/thermal-printing/{transaction:transaction_number}', ThermalPrintingController::class);
 });

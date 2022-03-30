@@ -16,7 +16,7 @@ class MutationController extends Controller
      */
     public function index()
     {
-        return inertia('mutation/Index', [
+        return inertia('mutation/Report', [
             'filters' => request()->all('startDate', 'endDate', 'outlet'),
             'mutations' => Mutation::latest()
                 ->filter(request()->only('startDate', 'endDate', 'outlet'))
