@@ -15,14 +15,14 @@ __webpack_require__.r(__webpack_exports__);
   field: 'createdAt',
   header: 'Tanggal'
 }, {
-  field: 'outlet',
-  header: 'Outlet'
+  field: 'type',
+  header: 'Tipe'
 }, {
   field: 'amount',
   header: 'Nilai'
 }, {
-  field: 'type',
-  header: 'Tipe'
+  field: 'outlet',
+  header: 'Outlet'
 }]);
 
 /***/ })

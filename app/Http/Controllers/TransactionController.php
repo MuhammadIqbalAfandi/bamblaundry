@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-// use App\Http\Requests\Transaction\StoreTransactionRequest;
 use App\Http\Requests\Transaction\StoreTransactionRequest;
 use App\Http\Requests\Transaction\UpdateTransactionRequest;
 use App\Models\Customer;
@@ -12,6 +11,7 @@ use App\Models\Outlet;
 use App\Models\Transaction;
 use App\Models\TransactionStatus;
 use Exception;
+use FontLib\Table\Type\name;
 use Hoa\Socket\Client as SocketClient;
 use Hoa\Websocket\Client as WebsocketClient;
 use Illuminate\Database\QueryException;
@@ -43,7 +43,7 @@ class TransactionController extends Controller
                 ->through(fn($transaction) => [
                     'id' => $transaction->id,
                     'transactionNumber' => $transaction->transaction_number,
-                    'dateLaundry' => $transaction->created_at,
+                    'createdAt' => $transaction->created_at,
                     'customer' => [
                         'number' => $transaction->customer->customer_number,
                         'name' => $transaction->customer->name,
@@ -183,7 +183,7 @@ class TransactionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  Int  $id
+     * @param  Transaction  $transaction
      * @return \Inertia\Response
      */
     public function show(Transaction $transaction)
@@ -196,6 +196,11 @@ class TransactionController extends Controller
                 'discount' => $transaction->discount,
                 'price' => $transaction->totalPriceAsFullString(),
                 'dateLaundry' => $transaction->created_at,
+            ],
+            'user' => [
+                'name' => $transaction->user->name,
+                'phone' => $transaction->user->phone,
+                'email' => $transaction->user->email,
             ],
             'customer' => [
                 'number' => $transaction->customer->customer_number,
@@ -233,7 +238,7 @@ class TransactionController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  Int  $id
+     * @param  Transaction  $transaction
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateTransactionRequest $request, Transaction $transaction)
@@ -241,16 +246,16 @@ class TransactionController extends Controller
         $transaction->update($request->validated());
 
         if ($transaction->transaction_status_id == 2) {
-            $status_message = " sudah diproses, harap menunggu sampai pemberitahuan selanjutnya.";
+            $statusMessage = " sudah diproses, harap menunggu sampai pemberitahuan selanjutnya.";
         } else if ($transaction->transaction_status_id == 3) {
-            $status_message = " sudah selesai, silahkan diambil.";
+            $statusMessage = " sudah selesai, silahkan diambil.";
         } else {
-            $status_message = " sudah diambil. Silahkan datang lagi di kemudian hari jika ingin laundry kembali, terima kasih.";
+            $statusMessage = " sudah diambil. Silahkan datang lagi di kemudian hari jika ingin laundry kembali, terima kasih.";
         }
 
         Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
             'receiver' => $transaction->customer->phone,
-            'message' => 'Layanan laundry Anda dengan nomor transaksi *' . $transaction->transaction_number . '*' . $status_message,
+            'message' => 'Layanan laundry Anda dengan nomor transaksi *' . $transaction->transaction_number . '*' . $statusMessage,
         ]);
 
         return back()->with('success', __('messages.success.update.transaction_status'));

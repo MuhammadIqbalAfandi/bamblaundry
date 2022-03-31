@@ -62,5 +62,4 @@ class TransactionDetail extends Model
     {
         return $this->setRupiahFormat($this->totalPrice(), 2, true);
     }
-
 }

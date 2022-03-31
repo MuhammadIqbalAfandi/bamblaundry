@@ -57,5 +57,4 @@ class Mutation extends Model
             $query->where('outlet_id', $outlet);
         });
     }
-
 }

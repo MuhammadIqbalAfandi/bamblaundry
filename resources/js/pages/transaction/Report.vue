@@ -67,10 +67,6 @@ watch(
   }, 300)
 )
 
-const linkReference = (data) => {
-  return route('transactions.show', data.id)
-}
-
 const exportExcelLink = ref('/reports/transactions/export/excel')
 
 const isAdmin = computed(() => usePage().props.value.isAdmin)
@@ -121,7 +117,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
             <AppButton
               v-if="transactions.data.length"
               label="Export excel"
-              class="p-button-text md:w-16rem"
+              class-button="p-button-text md:w-16rem"
               icon="pi pi-file-excel"
               :inertia-link="false"
               :href="exportExcelLink"
@@ -135,29 +131,14 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
         :field="tableHeader.field"
         :header="tableHeader.header"
         :key="tableHeader.field"
-      >
-        <template #body="{ data, field }">
-          <template v-if="field === 'transactionNumber'">
-            <p class="font-bold">{{ data[field] }}</p>
-            <p>{{ data.createdAt }}</p>
-          </template>
-          <template v-else-if="field === 'transactionStatusName'">
-            <Badge v-if="data['transactionStatusId'] === 1" :value="data[field]"></Badge>
-            <Badge v-else-if="data['transactionStatusId'] === 2" :value="data[field]" severity="warning"></Badge>
-            <Badge v-else :value="data[field]" severity="success"></Badge>
-          </template>
-          <template v-else>
-            {{ data[field] }}
-          </template>
-        </template>
-      </Column>
+      />
 
       <Column>
         <template #body="{ data }">
           <AppButton
             icon="pi pi-link"
             class="p-button-text p-button-icon-only p-button-rounded p-button-text"
-            :href="linkReference(data)"
+            :href="`/transactions?startDate=${data.startDate}&endDate=${data.startDate}`"
           />
         </template>
       </Column>

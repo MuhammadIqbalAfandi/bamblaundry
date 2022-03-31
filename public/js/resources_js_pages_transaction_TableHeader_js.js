@@ -23,11 +23,11 @@ var IndexTable = [{
   field: 'price',
   header: 'Total Harga'
 }, {
-  field: 'outlet',
-  header: 'Outlet'
-}, {
   field: 'transactionStatusName',
   header: 'Status'
+}, {
+  field: 'outlet',
+  header: 'Outlet'
 }];
 var TransactionBasketTable = [{
   field: 'laundry',
@@ -46,20 +46,14 @@ var TransactionBasketTable = [{
   header: 'Total Harga'
 }];
 var TransactionReportTable = [{
-  field: 'transactionNumber',
-  header: 'Id Transaksi'
+  field: 'createdAt',
+  header: 'Tanggal'
+}, {
+  field: 'numberOfTransaction',
+  header: 'Jumlah Transaksi'
 }, {
   field: 'price',
-  header: 'Total Harga'
-}, {
-  field: 'outlet',
-  header: 'Outlet'
-}, {
-  field: 'transactionStatusName',
-  header: 'Status'
-}, {
-  field: 'user',
-  header: 'User'
+  header: 'Total Nilai'
 }];
 
 /***/ })

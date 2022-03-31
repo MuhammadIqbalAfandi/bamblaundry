@@ -328,6 +328,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     transaction: Object,
+    user: Object,
     customer: Object,
     outlet: Object,
     transactionDetails: Object
@@ -560,7 +561,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       href: item.to,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([item["class"], 'p-ripple', {
         'p-disabled': item.disabled,
-        'router-link-exact-active': _ctx.$page.component === item.component
+        'router-link-exact-active': _ctx.$page.component.startsWith(item.component) || _ctx.$page.url.startsWith(item.to)
       }]),
       style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)(item.style),
       target: item.target,
@@ -1075,11 +1076,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Divider, {
             type: "dashed",
             "class": "block md:hidden"
-          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [_hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$page.props.auth.user.name), 1
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [_hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.user.name), 1
           /* TEXT */
-          ), _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$page.props.auth.user.phone), 1
+          ), _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.user.phone), 1
           /* TEXT */
-          ), _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$page.props.auth.user.email), 1
+          ), _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.user.email), 1
           /* TEXT */
           )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Divider, {
             type: "dashed",
@@ -1186,11 +1187,11 @@ var IndexTable = [{
   field: 'price',
   header: 'Total Harga'
 }, {
-  field: 'outlet',
-  header: 'Outlet'
-}, {
   field: 'transactionStatusName',
   header: 'Status'
+}, {
+  field: 'outlet',
+  header: 'Outlet'
 }];
 var TransactionBasketTable = [{
   field: 'laundry',
@@ -1209,20 +1210,14 @@ var TransactionBasketTable = [{
   header: 'Total Harga'
 }];
 var TransactionReportTable = [{
-  field: 'transactionNumber',
-  header: 'Id Transaksi'
+  field: 'createdAt',
+  header: 'Tanggal'
+}, {
+  field: 'numberOfTransaction',
+  header: 'Jumlah Transaksi'
 }, {
   field: 'price',
-  header: 'Total Harga'
-}, {
-  field: 'outlet',
-  header: 'Outlet'
-}, {
-  field: 'transactionStatusName',
-  header: 'Status'
-}, {
-  field: 'user',
-  header: 'User'
+  header: 'Total Nilai'
 }];
 
 /***/ }),

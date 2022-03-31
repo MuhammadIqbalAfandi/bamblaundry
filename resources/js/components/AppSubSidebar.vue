@@ -66,7 +66,7 @@ const visible = (item) => {
               'p-ripple',
               {
                 'p-disabled': item.disabled,
-                'router-link-exact-active': $page.component === item.component,
+                'router-link-exact-active': $page.component.startsWith(item.component) || $page.url.startsWith(item.to),
               },
             ]"
             :style="item.style"

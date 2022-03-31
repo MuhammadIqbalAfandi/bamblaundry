@@ -212,7 +212,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
         <template #body="{ data, field }">
           <template v-if="field === 'transactionNumber'">
             <p class="font-bold">{{ data[field] }}</p>
-            <p>{{ data.dateLaundry }}</p>
+            <p>{{ data.createdAt }}</p>
           </template>
           <template v-else-if="field === 'customer'">
             <p class="font-bold">{{ data.customer.number }}</p>

@@ -554,7 +554,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       href: item.to,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([item["class"], 'p-ripple', {
         'p-disabled': item.disabled,
-        'router-link-exact-active': _ctx.$page.component === item.component
+        'router-link-exact-active': _ctx.$page.component.startsWith(item.component) || _ctx.$page.url.startsWith(item.to)
       }]),
       style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)(item.style),
       target: item.target,

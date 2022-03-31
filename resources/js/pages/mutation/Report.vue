@@ -125,7 +125,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
             <AppButton
               v-if="mutations.data.length"
               label="Export excel"
-              class="p-button-text md:w-16rem"
+              class-button="p-button-text md:w-16rem"
               icon="pi pi-file-excel"
               :inertia-link="false"
               :href="exportExcelLink"

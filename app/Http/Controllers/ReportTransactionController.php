@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\TransactionExport;
 use App\Models\Outlet;
 use App\Models\Transaction;
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportTransactionController extends Controller
@@ -24,14 +24,9 @@ class ReportTransactionController extends Controller
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($transaction) => [
-                    'id' => $transaction->id,
-                    'transactionNumber' => $transaction->transaction_number,
+                    'startDate' => Carbon::parse($transaction->getRawOriginal('created_at'))->translatedFormat('Y-m-d'),
                     'createdAt' => $transaction->created_at,
-                    'outlet' => $transaction->outlet->name,
                     'price' => $transaction->totalPriceAsFullString(),
-                    'transactionStatusName' => $transaction->transactionStatus->name,
-                    'transactionStatusId' => $transaction->transactionStatus->id,
-                    'user' => $transaction->user->name,
                 ]),
             'outlets' => Outlet::all()
                 ->transform(fn($outlet) => [

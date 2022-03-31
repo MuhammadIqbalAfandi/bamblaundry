@@ -6,6 +6,7 @@ import { TransactionBasketTable } from './TableHeader'
 
 defineProps({
   transaction: Object,
+  user: Object,
   customer: Object,
   outlet: Object,
   transactionDetails: Object,
@@ -75,13 +76,13 @@ defineProps({
 
               <div class="col-auto mr-7">
                 <h3>Admin</h3>
-                <p>{{ $page.props.auth.user.name }}</p>
+                <p>{{ user.name }}</p>
 
                 <h3>No HP</h3>
-                <p>{{ $page.props.auth.user.phone }}</p>
+                <p>{{ user.phone }}</p>
 
                 <h3>Email</h3>
-                <p>{{ $page.props.auth.user.email }}</p>
+                <p>{{ user.email }}</p>
               </div>
 
               <Divider type="dashed" class="block md:hidden" />

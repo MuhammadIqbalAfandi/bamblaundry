@@ -15,12 +15,13 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
-    icon: String,
-    label: String,
     inertiaLink: {
       type: Boolean,
       "default": true
-    }
+    },
+    icon: String,
+    label: String,
+    classButton: String
   },
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
@@ -467,11 +468,6 @@ __webpack_require__.r(__webpack_exports__);
       var params = window.location.search;
       exportExcelLink.value = "/reports/transactions/export/excel".concat(params);
     }, 300));
-
-    var linkReference = function linkReference(data) {
-      return route('transactions.show', data.id);
-    };
-
     var exportExcelLink = (0,vue__WEBPACK_IMPORTED_MODULE_1__.ref)('/reports/transactions/export/excel');
     var isAdmin = (0,vue__WEBPACK_IMPORTED_MODULE_1__.computed)(function () {
       return (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.usePage)().props.value.isAdmin;
@@ -479,7 +475,6 @@ __webpack_require__.r(__webpack_exports__);
     var __returned__ = {
       props: props,
       filterForm: filterForm,
-      linkReference: linkReference,
       exportExcelLink: exportExcelLink,
       isAdmin: isAdmin,
       Inertia: _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_0__.Inertia,
@@ -526,14 +521,15 @@ var _hoisted_1 = {
   "class": "p-button-label"
 };
 var _hoisted_2 = {
-  key: 1,
-  "class": "p-button p-component"
+  key: 1
 };
 var _hoisted_3 = {
   key: 1,
   "class": "p-button-label"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_Button = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Button");
+
   return $props.inertiaLink ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
     key: 0,
     "class": "p-button p-component",
@@ -553,14 +549,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1
     /* STABLE */
 
-  })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", _hoisted_2, [$props.icon ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
-    key: 0,
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["p-button-icon p-button-icon-left", $props.icon])
-  }, null, 2
-  /* CLASS */
-  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.label ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.label), 1
-  /* TEXT */
-  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]));
+  })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($props.classButton)
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [$props.icon ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+        key: 0,
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["p-button-icon p-button-icon-left", $props.icon])
+      }, null, 2
+      /* CLASS */
+      )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.label ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.label), 1
+      /* TEXT */
+      )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+    }),
+    _: 1
+    /* STABLE */
+
+  }, 8
+  /* PROPS */
+  , ["class"])]));
 }
 
 /***/ }),
@@ -829,7 +836,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       href: item.to,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([item["class"], 'p-ripple', {
         'p-disabled': item.disabled,
-        'router-link-exact-active': _ctx.$page.component === item.component
+        'router-link-exact-active': _ctx.$page.component.startsWith(item.component) || _ctx.$page.url.startsWith(item.to)
       }]),
       style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)(item.style),
       target: item.target,
@@ -1138,15 +1145,10 @@ var _hoisted_6 = {
 var _hoisted_7 = {
   "class": "col-12 md:col-4 flex justify-content-end"
 };
-var _hoisted_8 = {
-  "class": "font-bold"
-};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Calendar = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Calendar");
 
   var _component_Dropdown = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Dropdown");
-
-  var _component_Badge = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Badge");
 
   var _component_Column = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Column");
 
@@ -1193,7 +1195,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [$props.transactions.data.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["AppButton"], {
             key: 0,
             label: "Export excel",
-            "class": "p-button-text md:w-16rem",
+            "class-button": "p-button-text md:w-16rem",
             icon: "pi pi-file-excel",
             "inertia-link": false,
             href: $setup.exportExcelLink
@@ -1207,62 +1209,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               field: tableHeader.field,
               header: tableHeader.header,
               key: tableHeader.field
-            }, {
-              body: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref) {
-                var data = _ref.data,
-                    field = _ref.field;
-                return [field === 'transactionNumber' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-                  key: 0
-                }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data[field]), 1
-                /* TEXT */
-                ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data.createdAt), 1
-                /* TEXT */
-                )], 64
-                /* STABLE_FRAGMENT */
-                )) : field === 'transactionStatusName' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-                  key: 1
-                }, [data['transactionStatusId'] === 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Badge, {
-                  key: 0,
-                  value: data[field]
-                }, null, 8
-                /* PROPS */
-                , ["value"])) : data['transactionStatusId'] === 2 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Badge, {
-                  key: 1,
-                  value: data[field],
-                  severity: "warning"
-                }, null, 8
-                /* PROPS */
-                , ["value"])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Badge, {
-                  key: 2,
-                  value: data[field],
-                  severity: "success"
-                }, null, 8
-                /* PROPS */
-                , ["value"]))], 2112
-                /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
-                )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-                  key: 2
-                }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(data[field]), 1
-                /* TEXT */
-                )], 2112
-                /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
-                ))];
-              }),
-              _: 2
-              /* DYNAMIC */
-
-            }, 1032
-            /* PROPS, DYNAMIC_SLOTS */
+            }, null, 8
+            /* PROPS */
             , ["field", "header"]);
           }), 128
           /* KEYED_FRAGMENT */
           )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Column, null, {
-            body: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref2) {
-              var data = _ref2.data;
+            body: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref) {
+              var data = _ref.data;
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
                 icon: "pi pi-link",
                 "class": "p-button-text p-button-icon-only p-button-rounded p-button-text",
-                href: $setup.linkReference(data)
+                href: "/transactions?startDate=".concat(data.startDate, "&endDate=").concat(data.startDate)
               }, null, 8
               /* PROPS */
               , ["href"])];
@@ -1314,11 +1272,11 @@ var IndexTable = [{
   field: 'price',
   header: 'Total Harga'
 }, {
-  field: 'outlet',
-  header: 'Outlet'
-}, {
   field: 'transactionStatusName',
   header: 'Status'
+}, {
+  field: 'outlet',
+  header: 'Outlet'
 }];
 var TransactionBasketTable = [{
   field: 'laundry',
@@ -1337,20 +1295,14 @@ var TransactionBasketTable = [{
   header: 'Total Harga'
 }];
 var TransactionReportTable = [{
-  field: 'transactionNumber',
-  header: 'Id Transaksi'
+  field: 'createdAt',
+  header: 'Tanggal'
+}, {
+  field: 'numberOfTransaction',
+  header: 'Jumlah Transaksi'
 }, {
   field: 'price',
-  header: 'Total Harga'
-}, {
-  field: 'outlet',
-  header: 'Outlet'
-}, {
-  field: 'transactionStatusName',
-  header: 'Status'
-}, {
-  field: 'user',
-  header: 'User'
+  header: 'Total Nilai'
 }];
 
 /***/ }),
