@@ -19,12 +19,12 @@ const form = useForm({
 })
 
 const submit = () => {
-  form.post(route('laundries.store'))
+  form.post(route('products.store'))
 }
 </script>
 
 <template>
-  <Head title="Tambah Tipe Laundry" />
+  <Head title="Tambah Product" />
 
   <AppLayout>
     <div class="grid">

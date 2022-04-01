@@ -21,6 +21,7 @@ export default [
       { label: 'Customer', icon: 'pi pi-users', to: '/customers', component: 'customer/Index' },
       { label: 'Outlet', icon: 'pi pi-share-alt', to: '/outlets', component: 'outlet/Index' },
       { label: 'Laundry', icon: 'pi pi-table', to: '/laundries', component: 'laundry/Index' },
+      { label: 'Product', icon: 'pi pi-table', to: '/products', component: 'product/Index' },
     ],
   },
 ]

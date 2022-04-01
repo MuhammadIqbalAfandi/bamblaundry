@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Laundry\StoreLaundryRequest;
-use App\Http\Requests\Laundry\UpdateLaundryRequest;
-use App\Models\Laundry;
+use App\Http\Requests\Product\StoreProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
+use App\Models\Product;
 
-class LaundryController extends Controller
+class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,9 +16,9 @@ class LaundryController extends Controller
      */
     public function index()
     {
-        return inertia('laundry/Index', [
+        return inertia('product/Index', [
             'filters' => request()->all('search'),
-            'laundries' => Laundry::filter(request()->only('search'))
+            'products' => Product::filter(request()->only('search'))
                 ->latest()
                 ->paginate(10)
                 ->withQueryString()
@@ -38,7 +38,7 @@ class LaundryController extends Controller
      */
     public function create()
     {
-        return inertia('laundry/Create');
+        return inertia('product/Create');
     }
 
     /**
@@ -47,18 +47,17 @@ class LaundryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreLaundryRequest $request)
+    public function store(StoreProductRequest $request)
     {
-        Laundry::create($request->validated());
+        Product::create($request->validated());
 
-        return to_route('laundries.index')->with('success', __('messages.success.store.laundry'));
+        return to_route('products.index')->with('success', __('messages.success.store.product'));
     }
-
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Inertia\Response
+     * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
@@ -68,17 +67,17 @@ class LaundryController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  Laundry  $laundry
+     * @param  Product  $product
      * @return \Inertia\Response
      */
-    public function edit(Laundry $laundry)
+    public function edit(Product $product)
     {
-        return inertia('laundry/Edit', [
-            'laundry' => [
-                'id' => $laundry->id,
-                'name' => $laundry->name,
-                'price' => $laundry->getRawOriginal('price'),
-                'unit' => $laundry->unit,
+        return inertia('product/Edit', [
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->getRawOriginal('price'),
+                'unit' => $product->unit,
             ],
         ]);
     }
@@ -87,26 +86,26 @@ class LaundryController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  Laundry  $laundry
+     * @param  Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateLaundryRequest $request, Laundry $laundry)
+    public function update(UpdateProductRequest $request, Product $product)
     {
-        $laundry->update($request->validated());
+        $product->update($request->validated());
 
-        return back()->with('success', __('messages.success.update.laundry'));
+        return back()->with('success', __('messages.success.update.product'));
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  Laundry  $laundry
+     * @param  Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Laundry $laundry)
+    public function destroy(Product $product)
     {
-        $laundry->delete();
+        $product->delete();
 
-        return to_route('laundries.index')->with('success', __('messages.success.destroy.laundry'));
+        return to_route('laundries.index')->with('success', __('messages.success.destroy.product'));
     }
 }

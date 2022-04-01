@@ -4,6 +4,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LaundryController;
 use App\Http\Controllers\OutletController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportMutationController;
 use App\Http\Controllers\ReportTransactionController;
 use App\Http\Controllers\ThermalPrintingController;
@@ -33,6 +34,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/outlets', OutletController::class);
 
     Route::resource('/laundries', LaundryController::class);
+
+    Route::resource('/products', ProductController::class);
 
     Route::resource('/transactions', TransactionController::class);
 

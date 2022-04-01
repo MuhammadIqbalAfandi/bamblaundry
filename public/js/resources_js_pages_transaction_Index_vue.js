@@ -2148,17 +2148,20 @@ var IndexTable = [{
   header: 'Outlet'
 }];
 var TransactionBasketTable = [{
-  field: 'laundry',
-  header: 'Tipe Laundry'
+  field: 'item',
+  header: 'Jenis Item'
 }, {
-  field: 'discount',
-  header: 'Diskon'
+  field: 'unit',
+  header: 'Satuan'
+}, {
+  field: 'price',
+  header: 'Harga'
 }, {
   field: 'quantity',
   header: 'Kuantitas'
 }, {
-  field: 'price',
-  header: 'Harga'
+  field: 'discount',
+  header: 'Diskon'
 }, {
   field: 'totalPrice',
   header: 'Total Harga'
@@ -2236,6 +2239,11 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-table',
     to: '/laundries',
     component: 'laundry/Index'
+  }, {
+    label: 'Product',
+    icon: 'pi pi-table',
+    to: '/products',
+    component: 'product/Index'
   }]
 }]);
 
@@ -2291,6 +2299,11 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-table',
     to: '/laundries',
     component: 'laundry/Index'
+  }, {
+    label: 'Product',
+    icon: 'pi pi-table',
+    to: '/products',
+    component: 'product/Index'
   }]
 }]);
 

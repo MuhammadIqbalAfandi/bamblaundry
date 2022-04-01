@@ -30,17 +30,20 @@ var IndexTable = [{
   header: 'Outlet'
 }];
 var TransactionBasketTable = [{
-  field: 'laundry',
-  header: 'Tipe Laundry'
+  field: 'item',
+  header: 'Jenis Item'
 }, {
-  field: 'discount',
-  header: 'Diskon'
+  field: 'unit',
+  header: 'Satuan'
+}, {
+  field: 'price',
+  header: 'Harga'
 }, {
   field: 'quantity',
   header: 'Kuantitas'
 }, {
-  field: 'price',
-  header: 'Harga'
+  field: 'discount',
+  header: 'Diskon'
 }, {
   field: 'totalPrice',
   header: 'Total Harga'

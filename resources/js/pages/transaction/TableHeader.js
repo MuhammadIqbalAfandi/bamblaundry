@@ -7,10 +7,11 @@ export const IndexTable = [
 ]
 
 export const TransactionBasketTable = [
-  { field: 'laundry', header: 'Tipe Laundry' },
-  { field: 'discount', header: 'Diskon' },
-  { field: 'quantity', header: 'Kuantitas' },
+  { field: 'item', header: 'Jenis Item' },
+  { field: 'unit', header: 'Satuan' },
   { field: 'price', header: 'Harga' },
+  { field: 'quantity', header: 'Kuantitas' },
+  { field: 'discount', header: 'Diskon' },
   { field: 'totalPrice', header: 'Total Harga' },
 ]
 

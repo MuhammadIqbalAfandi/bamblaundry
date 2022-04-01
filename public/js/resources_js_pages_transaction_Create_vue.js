@@ -744,6 +744,7 @@ __webpack_require__.r(__webpack_exports__);
     transactionNumber: String,
     outlets: Array,
     laundries: Array,
+    products: Array,
     customers: Array,
     customerNumber: String,
     genders: Array
@@ -823,32 +824,68 @@ __webpack_require__.r(__webpack_exports__);
       form.laundry = event.value;
     };
 
+    var productOnComplete = function productOnComplete(event) {
+      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_1__.Inertia.reload({
+        data: {
+          product: event.query
+        },
+        only: ['products']
+      });
+    };
+
+    var productOnSelected = function productOnSelected(event) {
+      form.product = event.value;
+    };
+
     var transactionBasket = (0,vue__WEBPACK_IMPORTED_MODULE_0__.reactive)([]);
 
-    var addTransactionBasket = function addTransactionBasket() {
+    var validationAddTransactionBasket = function validationAddTransactionBasket() {
       form.clearErrors();
 
-      if (!form.laundry.id) {
-        form.setError('laundry_id', 'Tipe laundry tidak boleh kosong');
+      if (!form.laundry.id && !form.product.id) {
+        form.setError('laundry', 'Salah satu harus diisi');
+        form.setError('product', 'Salah satu harus diisi');
       }
 
-      if (!form.quantity && form.laundry.id) {
-        form.setError('quantity', 'Kuantitas tidak boleh 0 atau kosong');
+      if (!form.quantityLaundry && form.laundry.id) {
+        form.setError('quantityLaundry', 'Kuantitas tidak boleh 0 atau kosong');
       }
 
-      if (form.hasErrors) {
-        return false;
+      if (!form.quantityProduct && form.product.id) {
+        form.setError('quantityProduct', 'Kuantitas tidak boleh 0 atau kosong');
+      }
+    };
+
+    var addTransactionBasket = function addTransactionBasket() {
+      validationAddTransactionBasket();
+
+      if (form.quantityLaundry) {
+        transactionBasket.push({
+          label: 'laundry',
+          id: form.laundry.id,
+          item: form.laundry.name,
+          unit: form.laundry.unit,
+          quantity: form.quantityLaundry,
+          price: form.laundry.price,
+          discount: 0,
+          totalPrice: form.quantityLaundry * form.laundry.price
+        });
+        form.reset('laundry', 'quantityLaundry');
       }
 
-      transactionBasket.push({
-        laundryId: form.laundry.id,
-        laundry: "".concat(form.laundry.name, " ").concat(form.laundry.price, "/").concat(form.laundry.unit),
-        quantity: form.quantity,
-        discount: 0,
-        price: form.laundry.price,
-        totalPrice: form.quantity * form.laundry.price
-      });
-      form.reset('laundry_id', 'quantity');
+      if (form.quantityProduct) {
+        transactionBasket.push({
+          label: 'product',
+          id: form.product.id,
+          item: form.product.name,
+          unit: form.product.unit,
+          price: form.product.price,
+          quantity: form.quantityProduct,
+          discount: 0,
+          totalPrice: form.quantityProduct * form.product.price
+        });
+        form.reset('product', 'quantityProduct');
+      }
     };
 
     var transactionBasketCellEdit = function transactionBasketCellEdit(event) {
@@ -881,10 +918,18 @@ __webpack_require__.r(__webpack_exports__);
     var form = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm)({
       transactionNumber: props.transactionNumber,
       customer: '',
-      laundry: '',
       discountAll: 0,
-      quantity: 0
+      laundry: '',
+      quantityLaundry: 0,
+      product: '',
+      quantityProduct: 0
     });
+
+    var transactionBasketFilter = function transactionBasketFilter(search) {
+      return transactionBasket.filter(function (val) {
+        return val.label === search;
+      });
+    };
 
     var submit = function submit() {
       form.transform(function (data) {
@@ -892,7 +937,8 @@ __webpack_require__.r(__webpack_exports__);
           transaction_number: data.transactionNumber,
           discount_all: data.discountAll,
           customer_number: data.customer.customerNumber,
-          laundries: transactionBasket
+          laundries: transactionBasketFilter('laundry'),
+          products: transactionBasketFilter('product')
         };
       }).post(route('transactions.store'));
     };
@@ -909,12 +955,16 @@ __webpack_require__.r(__webpack_exports__);
       submitCustomer: submitCustomer,
       laundryOnComplete: laundryOnComplete,
       laundryOnSelected: laundryOnSelected,
+      productOnComplete: productOnComplete,
+      productOnSelected: productOnSelected,
       transactionBasket: transactionBasket,
+      validationAddTransactionBasket: validationAddTransactionBasket,
       addTransactionBasket: addTransactionBasket,
       transactionBasketCellEdit: transactionBasketCellEdit,
       transactionBasketOnDelete: transactionBasketOnDelete,
       transactionPriceTotal: transactionPriceTotal,
       form: form,
+      transactionBasketFilter: transactionBasketFilter,
       submit: submit,
       ref: vue__WEBPACK_IMPORTED_MODULE_0__.ref,
       reactive: vue__WEBPACK_IMPORTED_MODULE_0__.reactive,
@@ -1825,73 +1875,82 @@ var _hoisted_12 = {
   "class": "col-12 sm:col-6"
 };
 var _hoisted_13 = {
-  "class": "col-12 sm:col-6 sm:col-offset-6 flex justify-content-end"
+  "class": "col-12 sm:col-6"
 };
 var _hoisted_14 = {
+  key: 0,
+  "class": "flex flex-column"
+};
+var _hoisted_15 = {
+  "class": "font-bold"
+};
+var _hoisted_16 = {
+  "class": "col-12 sm:col-6"
+};
+var _hoisted_17 = {
+  "class": "col-12 sm:col-6 sm:col-offset-6 flex justify-content-end"
+};
+var _hoisted_18 = {
   "class": "col-12"
 };
 
-var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h1", {
+var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h1", {
   "class": "text-base"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "pi pi-shopping-cart"
 }), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "ml-2"
-}, "Daftar Laundry")], -1
+}, "Keranjang")], -1
 /* HOISTED */
 );
 
-var _hoisted_16 = {
-  "class": "flex justify-content-center p-error"
-};
-
-var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Info Customer", -1
+var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Info Customer", -1
 /* HOISTED */
 );
 
-var _hoisted_18 = {
+var _hoisted_21 = {
   "class": "mt-2"
 };
-var _hoisted_19 = {
+var _hoisted_22 = {
   "class": "mr-3"
 };
-var _hoisted_20 = {
+var _hoisted_23 = {
   "class": "col-12 sm:col-6 sm:col-offset-6 flex flex-column align-items-end"
 };
-var _hoisted_21 = {
+var _hoisted_24 = {
   "class": "field"
 };
 
-var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "for": "discount"
 }, "Diskon", -1
 /* HOISTED */
 );
 
-var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Total harga: ");
+var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Total harga: ");
 
-var _hoisted_24 = {
+var _hoisted_27 = {
   "class": "font-bold"
 };
-var _hoisted_25 = {
+var _hoisted_28 = {
   "class": "flex justify-content-end"
 };
-var _hoisted_26 = {
-  "class": "grid"
-};
-var _hoisted_27 = {
-  "class": "col-12 md:col-6"
-};
-var _hoisted_28 = {
-  "class": "col-12 md:col-6"
-};
 var _hoisted_29 = {
-  "class": "col-12 md:col-6"
+  "class": "grid"
 };
 var _hoisted_30 = {
   "class": "col-12 md:col-6"
 };
 var _hoisted_31 = {
+  "class": "col-12 md:col-6"
+};
+var _hoisted_32 = {
+  "class": "col-12 md:col-6"
+};
+var _hoisted_33 = {
+  "class": "col-12 md:col-6"
+};
+var _hoisted_34 = {
   "class": "flex justify-content-end"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -1973,7 +2032,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
               return $setup.form.laundry = $event;
             }),
-            error: $setup.form.errors.laundry_id,
+            error: $setup.form.errors.product,
             suggestions: $props.laundries,
             onComplete: $setup.laundryOnComplete,
             onItemSelect: $setup.laundryOnSelected
@@ -1993,24 +2052,64 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["modelValue", "error", "suggestions"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputNumber"], {
             "show-buttons": "",
             placeholder: "kuantitas",
-            modelValue: $setup.form.quantity,
+            modelValue: $setup.form.quantityLaundry,
             "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
-              return $setup.form.quantity = $event;
+              return $setup.form.quantityLaundry = $event;
             }),
             "use-grouping": false,
             label: $setup.form.laundry.id ? "Jumlah (".concat($setup.form.laundry.unit, ")") : '-',
             disabled: !$setup.form.laundry.id,
-            error: $setup.form.errors.quantity,
+            error: $setup.form.errors.quantityLaundry,
             step: 0.1,
             min: 0
           }, null, 8
           /* PROPS */
-          , ["modelValue", "label", "disabled", "error", "step"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
+          , ["modelValue", "label", "disabled", "error", "step"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppAutocompleteBasic"], {
+            dropdown: "",
+            label: "Jenis Product",
+            field: "name",
+            placeholder: "jenis product",
+            modelValue: $setup.form.product,
+            "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
+              return $setup.form.product = $event;
+            }),
+            error: $setup.form.errors.product,
+            suggestions: $props.products,
+            onComplete: $setup.productOnComplete,
+            onItemSelect: $setup.productOnSelected
+          }, {
+            item: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (slotProps) {
+              return [slotProps.item ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(slotProps.item.name), 1
+              /* TEXT */
+              ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(slotProps.item.price) + " / " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(slotProps.item.unit), 1
+              /* TEXT */
+              )])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+            }),
+            _: 1
+            /* STABLE */
+
+          }, 8
+          /* PROPS */
+          , ["modelValue", "error", "suggestions"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputNumber"], {
+            "show-buttons": "",
+            placeholder: "kuantitas",
+            modelValue: $setup.form.quantityProduct,
+            "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+              return $setup.form.quantityProduct = $event;
+            }),
+            "use-grouping": false,
+            label: $setup.form.product.id ? "Jumlah (".concat($setup.form.product.unit, ")") : '-',
+            disabled: !$setup.form.product.id,
+            error: $setup.form.errors.quantityProduct,
+            min: 0
+          }, null, 8
+          /* PROPS */
+          , ["modelValue", "label", "disabled", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Tambahkan",
             "class": "p-button-text",
             icon: "pi pi-shopping-cart",
             onClick: $setup.addTransactionBasket
-          })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DataTable, {
+          })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [_hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DataTable, {
             "striped-rows": "",
             "row-hover": "",
             "responsive-layout": "scroll",
@@ -2018,9 +2117,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "edit-mode": "cell",
             value: $setup.transactionBasket,
             onCellEditComplete: $setup.transactionBasketCellEdit
-          }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
+          }, {
             header: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_19, "Nama : " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.form.customer.name), 1
+              return [_hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_22, "Nama : " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.form.customer.name), 1
               /* TEXT */
               ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "HP : " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.form.customer.phone), 1
               /* TEXT */
@@ -2124,23 +2223,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
               })];
             }),
-            _: 2
-            /* DYNAMIC */
+            _: 1
+            /* STABLE */
 
-          }, [_ctx.$page.props.errors.laundries ? {
-            name: "empty",
-            fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$page.props.errors.laundries), 1
-              /* TEXT */
-              )];
-            })
-          } : undefined]), 1032
-          /* PROPS, DYNAMIC_SLOTS */
-          , ["value"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_InputNumber, {
+          }, 8
+          /* PROPS */
+          , ["value"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [_hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_InputNumber, {
             id: "discount",
             "input-class": "w-4rem ml-2",
             modelValue: $setup.form.discountAll,
-            "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
+            "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
               return $setup.form.discountAll = $event;
             }),
             suffix: "%",
@@ -2148,12 +2240,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             max: 100
           }, null, 8
           /* PROPS */
-          , ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [_hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.transactionPriceTotal()), 1
+          , ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [_hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.transactionPriceTotal()), 1
           /* TEXT */
           )])])])];
         }),
         footer: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             label: "Simpan Transaksi",
             icon: "pi pi-check",
             "class": "p-button-text",
@@ -2169,7 +2261,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Dialog, {
         modal: "",
         visible: $setup.customerDialogShow,
-        "onUpdate:visible": _cache[10] || (_cache[10] = function ($event) {
+        "onUpdate:visible": _cache[12] || (_cache[12] = function ($event) {
           return $setup.customerDialogShow = $event;
         }),
         "class": "p-fluid",
@@ -2184,7 +2276,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onShow: $setup.customerDialogOnShow
       }, {
         footer: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             label: "Simpan",
             icon: "pi pi-check",
             "class": "p-button-text",
@@ -2195,41 +2287,41 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["disabled"])])];
         }),
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
             disabled: "",
             label: "Id Customer",
             placeholder: "id customer",
             modelValue: $setup.formCustomer.customer_number,
-            "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+            "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
               return $setup.formCustomer.customer_number = $event;
             })
           }, null, 8
           /* PROPS */
-          , ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
+          , ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
             label: "Nama",
             placeholder: "nama",
             error: $setup.formCustomer.errors.name,
             modelValue: $setup.formCustomer.name,
-            "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+            "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
               return $setup.formCustomer.name = $event;
             })
           }, null, 8
           /* PROPS */
-          , ["error", "modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
+          , ["error", "modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
             label: "Nomor HP",
             placeholder: "nomor hp",
             modelValue: $setup.formCustomer.phone,
-            "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
+            "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
               return $setup.formCustomer.phone = $event;
             }),
             error: $setup.formCustomer.errors.phone
           }, null, 8
           /* PROPS */
-          , ["modelValue", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
+          , ["modelValue", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
             label: "Jenis Kelamin",
             placeholder: "Pilih satu",
             modelValue: $setup.formCustomer.gender_id,
-            "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+            "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
               return $setup.formCustomer.gender_id = $event;
             }),
             options: $props.genders,
@@ -2282,17 +2374,20 @@ var IndexTable = [{
   header: 'Outlet'
 }];
 var TransactionBasketTable = [{
-  field: 'laundry',
-  header: 'Tipe Laundry'
+  field: 'item',
+  header: 'Jenis Item'
 }, {
-  field: 'discount',
-  header: 'Diskon'
+  field: 'unit',
+  header: 'Satuan'
+}, {
+  field: 'price',
+  header: 'Harga'
 }, {
   field: 'quantity',
   header: 'Kuantitas'
 }, {
-  field: 'price',
-  header: 'Harga'
+  field: 'discount',
+  header: 'Diskon'
 }, {
   field: 'totalPrice',
   header: 'Total Harga'
@@ -2385,6 +2480,11 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-table',
     to: '/laundries',
     component: 'laundry/Index'
+  }, {
+    label: 'Product',
+    icon: 'pi pi-table',
+    to: '/products',
+    component: 'product/Index'
   }]
 }]);
 
@@ -2439,6 +2539,11 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-table',
     to: '/laundries',
     component: 'laundry/Index'
+  }, {
+    label: 'Product',
+    icon: 'pi pi-table',
+    to: '/products',
+    component: 'product/Index'
   }]
 }]);
 

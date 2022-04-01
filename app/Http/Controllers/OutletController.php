@@ -23,8 +23,8 @@ class OutletController extends Controller
 
         return inertia('outlet/Index', [
             'filters' => request()->all('search'),
-            'outlets' => Outlet::latest()
-                ->filter(request()->only('search'))
+            'outlets' => Outlet::filter(request()->only('search'))
+                ->latest()
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($outlet) => [

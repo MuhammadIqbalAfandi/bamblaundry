@@ -16,6 +16,7 @@ const props = defineProps({
   transactionNumber: String,
   outlets: Array,
   laundries: Array,
+  products: Array,
   customers: Array,
 
   customerNumber: String,
@@ -95,33 +96,68 @@ const laundryOnSelected = (event) => {
   form.laundry = event.value
 }
 
+const productOnComplete = (event) => {
+  Inertia.reload({
+    data: { product: event.query },
+    only: ['products'],
+  })
+}
+
+const productOnSelected = (event) => {
+  form.product = event.value
+}
+
 const transactionBasket = reactive([])
 
-const addTransactionBasket = () => {
+const validationAddTransactionBasket = () => {
   form.clearErrors()
 
-  if (!form.laundry.id) {
-    form.setError('laundry_id', 'Tipe laundry tidak boleh kosong')
+  if (!form.laundry.id && !form.product.id) {
+    form.setError('laundry', 'Salah satu harus diisi')
+    form.setError('product', 'Salah satu harus diisi')
   }
 
-  if (!form.quantity && form.laundry.id) {
-    form.setError('quantity', 'Kuantitas tidak boleh 0 atau kosong')
+  if (!form.quantityLaundry && form.laundry.id) {
+    form.setError('quantityLaundry', 'Kuantitas tidak boleh 0 atau kosong')
   }
 
-  if (form.hasErrors) {
-    return false
+  if (!form.quantityProduct && form.product.id) {
+    form.setError('quantityProduct', 'Kuantitas tidak boleh 0 atau kosong')
+  }
+}
+
+const addTransactionBasket = () => {
+  validationAddTransactionBasket()
+
+  if (form.quantityLaundry) {
+    transactionBasket.push({
+      label: 'laundry',
+      id: form.laundry.id,
+      item: form.laundry.name,
+      unit: form.laundry.unit,
+      quantity: form.quantityLaundry,
+      price: form.laundry.price,
+      discount: 0,
+      totalPrice: form.quantityLaundry * form.laundry.price,
+    })
+
+    form.reset('laundry', 'quantityLaundry')
   }
 
-  transactionBasket.push({
-    laundryId: form.laundry.id,
-    laundry: `${form.laundry.name} ${form.laundry.price}/${form.laundry.unit}`,
-    quantity: form.quantity,
-    discount: 0,
-    price: form.laundry.price,
-    totalPrice: form.quantity * form.laundry.price,
-  })
+  if (form.quantityProduct) {
+    transactionBasket.push({
+      label: 'product',
+      id: form.product.id,
+      item: form.product.name,
+      unit: form.product.unit,
+      price: form.product.price,
+      quantity: form.quantityProduct,
+      discount: 0,
+      totalPrice: form.quantityProduct * form.product.price,
+    })
 
-  form.reset('laundry_id', 'quantity')
+    form.reset('product', 'quantityProduct')
+  }
 }
 
 const transactionBasketCellEdit = (event) => {
@@ -151,10 +187,18 @@ const transactionPriceTotal = () => {
 const form = useForm({
   transactionNumber: props.transactionNumber,
   customer: '',
-  laundry: '',
   discountAll: 0,
-  quantity: 0,
+
+  laundry: '',
+  quantityLaundry: 0,
+
+  product: '',
+  quantityProduct: 0,
 })
+
+const transactionBasketFilter = (search) => {
+  return transactionBasket.filter((val) => val.label === search)
+}
 
 const submit = () => {
   form
@@ -162,7 +206,8 @@ const submit = () => {
       transaction_number: data.transactionNumber,
       discount_all: data.discountAll,
       customer_number: data.customer.customerNumber,
-      laundries: transactionBasket,
+      laundries: transactionBasketFilter('laundry'),
+      products: transactionBasketFilter('product'),
     }))
     .post(route('transactions.store'))
 }
@@ -229,7 +274,7 @@ const submit = () => {
                   field="name"
                   placeholder="tipe Laundry"
                   v-model="form.laundry"
-                  :error="form.errors.laundry_id"
+                  :error="form.errors.product"
                   :suggestions="laundries"
                   @complete="laundryOnComplete"
                   @item-select="laundryOnSelected"
@@ -249,12 +294,48 @@ const submit = () => {
                 <AppInputNumber
                   show-buttons
                   placeholder="kuantitas"
-                  v-model="form.quantity"
+                  v-model="form.quantityLaundry"
                   :use-grouping="false"
                   :label="form.laundry.id ? `Jumlah (${form.laundry.unit})` : '-'"
                   :disabled="!form.laundry.id"
-                  :error="form.errors.quantity"
+                  :error="form.errors.quantityLaundry"
                   :step="0.1"
+                  :min="0"
+                />
+              </div>
+
+              <div class="col-12 sm:col-6">
+                <AppAutocompleteBasic
+                  dropdown
+                  label="Jenis Product"
+                  field="name"
+                  placeholder="jenis product"
+                  v-model="form.product"
+                  :error="form.errors.product"
+                  :suggestions="products"
+                  @complete="productOnComplete"
+                  @item-select="productOnSelected"
+                >
+                  <template #item="slotProps">
+                    <template v-if="slotProps.item">
+                      <div class="flex flex-column">
+                        <span>{{ slotProps.item.name }}</span>
+                        <span class="font-bold">{{ slotProps.item.price }} / {{ slotProps.item.unit }}</span>
+                      </div>
+                    </template>
+                  </template>
+                </AppAutocompleteBasic>
+              </div>
+
+              <div class="col-12 sm:col-6">
+                <AppInputNumber
+                  show-buttons
+                  placeholder="kuantitas"
+                  v-model="form.quantityProduct"
+                  :use-grouping="false"
+                  :label="form.product.id ? `Jumlah (${form.product.unit})` : '-'"
+                  :disabled="!form.product.id"
+                  :error="form.errors.quantityProduct"
                   :min="0"
                 />
               </div>
@@ -269,7 +350,7 @@ const submit = () => {
               </div>
 
               <div class="col-12">
-                <h1 class="text-base"><i class="pi pi-shopping-cart"></i> <span class="ml-2">Daftar Laundry</span></h1>
+                <h1 class="text-base"><i class="pi pi-shopping-cart"></i> <span class="ml-2">Keranjang</span></h1>
 
                 <DataTable
                   striped-rows
@@ -280,12 +361,6 @@ const submit = () => {
                   :value="transactionBasket"
                   @cell-edit-complete="transactionBasketCellEdit"
                 >
-                  <template v-if="$page.props.errors.laundries" #empty>
-                    <div class="flex justify-content-center p-error">
-                      {{ $page.props.errors.laundries }}
-                    </div>
-                  </template>
-
                   <template #header>
                     <span>Info Customer</span>
                     <div class="mt-2">

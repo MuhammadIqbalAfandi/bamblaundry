@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Helpers\CurrencyFormat;
 use App\Models\Laundry;
+use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +20,7 @@ class TransactionDetail extends Model
         'quantity',
         'transaction_id',
         'laundry_id',
+        'product_id',
     ];
 
     protected function price(): Attribute
@@ -43,6 +45,11 @@ class TransactionDetail extends Model
     public function laundry()
     {
         return $this->belongsTo(Laundry::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 
     public function totalPrice()

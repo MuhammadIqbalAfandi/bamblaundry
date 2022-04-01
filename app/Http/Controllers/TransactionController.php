@@ -8,13 +8,10 @@ use App\Http\Requests\Transaction\UpdateTransactionRequest;
 use App\Models\Customer;
 use App\Models\Laundry;
 use App\Models\Outlet;
+use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionStatus;
 use Exception;
-use FontLib\Table\Type\name;
-use Hoa\Socket\Client as SocketClient;
-use Hoa\Websocket\Client as WebsocketClient;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -38,6 +35,7 @@ class TransactionController extends Controller
             'filters' => request()->all('search', 'startDate', 'endDate', 'outlet'),
             'transactions' => $transactions
                 ->filter(request()->only('search', 'startDate', 'endDate', 'outlet'))
+                ->latest()
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($transaction) => [
@@ -76,22 +74,28 @@ class TransactionController extends Controller
     {
         return inertia('transaction/Create', [
             'transactionNumber' => 'TS' . now()->format('YmdHis'),
-            'customers' => fn() => Customer::latest()
-                ->filter(request('customer'))
+            'customers' => fn() => Customer::filter(request('customer'))
                 ->get()
                 ->transform(fn($customer) => [
                     'name' => $customer->name,
                     'customerNumber' => $customer->customer_number,
                     'phone' => $customer->phone,
                 ]),
-            'laundries' => fn() => Laundry::latest()
-                ->filter(request('laundry'))
+            'laundries' => fn() => Laundry::filter(request('laundry'))
                 ->get()
                 ->transform(fn($laundry) => [
                     'id' => $laundry->id,
                     'name' => $laundry->name,
                     'unit' => $laundry->unit,
                     'price' => $laundry->getRawOriginal('price'),
+                ]),
+            'products' => fn() => Product::filter(request('product'))
+                ->get()
+                ->transform(fn($product) => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'unit' => $product->unit,
+                    'price' => $product->getRawOriginal('price'),
                 ]),
             'customerNumber' => fn() => 'CS' . now()->format('YmdHis'),
             'genders' => [
@@ -121,13 +125,26 @@ class TransactionController extends Controller
                 'outlet_id' => $request->user()->outlet_id,
             ]);
 
-            foreach ($request->laundries as $laundry) {
-                $transaction->transactionDetails()->create([
-                    'price' => $laundry['price'],
-                    'discount' => $laundry['discount'],
-                    'quantity' => $laundry['quantity'],
-                    'laundry_id' => $laundry['laundryId'],
-                ]);
+            if ($request->laundries) {
+                foreach ($request->laundries as $laundry) {
+                    $transaction->transactionDetails()->create([
+                        'price' => $laundry['price'],
+                        'discount' => $laundry['discount'],
+                        'quantity' => $laundry['quantity'],
+                        'laundry_id' => $laundry['id'],
+                    ]);
+                }
+            }
+
+            if ($request->products) {
+                foreach ($request->products as $product) {
+                    $transaction->transactionDetails()->create([
+                        'price' => $product['price'],
+                        'discount' => $product['discount'],
+                        'quantity' => $product['quantity'],
+                        'product_id' => $product['id'],
+                    ]);
+                }
             }
 
             $transaction->mutation()->create([
@@ -138,42 +155,39 @@ class TransactionController extends Controller
 
             DB::commit();
 
-            $transaction = Transaction::with(['outlet', 'customer', 'transactionDetails.laundry'])->latest()->first();
+            // $transaction = Transaction::with(['outlet', 'customer', 'transactionDetails.laundry'])->latest()->first();
 
-            $discountAsString = $transaction->discountAsString();
-            $subTotalAsString = $transaction->subTotalAsString();
-            $totalPriceAsString = $transaction->totalPriceAsString();
-            foreach ($transaction->transactionDetails as $transactionDetail) {
-                $totalPriceAsStringDetail = $transactionDetail->totalPriceAsString();
-                $transactionDetail->totalPriceAsString = $totalPriceAsStringDetail;
-            }
+            // $discountAsString = $transaction->discountAsString();
+            // $subTotalAsString = $transaction->subTotalAsString();
+            // $totalPriceAsString = $transaction->totalPriceAsString();
+            // foreach ($transaction->transactionDetails as $transactionDetail) {
+            //     $totalPriceAsStringDetail = $transactionDetail->totalPriceAsString();
+            //     $transactionDetail->totalPriceAsString = $totalPriceAsStringDetail;
+            // }
 
-            $transaction->discountAsString = $discountAsString;
-            $transaction->subTotalAsString = $subTotalAsString;
-            $transaction->totalPriceAsString = $totalPriceAsString;
+            // $transaction->discountAsString = $discountAsString;
+            // $transaction->subTotalAsString = $subTotalAsString;
+            // $transaction->totalPriceAsString = $totalPriceAsString;
 
-            // $thermalPrinting = new ThermalPrinting($transaction);
-            // $thermalPrinting->startPrinting(2);
-            try {
-                $socket = new WebsocketClient(
-                    new SocketClient('ws://127.0.0.1:5544')
-                );
-                $socket->setHost('escpos-server');
-                $socket->connect();
-                $socket->send(json_encode($transaction));
-                $socket->close();
-                // dd($socket->getConnection()->getCurrentNode());
-            } catch (Exception $e) {
-                return back()->with('error', __('messages.error.store.transaction'));
-            }
+            // try {
+            //     $socket = new WebsocketClient(
+            //         new SocketClient('ws://127.0.0.1:5544')
+            //     );
+            //     $socket->setHost('escpos-server');
+            //     $socket->connect();
+            //     $socket->send(json_encode($transaction));
+            //     $socket->close();
+            // } catch (Exception $e) {
+            //     return back()->with('error', __('messages.error.store.transaction'));
+            // }
 
-            Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
-                'receiver' => $transaction->customer->phone,
-                'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transaction_number . '*',
-            ]);
+            // Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
+            //     'receiver' => $transaction->customer->phone,
+            //     'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transaction_number . '*',
+            // ]);
 
             return to_route('transactions.index')->with('success', __('messages.success.store.transaction'));
-        } catch (QueryException $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return back()->with('error', __('messages.error.store.transaction'));
@@ -214,7 +228,8 @@ class TransactionController extends Controller
             ],
             'transactionDetails' => $transaction->transactionDetails
                 ->transform(fn($transactionDetail) => [
-                    'laundry' => "{$transactionDetail->laundry->name} {$transactionDetail->laundry->getRawOriginal('price')}/{$transactionDetail->laundry->unit}",
+                    'item' => $transactionDetail->laundry->name ?? $transactionDetail->product->name,
+                    'unit' => $transactionDetail->laundry->unit ?? $transactionDetail->product->unit,
                     'quantity' => $transactionDetail->quantity,
                     'discount' => $transactionDetail->discount,
                     'price' => $transactionDetail->price,
@@ -245,18 +260,18 @@ class TransactionController extends Controller
     {
         $transaction->update($request->validated());
 
-        if ($transaction->transaction_status_id == 2) {
-            $statusMessage = " sudah diproses, harap menunggu sampai pemberitahuan selanjutnya.";
-        } else if ($transaction->transaction_status_id == 3) {
-            $statusMessage = " sudah selesai, silahkan diambil.";
-        } else {
-            $statusMessage = " sudah diambil. Silahkan datang lagi di kemudian hari jika ingin laundry kembali, terima kasih.";
-        }
+        // if ($transaction->transaction_status_id == 2) {
+        //     $statusMessage = " sudah diproses, harap menunggu sampai pemberitahuan selanjutnya.";
+        // } else if ($transaction->transaction_status_id == 3) {
+        //     $statusMessage = " sudah selesai, silahkan diambil.";
+        // } else {
+        //     $statusMessage = " sudah diambil. Silahkan datang lagi di kemudian hari jika ingin laundry kembali, terima kasih.";
+        // }
 
-        Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
-            'receiver' => $transaction->customer->phone,
-            'message' => 'Layanan laundry Anda dengan nomor transaksi *' . $transaction->transaction_number . '*' . $statusMessage,
-        ]);
+        // Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
+        //     'receiver' => $transaction->customer->phone,
+        //     'message' => 'Layanan laundry Anda dengan nomor transaksi *' . $transaction->transaction_number . '*' . $statusMessage,
+        // ]);
 
         return back()->with('success', __('messages.success.update.transaction_status'));
     }

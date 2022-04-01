@@ -45,6 +45,7 @@ entity TransactionDetail {
   * quantity
   * transaction_id
   * laundry_id
+  * product_id
 }
 
 entity Laundry {
@@ -89,6 +90,14 @@ entity Expense {
   * outlet_id
 }
 
+entity Product {
+  * id
+  __
+  * name
+  * price
+  * unit
+}
+
 Mutation ||--|| Expense
 Mutation ||--|{ Outlet
 Mutation ||--|| Transaction
@@ -102,3 +111,4 @@ Expense ||--|{ Outlet
 User ||--|{ Role
 User ||--|{ Outlet
 TransactionDetail ||--|{ Laundry
+TransactionDetail ||--|{ Product

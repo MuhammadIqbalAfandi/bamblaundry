@@ -11,7 +11,7 @@ import AppLayout from '@/layouts/AppLayout.vue'
 import TableHeader from './TableHeader'
 
 const props = defineProps({
-  laundries: Object,
+  products: Object,
   filters: Object,
 })
 
@@ -22,24 +22,24 @@ const filterForm = useForm({
 watch(
   filterForm,
   throttle(() => {
-    Inertia.get('/laundries', pickBy({ search: filterForm.search }), { preserveState: true })
+    Inertia.get('/products', pickBy({ search: filterForm.search }), { preserveState: true })
   }, 300)
 )
 </script>
 
 <template>
-  <Head title="Daftar Tipe Laundry" />
+  <Head title="Daftar Product" />
 
   <AppLayout>
     <DataTable
       responsiveLayout="scroll"
       columnResizeMode="expand"
-      :value="laundries.data"
+      :value="products.data"
       :rowHover="true"
       :stripedRows="true"
     >
       <template #header>
-        <h5>Laundry</h5>
+        <h5>Product</h5>
 
         <div class="grid">
           <div class="col-12 md:col-8">
@@ -50,8 +50,8 @@ watch(
 
           <div class="col-12 md:col-4 flex justify-content-end">
             <AppButton
-              :href="route('laundries.create')"
-              label="Tambah Laundry"
+              :href="route('products.create')"
+              label="Tambah Product"
               icon="pi pi-pencil"
               class="p-button-text"
             />
@@ -71,12 +71,12 @@ watch(
           <AppButton
             icon="pi pi-angle-double-right"
             class="p-button-icon-only p-button-rounded p-button-text"
-            :href="route('laundries.edit', data.id)"
+            :href="route('products.edit', data.id)"
           />
         </template>
       </Column>
     </DataTable>
 
-    <AppPagination :links="laundries.links" />
+    <AppPagination :links="products.links" />
   </AppLayout>
 </template>

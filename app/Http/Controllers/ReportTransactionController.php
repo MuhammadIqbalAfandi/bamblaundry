@@ -19,15 +19,16 @@ class ReportTransactionController extends Controller
     {
         return inertia('transaction/Report', [
             'filters' => request()->all('startDate', 'endDate', 'outlet'),
-            'transactions' => Transaction::latest()
-                ->filter(request()->only('startDate', 'endDate', 'outlet'))
+            'transactions' => Transaction::filter(request()->only('startDate', 'endDate', 'outlet'))
+                ->latest()
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($transaction) => [
                     'startDate' => Carbon::parse($transaction->getRawOriginal('created_at'))->translatedFormat('Y-m-d'),
                     'createdAt' => $transaction->created_at,
                     'price' => $transaction->totalPriceAsFullString(),
-                ]),
+                ])
+            ,
             'outlets' => Outlet::all()
                 ->transform(fn($outlet) => [
                     'label' => $outlet->name,

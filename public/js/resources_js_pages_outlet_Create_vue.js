@@ -1240,6 +1240,11 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-table',
     to: '/laundries',
     component: 'laundry/Index'
+  }, {
+    label: 'Product',
+    icon: 'pi pi-table',
+    to: '/products',
+    component: 'product/Index'
   }]
 }]);
 
@@ -1294,6 +1299,11 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-table',
     to: '/laundries',
     component: 'laundry/Index'
+  }, {
+    label: 'Product',
+    icon: 'pi pi-table',
+    to: '/products',
+    component: 'product/Index'
   }]
 }]);
 

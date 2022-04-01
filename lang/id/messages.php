@@ -28,6 +28,7 @@ return [
             'customer' => 'Akun customer berhasil ditambahkan',
             'outlet' => 'Data outlet berhasil ditambahkan',
             'laundry' => 'Data laundry berhasil ditambahkan',
+            'product' => 'Data product berhasil ditambahkan',
         ],
         'update' => [
             'transaction_status' => 'Status transaksi berhasil diubah',
@@ -35,12 +36,14 @@ return [
             'customer' => 'Akun customer berhasil diubah',
             'outlet' => 'Data outlet berhasil diubah',
             'laundry' => 'Data laundry berhasil diubah',
+            'product' => 'Data product berhasil diubah',
         ],
         'destroy' => [
             'user' => 'Akun user berhasil dihapus',
             'customer' => 'Akun customer berhasil dihapus',
             'outlet' => 'Data outlet berhasil dihapus',
             'laundry' => 'Data laundry berhasil dihapus',
+            'product' => 'Data product berhasil dihapus',
         ],
     ],
 

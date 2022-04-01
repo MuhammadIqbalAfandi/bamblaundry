@@ -1,10 +1,26 @@
 <script setup>
-import { watch, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
+import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppButton from '@/components/AppButton.vue'
-import AppInputNumber from '@/components/AppInputNumber.vue'
 import AppInputText from '@/components/AppInputText.vue'
+import AppInputNumber from '@/components/AppInputNumber.vue'
+import AppDialog from '@/components/AppDialog.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
+
+const props = defineProps({
+  product: Object,
+})
+
+const form = useForm({
+  name: props.product.name,
+  price: props.product.price,
+  unit: props.product.unit,
+})
+
+const submit = () => {
+  form.put(route('products.update', props.product.id))
+}
 
 const errors = computed(() => usePage().props.value.errors)
 
@@ -12,19 +28,19 @@ watch(errors, () => {
   form.clearErrors()
 })
 
-const form = useForm({
-  name: null,
-  price: null,
-  unit: null,
-})
+const visibleDialog = ref(false)
 
-const submit = () => {
-  form.post(route('laundries.store'))
+const confirmDialog = () => {
+  visibleDialog.value = true
 }
+
+const onAgree = (id) => Inertia.delete(route('products.destroy', id))
+
+const onCancel = () => (visibleDialog.value = false)
 </script>
 
 <template>
-  <Head title="Tambah Tipe Laundry" />
+  <Head title="Ubah Product" />
 
   <AppLayout>
     <div class="grid">
@@ -47,7 +63,18 @@ const submit = () => {
           </template>
 
           <template #footer>
-            <div class="flex justify-content-end">
+            <div
+              class="flex flex-column sm:flex-row align-items-center sm:justify-content-center sm:justify-content-between"
+            >
+              <AppDialog
+                message="Yakin akan menghapus data ini?"
+                v-model:visible="visibleDialog"
+                @agree="onAgree(product.id)"
+                @cancel="onCancel"
+              />
+
+              <Button label="Hapus" icon="pi pi-trash" class="p-button-text p-button-danger" @click="confirmDialog" />
+
               <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
             </div>
           </template>

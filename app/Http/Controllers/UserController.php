@@ -25,8 +25,8 @@ class UserController extends Controller
 
         return inertia('user/Index', [
             'filters' => request()->all('search'),
-            'users' => User::latest()
-                ->filter(request()->only('search'))
+            'users' => User::filter(request()->only('search'))
+                ->latest()
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($user) => [
@@ -60,7 +60,7 @@ class UserController extends Controller
                     'label' => $role->name,
                     'value' => $role->id,
                 ]),
-            'outlets' => Outlet::all()
+            'outlets' => Outlet::get()
                 ->transform(fn($outlet) => [
                     'label' => $outlet->name,
                     'value' => $outlet->id,
@@ -143,7 +143,7 @@ class UserController extends Controller
                     'label' => $role->name,
                     'value' => $role->id,
                 ]),
-            'outlets' => Outlet::all()
+            'outlets' => Outlet::get()
                 ->transform(fn($outlet) => [
                     'label' => $outlet->name,
                     'value' => $outlet->id,

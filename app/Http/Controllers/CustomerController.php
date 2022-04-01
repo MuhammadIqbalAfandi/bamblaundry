@@ -18,8 +18,8 @@ class CustomerController extends Controller
     {
         return inertia('customer/Index', [
             'filters' => request()->all('search'),
-            'customers' => Customer::latest()
-                ->filter(request()->only('search'))
+            'customers' => Customer::filter(request()->only('search'))
+                ->latest()
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn($customer) => [

@@ -40,7 +40,7 @@ const onCancel = () => (visibleDialog.value = false)
 </script>
 
 <template>
-  <Head title="Ubah tipe Laundry" />
+  <Head title="Ubah Tipe Laundry" />
 
   <AppLayout>
     <div class="grid">

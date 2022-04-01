@@ -1319,7 +1319,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Card = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Card");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["Head"], {
-    title: "Tambah tipe Laundry"
+    title: "Tambah Tipe Laundry"
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppLayout"], null, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Card, null, {
@@ -1438,6 +1438,11 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-table',
     to: '/laundries',
     component: 'laundry/Index'
+  }, {
+    label: 'Product',
+    icon: 'pi pi-table',
+    to: '/products',
+    component: 'product/Index'
   }]
 }]);
 
@@ -1492,6 +1497,11 @@ __webpack_require__.r(__webpack_exports__);
     icon: 'pi pi-table',
     to: '/laundries',
     component: 'laundry/Index'
+  }, {
+    label: 'Product',
+    icon: 'pi pi-table',
+    to: '/products',
+    component: 'product/Index'
   }]
 }]);
 
