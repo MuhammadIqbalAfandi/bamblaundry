@@ -2025,9 +2025,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           /* PROPS */
           , ["modelValue", "error", "suggestions"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppAutocompleteBasic"], {
             dropdown: "",
-            label: "Tipe Laundry",
+            label: "Laundry",
             field: "name",
-            placeholder: "tipe Laundry",
+            placeholder: "laundry",
             modelValue: $setup.form.laundry,
             "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
               return $setup.form.laundry = $event;
@@ -2066,9 +2066,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           /* PROPS */
           , ["modelValue", "label", "disabled", "error", "step"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppAutocompleteBasic"], {
             dropdown: "",
-            label: "Jenis Product",
+            label: "Product",
             field: "name",
-            placeholder: "jenis product",
+            placeholder: "product",
             modelValue: $setup.form.product,
             "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
               return $setup.form.product = $event;

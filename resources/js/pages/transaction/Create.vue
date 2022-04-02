@@ -270,9 +270,9 @@ const submit = () => {
               <div class="col-12 sm:col-6">
                 <AppAutocompleteBasic
                   dropdown
-                  label="Tipe Laundry"
+                  label="Laundry"
                   field="name"
-                  placeholder="tipe Laundry"
+                  placeholder="laundry"
                   v-model="form.laundry"
                   :error="form.errors.product"
                   :suggestions="laundries"
@@ -307,9 +307,9 @@ const submit = () => {
               <div class="col-12 sm:col-6">
                 <AppAutocompleteBasic
                   dropdown
-                  label="Jenis Product"
+                  label="Product"
                   field="name"
-                  placeholder="jenis product"
+                  placeholder="product"
                   v-model="form.product"
                   :error="form.errors.product"
                   :suggestions="products"

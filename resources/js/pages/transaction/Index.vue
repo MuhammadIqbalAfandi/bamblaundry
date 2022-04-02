@@ -158,7 +158,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
       :striped-rows="true"
     >
       <template #header>
-        <h5>Transaksi</h5>
+        <h1>Transaksi</h1>
 
         <div class="grid">
           <div class="col-12 md:col-8">

@@ -9,9 +9,10 @@
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "IndexTable": () => (/* binding */ IndexTable),
+/* harmony export */   "TransactionTable": () => (/* binding */ TransactionTable)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
+var IndexTable = [{
   field: 'customer_number',
   header: 'Id Customer'
 }, {
@@ -23,7 +24,23 @@ __webpack_require__.r(__webpack_exports__);
 }, {
   field: 'gender',
   header: 'Jenis Kelamin'
-}]);
+}];
+var TransactionTable = [{
+  field: 'transactionNumber',
+  header: 'Id Transaksi'
+}, {
+  field: 'customer',
+  header: 'Id Customer'
+}, {
+  field: 'price',
+  header: 'Total Harga'
+}, {
+  field: 'transactionStatusName',
+  header: 'Status'
+}, {
+  field: 'outlet',
+  header: 'Outlet'
+}];
 
 /***/ })
 

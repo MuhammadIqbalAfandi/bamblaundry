@@ -704,8 +704,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "model-value": $props.modelValue,
     "editor-style": $props.editorStyle,
     placeholder: $props.placeholder,
-    onInput: _cache[0] || (_cache[0] = function ($event) {
-      return _ctx.$emit('update:modelValue', $event);
+    onTextChange: _cache[0] || (_cache[0] = function ($event) {
+      return _ctx.$emit('update:modelValue', $event.htmlValue);
     })
   }, {
     toolbar: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -1295,35 +1295,32 @@ var _hoisted_1 = {
   "class": "grid"
 };
 var _hoisted_2 = {
-  "class": "col-12 md:col-3"
+  "class": "col-12 md:col-8"
 };
 var _hoisted_3 = {
-  "class": "col-12"
-};
-var _hoisted_4 = {
   "class": "q-formats"
 };
-var _hoisted_5 = {
+var _hoisted_4 = {
   "class": "ql-bold"
 };
-var _hoisted_6 = {
+var _hoisted_5 = {
   "class": "ql-italic"
 };
-var _hoisted_7 = {
+var _hoisted_6 = {
   "class": "ql-underline"
 };
-var _hoisted_8 = {
+var _hoisted_7 = {
   "class": "ql-formats"
 };
-var _hoisted_9 = {
+var _hoisted_8 = {
   "class": "ql-list",
   value: "ordered"
 };
-var _hoisted_10 = {
+var _hoisted_9 = {
   "class": "ql-list",
   value: "bullet"
 };
-var _hoisted_11 = {
+var _hoisted_10 = {
   "class": "flex justify-content-end"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -1333,19 +1330,20 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["AppLayout"], null, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Card, null, {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Card, null, {
         content: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputNumber"], {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputNumber"], {
             modelValue: $setup.form.amount,
             "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
               return $setup.form.amount = $event;
             }),
+            "class": "md:w-16rem",
             label: "Pengeluaran",
             placeholder: "pengeluaran",
             error: $setup.form.errors.amount
           }, null, 8
           /* PROPS */
-          , ["modelValue", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppEditor"], {
+          , ["modelValue", "error"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppEditor"], {
             label: "Keterangan",
             modelValue: $setup.form.description,
             "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
@@ -1356,23 +1354,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             error: $setup.form.errors.description
           }, {
             toolbar: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_5, null, 512
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_4, null, 512
               /* NEED_PATCH */
               ), [[_directive_tooltip, 'Bold', void 0, {
                 bottom: true
-              }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_6, null, 512
+              }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_5, null, 512
               /* NEED_PATCH */
               ), [[_directive_tooltip, 'Italic', void 0, {
                 bottom: true
-              }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_7, null, 512
+              }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_6, null, 512
               /* NEED_PATCH */
               ), [[_directive_tooltip, 'Underline', void 0, {
                 bottom: true
-              }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_9, null, 512
+              }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_8, null, 512
               /* NEED_PATCH */
               ), [[_directive_tooltip, 'Ordered', void 0, {
                 bottom: true
-              }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_10, null, 512
+              }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_9, null, 512
               /* NEED_PATCH */
               ), [[_directive_tooltip, 'Bullet', void 0, {
                 bottom: true
@@ -1383,10 +1381,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
           }, 8
           /* PROPS */
-          , ["modelValue", "error"])])])];
+          , ["modelValue", "error"])];
         }),
         footer: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             onClick: $setup.submit,
             label: "Simpan",
             icon: "pi pi-check",
@@ -1396,7 +1394,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         _: 1
         /* STABLE */
 
-      })];
+      })])])];
     }),
     _: 1
     /* STABLE */

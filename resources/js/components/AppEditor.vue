@@ -42,7 +42,7 @@ const ariaDescribedbyLabel = computed(() =>
       :model-value="modelValue"
       :editor-style="editorStyle"
       :placeholder="placeholder"
-      @input="$emit('update:modelValue', $event)"
+      @text-change="$emit('update:modelValue', $event.htmlValue)"
     >
       <template #toolbar>
         <slot name="toolbar" />

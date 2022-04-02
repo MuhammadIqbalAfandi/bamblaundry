@@ -24,19 +24,18 @@ const submit = () => {
 
 <template>
   <AppLayout>
-    <Card>
-      <template #content>
-        <div class="grid">
-          <div class="col-12 md:col-3">
+    <div class="grid">
+      <div class="col-12 md:col-8">
+        <Card>
+          <template #content>
             <AppInputNumber
               v-model="form.amount"
+              class="md:w-16rem"
               label="Pengeluaran"
               placeholder="pengeluaran"
               :error="form.errors.amount"
             />
-          </div>
 
-          <div class="col-12">
             <AppEditor
               label="Keterangan"
               v-model="form.description"
@@ -56,15 +55,15 @@ const submit = () => {
                 </span>
               </template>
             </AppEditor>
-          </div>
-        </div>
-      </template>
+          </template>
 
-      <template #footer>
-        <div class="flex justify-content-end">
-          <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
-        </div>
-      </template>
-    </Card>
+          <template #footer>
+            <div class="flex justify-content-end">
+              <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
+            </div>
+          </template>
+        </Card>
+      </div>
+    </div>
   </AppLayout>
 </template>

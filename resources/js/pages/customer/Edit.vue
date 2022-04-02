@@ -6,11 +6,15 @@ import AppButton from '@/components/AppButton.vue'
 import AppDropdown from '@/components/AppDropdown.vue'
 import AppInputText from '@/components/AppInputText.vue'
 import AppDialog from '@/components/AppDialog.vue'
+import AppPagination from '@/components/AppPagination.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
+
+import { TransactionTable } from './TableHeader'
 
 const props = defineProps({
   customer: Object,
   genders: Array,
+  transactions: Object,
 })
 
 const form = useForm({
@@ -94,6 +98,66 @@ const onCancel = () => (visibleDialog.value = false)
 
               <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
             </div>
+          </template>
+        </Card>
+      </div>
+    </div>
+
+    <h2>Riwayat Transaksi</h2>
+    <div class="grid">
+      <div class="col-12">
+        <Card>
+          <template #content>
+            <DataTable
+              responsive-layout="scroll"
+              column-resize-mode="expand"
+              :value="transactions.data"
+              :row-hover="true"
+              :striped-rows="true"
+            >
+              <Column
+                v-for="transactionTable in TransactionTable"
+                :field="transactionTable.field"
+                :header="transactionTable.header"
+                :key="transactionTable.field"
+              >
+                <template #body="{ data, field }">
+                  <template v-if="field === 'transactionNumber'">
+                    <p class="font-bold">{{ data[field] }}</p>
+                    <p>{{ data.createdAt }}</p>
+                  </template>
+                  <template v-else-if="field === 'customer'">
+                    <p class="font-bold">{{ data.customer.number }}</p>
+                    <p>{{ data.customer.name }}</p>
+                    <p>{{ data.customer.phone }}</p>
+                  </template>
+                  <template v-else-if="field === 'transactionStatusName'">
+                    <Badge v-if="data['transactionStatusId'] === 1" :value="data[field]"></Badge>
+                    <Badge
+                      v-else-if="data['transactionStatusId'] === 2"
+                      :value="data[field]"
+                      severity="warning"
+                    ></Badge>
+                    <Badge v-else :value="data[field]" severity="success"></Badge>
+                  </template>
+                  <template v-else>
+                    {{ data[field] }}
+                  </template>
+                </template>
+              </Column>
+
+              <Column>
+                <template #body="{ data }">
+                  <AppButton
+                    icon="pi pi-angle-double-right"
+                    class="p-button-icon-only p-button-rounded p-button-text"
+                    :href="route('transactions.show', data.id)"
+                  />
+                </template>
+              </Column>
+            </DataTable>
+
+            <AppPagination :links="transactions.links" />
           </template>
         </Card>
       </div>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,11 @@ class Customer extends Model
         return Attribute::make(
             get:fn($value) => $value == 1 ? __('words.female') : __('words.male'),
         );
+    }
+
+    public function transaction()
+    {
+        return $this->hasMany(Transaction::class, 'customer_number', 'customer_number');
     }
 
     public function scopeFilter($query, $filters)

@@ -448,7 +448,7 @@ __webpack_require__.r(__webpack_exports__);
       AppButton: _components_AppButton_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
       AppPagination: _components_AppPagination_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
       AppLayout: _layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
-      TableHeader: _TableHeader__WEBPACK_IMPORTED_MODULE_8__["default"]
+      IndexTable: _TableHeader__WEBPACK_IMPORTED_MODULE_8__.IndexTable
     };
     Object.defineProperty(__returned__, '__isScriptSetup', {
       enumerable: false,
@@ -1080,7 +1080,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 
-var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Customer", -1
+var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h1", null, "Customer", -1
 /* HOISTED */
 );
 
@@ -1134,11 +1134,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["href"])])])];
         }),
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.TableHeader, function (tableHeader) {
+          return [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.IndexTable, function (indexTable) {
             return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Column, {
-              field: tableHeader.field,
-              header: tableHeader.header,
-              key: tableHeader.field
+              field: indexTable.field,
+              header: indexTable.header,
+              key: indexTable.field
             }, null, 8
             /* PROPS */
             , ["field", "header"]);
@@ -1190,9 +1190,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "IndexTable": () => (/* binding */ IndexTable),
+/* harmony export */   "TransactionTable": () => (/* binding */ TransactionTable)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
+var IndexTable = [{
   field: 'customer_number',
   header: 'Id Customer'
 }, {
@@ -1204,7 +1205,23 @@ __webpack_require__.r(__webpack_exports__);
 }, {
   field: 'gender',
   header: 'Jenis Kelamin'
-}]);
+}];
+var TransactionTable = [{
+  field: 'transactionNumber',
+  header: 'Id Transaksi'
+}, {
+  field: 'customer',
+  header: 'Id Customer'
+}, {
+  field: 'price',
+  header: 'Total Harga'
+}, {
+  field: 'transactionStatusName',
+  header: 'Status'
+}, {
+  field: 'outlet',
+  header: 'Outlet'
+}];
 
 /***/ }),
 
