@@ -107,7 +107,7 @@ class Transaction extends Model
 
     public function totalPriceAsFullString()
     {
-        return $this->setRupiahFormat($this->totalPrice(), 2, true);
+        return $this->setRupiahFormat($this->totalPrice(), 0, true);
     }
 
     public function subTotal()

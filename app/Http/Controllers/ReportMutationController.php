@@ -6,8 +6,6 @@ use App\Exports\MutationExport;
 use App\Http\Controllers\Controller;
 use App\Models\Mutation;
 use App\Models\Outlet;
-use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ReportMutationController extends Controller
 {
@@ -45,6 +43,6 @@ class ReportMutationController extends Controller
      */
     public function exportExcel()
     {
-        return Excel::download(new MutationExport(request()), 'report-mutation.xls');
+        return new MutationExport(request());
     }
 }

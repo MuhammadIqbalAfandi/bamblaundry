@@ -26,7 +26,7 @@ class TransactionDetail extends Model
     protected function price(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $this->setRupiahFormat($value, 2, true)
+            get:fn($value) => $this->setRupiahFormat($value, 0, true)
         );
     }
 
@@ -67,6 +67,6 @@ class TransactionDetail extends Model
 
     public function totalPriceAsFullString()
     {
-        return $this->setRupiahFormat($this->totalPrice(), 2, true);
+        return $this->setRupiahFormat($this->totalPrice(), 0, true);
     }
 }

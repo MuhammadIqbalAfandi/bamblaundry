@@ -32,7 +32,7 @@ class Expense extends Model
     public function amount(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => '- ' . $this->setRupiahFormat($value, 2, true)
+            get:fn($value) => '- ' . $this->setRupiahFormat($value, 0, true)
         );
     }
 

@@ -57712,7 +57712,7 @@ __webpack_require__.r(__webpack_exports__);
   }
 });
 _inertiajs_progress__WEBPACK_IMPORTED_MODULE_7__.InertiaProgress.init({
-  color: '#eb4432'
+  color: '#4F46E5'
 });
 })();
 

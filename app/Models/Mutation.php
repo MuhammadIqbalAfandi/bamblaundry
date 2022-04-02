@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Helpers\CurrencyFormat;
+use App\Models\Helpers\HasMutation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mutation extends Model
 {
-    use HasFactory, CurrencyFormat;
+    use HasFactory, CurrencyFormat, HasMutation;
 
     protected $fillable = [
         'type',
@@ -30,8 +31,8 @@ class Mutation extends Model
     public function amount(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $this->transaction_id ? $this->setRupiahFormat($value, 2, true)
-            : '- ' . $this->setRupiahFormat($value, 2, true)
+            get:fn($value) => $this->transaction_id ? $this->setRupiahFormat($value, 0, true)
+            : '- ' . $this->setRupiahFormat($value, 0, true)
         );
     }
 
