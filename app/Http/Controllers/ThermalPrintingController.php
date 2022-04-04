@@ -17,7 +17,7 @@ class ThermalPrintingController extends Controller
         // $thermalPrinting->startPrinting(1);
 
         $transaction->load(['outlet', 'customer', 'transactionDetails.laundry']);
-        $discountAsString = $transaction->discountAsString();
+        $discount = $transaction->discount;
         $subTotalAsString = $transaction->subTotalAsString();
         $totalPriceAsString = $transaction->totalPriceAsString();
         foreach ($transaction->transactionDetails as $transactionDetail) {
@@ -25,7 +25,7 @@ class ThermalPrintingController extends Controller
             $transactionDetail->totalPriceAsString = $totalPriceAsStringDetail;
         }
 
-        $transaction->discountAsString = $discountAsString;
+        $transaction->discount = $discount;
         $transaction->subTotalAsString = $subTotalAsString;
         $transaction->totalPriceAsString = $totalPriceAsString;
 

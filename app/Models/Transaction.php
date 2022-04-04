@@ -37,7 +37,7 @@ class Transaction extends Model
     public function discount(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => "{$value}%"
+            get:fn($value) => $this->setRupiahFormat($value, 0, true)
         );
     }
 
@@ -97,7 +97,7 @@ class Transaction extends Model
             return $price - $price * ($transactionDetail->getRawOriginal('discount') / 100);
         });
 
-        return $price - $price * ($this->getRawOriginal('discount') / 100);
+        return $price - $this->getRawOriginal('discount');
     }
 
     public function totalPriceAsString()
@@ -123,12 +123,5 @@ class Transaction extends Model
     public function subTotalAsString()
     {
         return $this->setRupiahFormat($this->subTotal());
-    }
-
-    public function discountAsString()
-    {
-        $discount = $this->getRawOriginal('discount') / 100;
-
-        return $this->setRupiahFormat($discount * $this->subTotal());
     }
 }

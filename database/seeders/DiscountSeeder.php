@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Customer;
+use App\Models\Discount;
 use Illuminate\Database\Seeder;
 
-class CustomerSeeder extends Seeder
+class DiscountSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,6 +14,8 @@ class CustomerSeeder extends Seeder
      */
     public function run()
     {
-        Customer::factory()->count(5000)->create();
+        Discount::create([
+            'discount' => 9000,
+        ]);
     }
 }

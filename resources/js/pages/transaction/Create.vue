@@ -14,10 +14,19 @@ import { IDRCurrencyFormat } from '@/utils/currency-format'
 
 const props = defineProps({
   transactionNumber: String,
-  outlets: Array,
-  laundries: Array,
-  products: Array,
-  customers: Array,
+  laundries: {
+    type: Array,
+    default: [],
+  },
+  products: {
+    type: Array,
+    default: [],
+  },
+  customers: {
+    type: Array,
+    default: [],
+  },
+  discount: Number,
 
   customerNumber: String,
   genders: Array,
@@ -28,6 +37,22 @@ const errors = computed(() => usePage().props.value.errors)
 watch(errors, () => {
   form.clearErrors()
 })
+
+watch(
+  () => props.customers,
+  (newVal) => {
+    if (Object.keys(newVal).length === 1) {
+      form.customer = newVal[0]
+    }
+  }
+)
+
+watch(
+  () => props.transactionNumber,
+  (newVal) => {
+    form.transactionNumber = newVal
+  }
+)
 
 const customerDialogShow = ref(false)
 
@@ -60,31 +85,6 @@ const customerOnSelected = (event) => {
   form.customer = event.value
 }
 
-const formCustomer = useForm({
-  transaction_number: props.transactionNumber,
-  customer_number: props.customerNumber,
-  name: '',
-  phone: '',
-  address: '',
-  gender_id: '',
-})
-
-const submitCustomer = () => {
-  formCustomer.post(route('customers.store'), {
-    onSuccess: () => {
-      form.customer = {
-        name: formCustomer.name,
-        customerNumber: formCustomer.customer_number,
-        phone: formCustomer.phone,
-      }
-
-      formCustomer.reset()
-
-      customerDialogShow.value = !customerDialogShow.value
-    },
-  })
-}
-
 const laundryOnComplete = (event) => {
   Inertia.reload({
     data: { laundry: event.query },
@@ -107,7 +107,51 @@ const productOnSelected = (event) => {
   form.product = event.value
 }
 
+const formCustomer = useForm({
+  transaction_number: props.transactionNumber,
+  customer_number: props.customerNumber,
+  name: '',
+  phone: '',
+  address: '',
+  gender_id: '',
+})
+
+const submitCustomer = () => {
+  formCustomer.post(route('customers.store'), {
+    onSuccess: () => {
+      customerOnComplete({ query: formCustomer.customer_number })
+
+      formCustomer.reset()
+
+      customerDialogShow.value = !customerDialogShow.value
+    },
+  })
+}
+
 const transactionBasket = reactive([])
+
+const transactionBasketClear = () => {
+  transactionBasket.splice(0)
+}
+
+const transactionBasketFilter = (search) => {
+  return transactionBasket.filter((val) => val.label === search)
+}
+
+const transactionBasketOnDelete = (id) => {
+  transactionBasket.splice(id, 1)
+}
+
+const transactionBasketCellEdit = (event) => {
+  const { data, newValue, field } = event
+
+  if (field === 'discount') {
+    data[field] = newValue ?? 0
+
+    const price = data['price'] * data['quantity']
+    data['totalPrice'] = price - price * (newValue / 100)
+  }
+}
 
 const validationAddTransactionBasket = () => {
   form.clearErrors()
@@ -160,34 +204,30 @@ const addTransactionBasket = () => {
   }
 }
 
-const transactionBasketCellEdit = (event) => {
-  const { data, newValue, field } = event
+const subTotal = () => {
+  return IDRCurrencyFormat(transactionBasket.reduce((prev, current) => prev + current.totalPrice, 0))
+}
 
-  if (field === 'discount') {
-    data[field] = newValue ?? 0
+const discount = () => {
+  form.discount = form.customer.checkTransaction + 1 === 7 ? props.discount : 0
 
-    const price = data['price'] * data['quantity']
-    data['totalPrice'] = price - price * (newValue / 100)
+  return IDRCurrencyFormat(form.discount)
+}
+
+const priceTotal = () => {
+  let totalPrice = transactionBasket.reduce((prev, current) => prev + current.totalPrice, 0)
+  totalPrice = totalPrice - form.discount
+  if (totalPrice < 0) {
+    totalPrice = 0
   }
-}
 
-const transactionBasketOnDelete = (id) => {
-  transactionBasket.splice(id, 1)
-}
-
-const transactionPriceTotal = () => {
-  form.discountAll = form.discountAll ?? 0
-
-  const totalPrice = transactionBasket.reduce((prev, current) => prev + current.totalPrice, 0)
-  const totalPriceAfterDiscount = totalPrice - totalPrice * (form.discountAll / 100)
-
-  return IDRCurrencyFormat(totalPriceAfterDiscount)
+  return IDRCurrencyFormat(totalPrice)
 }
 
 const form = useForm({
   transactionNumber: props.transactionNumber,
   customer: '',
-  discountAll: 0,
+  discount: props.discount,
 
   laundry: '',
   quantityLaundry: 0,
@@ -196,20 +236,25 @@ const form = useForm({
   quantityProduct: 0,
 })
 
-const transactionBasketFilter = (search) => {
-  return transactionBasket.filter((val) => val.label === search)
-}
-
 const submit = () => {
   form
     .transform((data) => ({
       transaction_number: data.transactionNumber,
-      discount_all: data.discountAll,
+      discount: data.discount,
       customer_number: data.customer.customerNumber,
       laundries: transactionBasketFilter('laundry'),
       products: transactionBasketFilter('product'),
     }))
-    .post(route('transactions.store'))
+    .post(route('transactions.store'), {
+      onSuccess: () => {
+        transactionBasketClear()
+
+        Inertia.reload({
+          data: { customer: form.customer.customerNumber },
+          only: ['customers', 'transactionNumber'],
+        })
+      },
+    })
 }
 </script>
 
@@ -234,8 +279,6 @@ const submit = () => {
               <div class="col-12 sm:col-6">
                 <AppAutocompleteBasic
                   empty
-                  dropdown
-                  complete-on-focus
                   label="Customer"
                   field="customerNumber"
                   placeholder="customer"
@@ -269,12 +312,11 @@ const submit = () => {
 
               <div class="col-12 sm:col-6">
                 <AppAutocompleteBasic
-                  dropdown
                   label="Laundry"
                   field="name"
                   placeholder="laundry"
                   v-model="form.laundry"
-                  :error="form.errors.product"
+                  :error="form.errors.laundry"
                   :suggestions="laundries"
                   @complete="laundryOnComplete"
                   @item-select="laundryOnSelected"
@@ -306,7 +348,6 @@ const submit = () => {
 
               <div class="col-12 sm:col-6">
                 <AppAutocompleteBasic
-                  dropdown
                   label="Product"
                   field="name"
                   placeholder="product"
@@ -424,21 +465,16 @@ const submit = () => {
               </div>
 
               <div class="col-12 sm:col-6 sm:col-offset-6 flex flex-column align-items-end">
-                <div class="field">
-                  <label for="discount">Diskon</label>
-
-                  <InputNumber
-                    id="discount"
-                    input-class="w-4rem ml-2"
-                    v-model="form.discountAll"
-                    suffix="%"
-                    :min="0"
-                    :max="100"
-                  />
-                </div>
+                <span>
+                  Sub Total: <span class="font-bold">{{ subTotal() }}</span>
+                </span>
 
                 <span>
-                  Total harga: <span class="font-bold">{{ transactionPriceTotal() }}</span>
+                  Diskon: <span class="font-bold">{{ discount() }}</span>
+                </span>
+
+                <span>
+                  Total harga: <span class="font-bold">{{ priceTotal() }}</span>
                 </span>
               </div>
             </div>

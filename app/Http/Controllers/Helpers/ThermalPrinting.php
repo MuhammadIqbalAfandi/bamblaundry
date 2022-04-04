@@ -15,7 +15,7 @@ class ThermalPrinting
     {
         if ($repeat >= 1) {
             /* Start the printer */
-            $connector = new FilePrintConnector("/dev/usb/lp1");
+            $connector = new FilePrintConnector("/dev/usb/lp1"); // Port usb connection example: /dev/usb/lp1
             $printer = new Printer($connector);
 
             /* Brand */
@@ -58,13 +58,13 @@ class ThermalPrinting
                 $price = str_pad("{$transactionDetail->price}", 11);
                 $totalPrice = str_pad("{$transactionDetail->totalPriceAsString()}", 10, ' ', STR_PAD_LEFT);
                 $printer->text("$type$qty$price$totalPrice\n");
-                $transactionDetail->discount != '0%' ? $printer->text("DISKON: {$transactionDetail->discount}\n") : null;
+                $printer->text("DISKON: {$transactionDetail->discount}\n");
             }
 
             /* Discount and total */
             $printer->feed();
             $printer->text($this->textSpacing('SUBTOTAL', $this->transaction->subTotalAsString()));
-            $printer->text($this->textSpacing('DISKON', $this->transaction->discount == '0%' ? "{$this->transaction->discount}" : "{$this->transaction->discount} (-{$this->transaction->discountAsString()})"));
+            $printer->text($this->textSpacing('DISKON', $this->transaction->discount));
             $printer->setEmphasis(true);
             $printer->text($this->textSpacing('TOTAL', "Rp{$this->transaction->totalPriceAsString()}"));
             $printer->setEmphasis(false);

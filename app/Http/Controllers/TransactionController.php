@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Transaction\StoreTransactionRequest;
 use App\Http\Requests\Transaction\UpdateTransactionRequest;
 use App\Models\Customer;
+use App\Models\Discount;
 use App\Models\Laundry;
 use App\Models\Outlet;
 use App\Models\Product;
@@ -14,7 +15,7 @@ use App\Models\TransactionStatus;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
+use Inertia\Inertia;
 
 class TransactionController extends Controller
 {
@@ -74,29 +75,39 @@ class TransactionController extends Controller
     {
         return inertia('transaction/Create', [
             'transactionNumber' => 'TS' . now()->format('YmdHis'),
-            'customers' => fn() => Customer::filter(request('customer'))
-                ->get()
-                ->transform(fn($customer) => [
-                    'name' => $customer->name,
-                    'customerNumber' => $customer->customer_number,
-                    'phone' => $customer->phone,
-                ]),
-            'laundries' => fn() => Laundry::filter(request('laundry'))
-                ->get()
-                ->transform(fn($laundry) => [
-                    'id' => $laundry->id,
-                    'name' => $laundry->name,
-                    'unit' => $laundry->unit,
-                    'price' => $laundry->getRawOriginal('price'),
-                ]),
-            'products' => fn() => Product::filter(request('product'))
-                ->get()
-                ->transform(fn($product) => [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'unit' => $product->unit,
-                    'price' => $product->getRawOriginal('price'),
-                ]),
+            'customers' => Inertia::lazy(
+                fn() => Customer::filter(request('customer'))
+                    ->latest()
+                    ->get()
+                    ->transform(fn($customer) => [
+                        'name' => $customer->name,
+                        'customerNumber' => $customer->customer_number,
+                        'phone' => $customer->phone,
+                        'checkTransaction' => $customer->checkTransaction(),
+                    ])
+            ),
+            'discount' => Discount::first()->discount,
+            'laundries' => Inertia::lazy(
+                fn() => Laundry::filter(request('laundry'))
+                    ->latest()
+                    ->get()
+                    ->transform(fn($laundry) => [
+                        'id' => $laundry->id,
+                        'name' => $laundry->name,
+                        'unit' => $laundry->unit,
+                        'price' => $laundry->getRawOriginal('price'),
+                    ])
+            ),
+            'products' => Inertia::lazy(
+                fn() => Product::filter(request('product'))
+                    ->get()
+                    ->transform(fn($product) => [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'unit' => $product->unit,
+                        'price' => $product->getRawOriginal('price'),
+                    ])
+            ),
             'customerNumber' => fn() => 'CS' . now()->format('YmdHis'),
             'genders' => [
                 ['label' => 'Perempuan', 'value' => 1],
@@ -118,7 +129,7 @@ class TransactionController extends Controller
         try {
             $transaction = Transaction::create([
                 'transaction_number' => $request->transaction_number,
-                'discount' => $request->discount_all,
+                'discount' => $request->discount,
                 'transaction_status_id' => 1,
                 'customer_number' => $request->customer_number,
                 'user_id' => $request->user()->id,
@@ -155,9 +166,12 @@ class TransactionController extends Controller
 
             DB::commit();
 
+            // $thermalPrinting = new ThermalPrinting($transaction);
+            // $thermalPrinting->startPrinting(2);
+
             // $transaction = Transaction::with(['outlet', 'customer', 'transactionDetails.laundry'])->latest()->first();
 
-            // $discountAsString = $transaction->discountAsString();
+            // $discount = $transaction->discount();
             // $subTotalAsString = $transaction->subTotalAsString();
             // $totalPriceAsString = $transaction->totalPriceAsString();
             // foreach ($transaction->transactionDetails as $transactionDetail) {
@@ -165,7 +179,7 @@ class TransactionController extends Controller
             //     $transactionDetail->totalPriceAsString = $totalPriceAsStringDetail;
             // }
 
-            // $transaction->discountAsString = $discountAsString;
+            // $transaction->discount = $discount;
             // $transaction->subTotalAsString = $subTotalAsString;
             // $transaction->totalPriceAsString = $totalPriceAsString;
 
@@ -186,7 +200,7 @@ class TransactionController extends Controller
             //     'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transaction_number . '*',
             // ]);
 
-            return to_route('transactions.index')->with('success', __('messages.success.store.transaction'));
+            return back()->with('success', __('messages.success.store.transaction'));
         } catch (Exception $e) {
             DB::rollBack();
 

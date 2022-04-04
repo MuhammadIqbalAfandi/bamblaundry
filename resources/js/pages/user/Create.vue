@@ -28,7 +28,7 @@ const form = useForm({
 })
 
 const submit = () => {
-  form.post(route('users.store'))
+  form.post(route('users.store'), { onSuccess: () => form.reset() })
 }
 </script>
 

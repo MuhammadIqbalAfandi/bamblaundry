@@ -51,7 +51,7 @@ class ProductController extends Controller
     {
         Product::create($request->validated());
 
-        return to_route('products.index')->with('success', __('messages.success.store.product'));
+        return back()->with('success', __('messages.success.store.product'));
     }
     /**
      * Display the specified resource.

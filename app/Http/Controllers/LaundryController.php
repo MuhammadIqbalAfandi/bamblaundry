@@ -51,7 +51,7 @@ class LaundryController extends Controller
     {
         Laundry::create($request->validated());
 
-        return to_route('laundries.index')->with('success', __('messages.success.store.laundry'));
+        return back()->with('success', __('messages.success.store.laundry'));
     }
 
     /**

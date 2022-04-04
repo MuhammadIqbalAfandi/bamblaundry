@@ -77,7 +77,7 @@ class ExpenseController extends Controller
 
             DB::commit();
 
-            return to_route('expenses.index')->with('success', __('messages.success.store.expense'));
+            return back()->with('success', __('messages.success.store.expense'));
         } catch (QueryException $e) {
 
             DB::rollBack();

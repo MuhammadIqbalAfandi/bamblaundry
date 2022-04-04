@@ -17,7 +17,7 @@ class CustomerFactory extends Factory
     public function definition()
     {
         return [
-            'customer_number' => 'CS' . now()->format('YmdHis'),
+            'customer_number' => 'CS202004' . $this->faker->unique()->randomNumber(8, true),
             'name' => $this->faker->name(),
             'phone' => $this->faker->phoneNumber(),
             'gender_id' => random_int(1, 2),

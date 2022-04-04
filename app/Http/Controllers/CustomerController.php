@@ -61,7 +61,7 @@ class CustomerController extends Controller
         if ($request->transaction_number) {
             return back()->with('success', __('messages.success.store.customer'));
         } else {
-            return to_route('customers.index')->with('success', __('messages.success.store.customer'));
+            return back()->with('success', __('messages.success.store.customer'));
         }
     }
 

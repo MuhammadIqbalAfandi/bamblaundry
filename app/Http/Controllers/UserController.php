@@ -82,7 +82,7 @@ class UserController extends Controller
     {
         User::create($request->validated());
 
-        return to_route('users.index')->with('success', __('messages.success.store.user'));
+        return back()->with('success', __('messages.success.store.user'));
     }
 
     /**

@@ -60,7 +60,7 @@ class OutletController extends Controller
     {
         Outlet::create($request->validated());
 
-        return to_route('outlets.index')->with('success', __('messages.success.store.outlet'));
+        return back()->with('success', __('messages.success.store.outlet'));
     }
 
     /**

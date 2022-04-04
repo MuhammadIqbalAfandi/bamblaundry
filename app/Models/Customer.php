@@ -30,14 +30,25 @@ class Customer extends Model
         return $this->hasMany(Transaction::class, 'customer_number', 'customer_number');
     }
 
-    public function scopeFilter($query, $filters)
+    public function scopeFilter($query, $search)
     {
-        $query->when($filters['search'] ?? null, function ($query, $search) {
+        $query->when($search ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('customer_number', 'like', '%' . $search . '%')
                     ->orWhere('name', 'like', '%' . $search . '%')
                     ->orWhere('phone', 'like', '%' . $search . '%');
             });
         });
+    }
+
+    public function checkTransaction()
+    {
+        $transactions = $this->transaction;
+
+        if ($transactions->count()) {
+            return $transactions->chunk(7)->last()->count();
+        } else {
+            return 0;
+        }
     }
 }
