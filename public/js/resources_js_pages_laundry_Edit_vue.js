@@ -1616,6 +1616,14 @@ __webpack_require__.r(__webpack_exports__);
     to: '/products',
     component: 'product/Index'
   }]
+}, {
+  label: 'Pengaturan',
+  items: [{
+    label: 'Diskon',
+    icon: 'pi pi-percentage',
+    to: '/discounts',
+    component: 'discount/Index'
+  }]
 }]);
 
 /***/ }),

@@ -24,4 +24,8 @@ export default [
       { label: 'Product', icon: 'pi pi-table', to: '/products', component: 'product/Index' },
     ],
   },
+  {
+    label: 'Pengaturan',
+    items: [{ label: 'Diskon', icon: 'pi pi-percentage', to: '/discounts', component: 'discount/Index' }],
+  },
 ]

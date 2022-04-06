@@ -22,6 +22,7 @@ return [
             'verify_email' => 'Link verifikasi email berhasil terkirim',
         ],
         'store' => [
+            'discount' => 'Diskon berhasil ditambahkan',
             'expense' => 'Pengeluaran berhasil ditambahkan',
             'transaction' => 'Transaksi berhasil ditambahkan',
             'user' => 'Akun user berhasil ditambahkan',

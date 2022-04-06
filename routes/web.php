@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LaundryController;
 use App\Http\Controllers\OutletController;
@@ -36,6 +37,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/laundries', LaundryController::class);
 
     Route::resource('/products', ProductController::class);
+
+    Route::resource('/discounts', DiscountController::class);
 
     Route::resource('/transactions', TransactionController::class);
 

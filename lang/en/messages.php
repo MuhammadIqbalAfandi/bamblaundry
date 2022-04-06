@@ -22,6 +22,7 @@ return [
             'verify_email' => 'Email Verification link successfully sent',
         ],
         'store' => [
+            'discount' => 'Discount successfully added',
             'expense' => 'Expense successfully added',
             'transaction' => 'Transaction successfully added',
             'user' => 'User Account successfully added',
