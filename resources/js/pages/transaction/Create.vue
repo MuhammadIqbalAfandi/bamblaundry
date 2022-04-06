@@ -2,7 +2,6 @@
 import { ref, reactive, watch, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
-import AppButton from '@/components/AppButton.vue'
 import AppDropdown from '@/components/AppDropdown.vue'
 import AppInputText from '@/components/AppInputText.vue'
 import AppInputNumber from '@/components/AppInputNumber.vue'
@@ -482,7 +481,7 @@ const submit = () => {
 
           <template #footer>
             <div class="flex justify-content-end">
-              <AppButton
+              <Button
                 label="Simpan Transaksi"
                 icon="pi pi-check"
                 class="p-button-text"
@@ -536,7 +535,7 @@ const submit = () => {
 
       <template #footer>
         <div class="flex justify-content-end">
-          <AppButton
+          <Button
             label="Simpan"
             icon="pi pi-check"
             class="p-button-text"

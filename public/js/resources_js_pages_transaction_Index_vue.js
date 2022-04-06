@@ -1348,7 +1348,7 @@ var _hoisted_1 = {
   "class": "grid"
 };
 var _hoisted_2 = {
-  "class": "col-12 lg:col-8"
+  "class": "col-12"
 };
 var _hoisted_3 = {
   key: 0
@@ -2077,7 +2077,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onHide: $setup.updateStatusDialogShow
       }, {
         footer: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Simpan",
             icon: "pi pi-check",
             "class": "p-button-text",

@@ -976,7 +976,7 @@ var _hoisted_1 = {
   "class": "grid"
 };
 var _hoisted_2 = {
-  "class": "col-12 lg:col-8"
+  "class": "col-12"
 };
 var _hoisted_3 = {
   key: 0
@@ -1555,7 +1555,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             href: _ctx.route('users.block', $props.user.id)
           }, null, 8
           /* PROPS */
-          , ["href"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
+          , ["href"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Simpan",
             "class": "p-button-text",
             icon: "pi pi-check",

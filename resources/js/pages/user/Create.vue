@@ -3,7 +3,6 @@ import { computed, watch } from 'vue'
 import { useForm, Head, usePage } from '@inertiajs/inertia-vue3'
 import AppInputText from '@/components/AppInputText.vue'
 import AppDropdown from '@/components/AppDropdown.vue'
-import AppButton from '@/components/AppButton.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 
 defineProps({
@@ -87,7 +86,7 @@ const submit = () => {
 
           <template #footer>
             <div class="flex justify-content-end">
-              <AppButton label="Simpan" @click="submit" icon="pi pi-check" class="p-button-text" />
+              <Button label="Simpan" icon="pi pi-check" class="p-button-text" @click="submit" />
             </div>
           </template>
         </Card>

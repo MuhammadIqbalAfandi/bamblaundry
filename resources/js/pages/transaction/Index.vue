@@ -268,7 +268,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
 
       <template #footer>
         <div class="flex justify-content-end">
-          <AppButton
+          <Button
             label="Simpan"
             icon="pi pi-check"
             class="p-button-text"

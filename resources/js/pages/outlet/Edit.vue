@@ -2,7 +2,6 @@
 import { ref, watch, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
-import AppButton from '@/components/AppButton.vue'
 import AppInputText from '@/components/AppInputText.vue'
 import AppDialog from '@/components/AppDialog.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
@@ -74,7 +73,7 @@ const onCancel = () => (visibleDialog.value = false)
 
               <Button label="Hapus" icon="pi pi-trash" class="p-button-text p-button-danger" @click="confirmDialog" />
 
-              <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
+              <Button label="Simpan" icon="pi pi-check" class="p-button-text" @click="submit" />
             </div>
           </template>
         </Card>

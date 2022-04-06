@@ -133,7 +133,7 @@ class UserController extends Controller
                 'name' => $user->name,
                 'phone' => $user->phone,
                 'email' => $user->email,
-                'gender_id' => $user->getRawOriginal('gender_id'),
+                'gender_id' => (int) $user->getRawOriginal('gender_id'),
                 'outlet_id' => $user->outlet_id,
                 'role_id' => $user->role_id,
             ],

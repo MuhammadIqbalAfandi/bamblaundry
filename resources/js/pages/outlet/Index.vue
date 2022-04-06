@@ -50,10 +50,10 @@ watch(
 
           <div class="col-12 md:col-4 flex justify-content-end">
             <AppButton
-              :href="route('outlets.create')"
               label="Tambah Outlet"
               icon="pi pi-pencil"
               class="p-button-text"
+              :href="route('outlets.create')"
             />
           </div>
         </div>

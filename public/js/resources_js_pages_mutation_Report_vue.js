@@ -633,7 +633,7 @@ var _hoisted_1 = {
   "class": "grid"
 };
 var _hoisted_2 = {
-  "class": "col-12 lg:col-8"
+  "class": "col-12"
 };
 var _hoisted_3 = {
   key: 0

@@ -120,7 +120,7 @@ watch(errors, () => {
                   :href="route('users.block', user.id)"
                 />
 
-                <AppButton label="Simpan" class="p-button-text" icon="pi pi-check" @click="submit" />
+                <Button label="Simpan" class="p-button-text" icon="pi pi-check" @click="submit" />
               </div>
             </div>
           </template>

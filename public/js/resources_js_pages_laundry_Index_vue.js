@@ -579,7 +579,7 @@ var _hoisted_1 = {
   "class": "grid"
 };
 var _hoisted_2 = {
-  "class": "col-12 lg:col-8"
+  "class": "col-12"
 };
 var _hoisted_3 = {
   key: 0
@@ -1124,10 +1124,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, null, 8
           /* PROPS */
           , ["modelValue"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
-            href: _ctx.route('laundries.create'),
             label: "Tambah Laundry",
             icon: "pi pi-pencil",
-            "class": "p-button-text"
+            "class": "p-button-text",
+            href: _ctx.route('laundries.create')
           }, null, 8
           /* PROPS */
           , ["href"])])])];

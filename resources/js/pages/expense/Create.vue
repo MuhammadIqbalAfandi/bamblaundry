@@ -2,7 +2,6 @@
 import { computed, watch } from 'vue'
 import { useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
-import AppButton from '@/components/AppButton.vue'
 import AppInputNumber from '@/components/AppInputNumber.vue'
 import AppEditor from '@/components/AppEditor.vue'
 
@@ -59,7 +58,13 @@ const submit = () => {
 
           <template #footer>
             <div class="flex justify-content-end">
-              <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
+              <Button
+                label="Simpan"
+                icon="pi pi-check"
+                class="p-button-text"
+                :disabled="form.processing"
+                @click="submit"
+              />
             </div>
           </template>
         </Card>

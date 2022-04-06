@@ -27,7 +27,7 @@ watch(
 
 <template>
   <div class="grid">
-    <div class="col-12 lg:col-8">
+    <div class="col-12">
       <Message v-if="$page.props.flash.success" severity="success" :style="messageDisplay" @close="onClose">
         {{ $page.props.flash.success }}
       </Message>

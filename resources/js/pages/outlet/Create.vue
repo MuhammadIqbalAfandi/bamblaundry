@@ -51,7 +51,7 @@ const submit = () => {
 
           <template #footer>
             <div class="flex justify-content-end">
-              <AppButton @click="submit" label="Simpan" icon="pi pi-check" class="p-button-text" />
+              <Button label="Simpan" icon="pi pi-check" class="p-button-text" @click="submit" />
             </div>
           </template>
         </Card>

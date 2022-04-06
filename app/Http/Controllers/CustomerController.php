@@ -90,7 +90,7 @@ class CustomerController extends Controller
                 'customer_number' => $customer->customer_number,
                 'name' => $customer->name,
                 'phone' => $customer->phone,
-                'gender_id' => $customer->getRawOriginal('gender_id'),
+                'gender_id' => (int) $customer->getRawOriginal('gender_id'),
             ],
             'genders' => [
                 ['label' => 'Perempuan', 'value' => 1],
