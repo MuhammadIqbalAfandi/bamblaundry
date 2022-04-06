@@ -22,7 +22,7 @@ return [
             'verify_email' => 'Link verifikasi email berhasil terkirim',
         ],
         'store' => [
-            'discount' => 'Diskon berhasil ditambahkan',
+            'discount' => 'Diskon berhasil diubah',
             'expense' => 'Pengeluaran berhasil ditambahkan',
             'transaction' => 'Transaksi berhasil ditambahkan',
             'user' => 'Akun user berhasil ditambahkan',
@@ -32,6 +32,7 @@ return [
             'product' => 'Data product berhasil ditambahkan',
         ],
         'update' => [
+            'change-password' => 'Password berhasil diubah',
             'transaction_status' => 'Status transaksi berhasil diubah',
             'user' => 'Akun user berhasil diubah',
             'customer' => 'Akun customer berhasil diubah',
@@ -50,6 +51,7 @@ return [
 
     'error' => [
         'store' => [
+            'change-password' => 'Password lama salah',
             'expense' => 'Pengeluaran gagal ditambahkan',
             'transaction' => 'Transaksi gagal ditambahkan',
         ],

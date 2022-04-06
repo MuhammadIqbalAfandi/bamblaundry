@@ -42543,6 +42543,346 @@ const StyleClass = {
 
 /***/ }),
 
+/***/ "./node_modules/primevue/tabpanel/tabpanel.esm.js":
+/*!********************************************************!*\
+  !*** ./node_modules/primevue/tabpanel/tabpanel.esm.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+
+var script = {
+    name: 'TabPanel',
+    props: {
+        header: null,
+        disabled: Boolean
+    }
+};
+
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")
+}
+
+script.render = render;
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
+
+/***/ }),
+
+/***/ "./node_modules/primevue/tabview/tabview.esm.js":
+/*!******************************************************!*\
+  !*** ./node_modules/primevue/tabview/tabview.esm.js ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
+/* harmony import */ var primevue_ripple__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primevue/ripple */ "./node_modules/primevue/ripple/ripple.esm.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+
+
+
+var script = {
+    name: 'TabView',
+    emits: ['update:activeIndex', 'tab-change', 'tab-click'],
+    props: {
+        activeIndex: {
+            type: Number,
+            default: 0
+        },
+        lazy: {
+            type: Boolean,
+            default: false
+        },
+        scrollable: {
+            type: Boolean,
+            default: false
+        }
+    },
+    data() {
+        return {
+            d_activeIndex: this.activeIndex,
+            backwardIsDisabled: true,
+            forwardIsDisabled: false
+        }
+    },
+    watch: {
+        activeIndex(newValue) {
+            this.d_activeIndex = newValue;
+
+            this.updateScrollBar(newValue);
+        }
+    },
+    updated() {
+        this.updateInkBar();
+    },
+    mounted() {
+        this.updateInkBar();
+    },
+    methods: {
+        onTabClick(event, i) {
+            if (!this.isTabDisabled(this.tabs[i]) && i !== this.d_activeIndex) {
+                this.d_activeIndex = i;
+                this.$emit('update:activeIndex', this.d_activeIndex);
+
+                this.$emit('tab-change', {
+                    originalEvent: event,
+                    index: i
+                });
+
+                this.updateScrollBar(i);
+            }
+
+            this.$emit('tab-click', {
+                originalEvent: event,
+                index: i
+            });
+        },
+        onTabKeydown(event, i) {
+            if (event.which === 13) {
+                this.onTabClick(event, i);
+            }
+        },
+        updateInkBar() {
+            let tabHeader = this.$refs.nav.children[this.d_activeIndex];
+            this.$refs.inkbar.style.width = primevue_utils__WEBPACK_IMPORTED_MODULE_0__.DomHandler.getWidth(tabHeader) + 'px';
+            this.$refs.inkbar.style.left =  primevue_utils__WEBPACK_IMPORTED_MODULE_0__.DomHandler.getOffset(tabHeader).left - primevue_utils__WEBPACK_IMPORTED_MODULE_0__.DomHandler.getOffset(this.$refs.nav).left + 'px';
+        },
+        updateScrollBar(index) {
+            let tabHeader = this.$refs.nav.children[index];
+            tabHeader.scrollIntoView({ block: 'nearest' });
+        },
+        updateButtonState() {
+            const content = this.$refs.content;
+            const { scrollLeft, scrollWidth } = content;
+            const width = primevue_utils__WEBPACK_IMPORTED_MODULE_0__.DomHandler.getWidth(content);
+
+            this.backwardIsDisabled = scrollLeft === 0;
+            this.forwardIsDisabled = parseInt(scrollLeft) === scrollWidth - width;
+        },
+        getKey(tab, i) {
+            return (tab.props && tab.props.header) ? tab.props.header : i;
+        },
+        isTabDisabled(tab) {
+            return (tab.props && tab.props.disabled);
+        },
+        isTabPanel(child) {
+            return child.type.name === 'TabPanel'
+        },
+        onScroll(event) {
+            this.scrollable && this.updateButtonState();
+
+            event.preventDefault();
+        },
+        getVisibleButtonWidths() {
+            const { prevBtn, nextBtn } = this.$refs;
+
+            return [prevBtn, nextBtn].reduce((acc, el) => el ? acc + primevue_utils__WEBPACK_IMPORTED_MODULE_0__.DomHandler.getWidth(el) : acc, 0);
+        },
+        navBackward() {
+            const content = this.$refs.content;
+            const width = primevue_utils__WEBPACK_IMPORTED_MODULE_0__.DomHandler.getWidth(content) - this.getVisibleButtonWidths();
+            const pos = content.scrollLeft - width;
+            content.scrollLeft = pos <= 0 ? 0 : pos;
+        },
+        navForward() {
+            const content = this.$refs.content;
+            const width = primevue_utils__WEBPACK_IMPORTED_MODULE_0__.DomHandler.getWidth(content) - this.getVisibleButtonWidths();
+            const pos = content.scrollLeft + width;
+            const lastPos = content.scrollWidth - width;
+
+            content.scrollLeft = pos >= lastPos ? lastPos : pos;
+        }
+    },
+    computed: {
+        contentClasses() {
+			return ['p-tabview p-component', {'p-tabview-scrollable': this.scrollable}];
+		},
+        prevButtonClasses() {
+            return ['p-tabview-nav-prev p-tabview-nav-btn p-link']
+        },
+        nextButtonClasses() {
+            return ['p-tabview-nav-next p-tabview-nav-btn p-link']
+        },
+        tabs() {
+            const tabs = [];
+            this.$slots.default().forEach(child => {
+                    if (this.isTabPanel(child)) {
+                        tabs.push(child);
+                    }
+                    else if (child.children && child.children instanceof Array) {
+                        child.children.forEach(nestedChild => {
+                            if (this.isTabPanel(nestedChild)) {
+                                tabs.push(nestedChild);
+                            }
+                        });
+                    }
+                }
+            );
+            return tabs;
+        }
+    },
+    directives: {
+        'ripple': primevue_ripple__WEBPACK_IMPORTED_MODULE_1__["default"]
+    }
+};
+
+const _hoisted_1 = { class: "p-tabview-nav-container" };
+const _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("span", { class: "pi pi-chevron-left" }, null, -1);
+const _hoisted_3 = {
+  ref: "nav",
+  class: "p-tabview-nav",
+  role: "tablist"
+};
+const _hoisted_4 = {
+  key: 0,
+  class: "p-tabview-title"
+};
+const _hoisted_5 = {
+  ref: "inkbar",
+  class: "p-tabview-ink-bar"
+};
+const _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("span", { class: "pi pi-chevron-right" }, null, -1);
+const _hoisted_7 = { class: "p-tabview-panels" };
+const _hoisted_8 = {
+  key: 0,
+  class: "p-tabview-panel",
+  role: "tabpanel"
+};
+
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_2__.resolveDirective)("ripple");
+
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("div", { class: $options.contentClasses }, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("div", _hoisted_1, [
+      ($props.scrollable && !$data.backwardIsDisabled)
+        ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("button", {
+            key: 0,
+            ref: "prevBtn",
+            class: $options.prevButtonClasses,
+            onClick: _cache[1] || (_cache[1] = (...args) => ($options.navBackward && $options.navBackward(...args))),
+            type: "button"
+          }, [
+            _hoisted_2
+          ], 2)), [
+            [_directive_ripple]
+          ])
+        : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true),
+      (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("div", {
+        ref: "content",
+        class: "p-tabview-nav-content",
+        onScroll: _cache[2] || (_cache[2] = (...args) => ($options.onScroll && $options.onScroll(...args)))
+      }, [
+        (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("ul", _hoisted_3, [
+          ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_2__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_2__.renderList)($options.tabs, (tab, i) => {
+            return ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("li", {
+              role: "presentation",
+              key: $options.getKey(tab,i),
+              class: [{'p-highlight': ($data.d_activeIndex === i), 'p-disabled': $options.isTabDisabled(tab)}]
+            }, [
+              (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("a", {
+                role: "tab",
+                class: "p-tabview-nav-link",
+                onClick: $event => ($options.onTabClick($event, i)),
+                onKeydown: $event => ($options.onTabKeydown($event, i)),
+                tabindex: $options.isTabDisabled(tab) ? null : '0',
+                "aria-selected": $data.d_activeIndex === i
+              }, [
+                (tab.props && tab.props.header)
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("span", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_2__.toDisplayString)(tab.props.header), 1))
+                  : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true),
+                (tab.children && tab.children.header)
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_2__.resolveDynamicComponent)(tab.children.header), { key: 1 }))
+                  : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true)
+              ], 40, ["onClick", "onKeydown", "tabindex", "aria-selected"]), [
+                [_directive_ripple]
+              ])
+            ], 2))
+          }), 128)),
+          (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("li", _hoisted_5, null, 512)
+        ], 512)
+      ], 544),
+      ($props.scrollable && !$data.forwardIsDisabled)
+        ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("button", {
+            key: 1,
+            ref: "nextBtn",
+            class: $options.nextButtonClasses,
+            onClick: _cache[3] || (_cache[3] = (...args) => ($options.navForward && $options.navForward(...args))),
+            type: "button"
+          }, [
+            _hoisted_6
+          ], 2)), [
+            [_directive_ripple]
+          ])
+        : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true)
+    ]),
+    (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("div", _hoisted_7, [
+      ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_2__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_2__.renderList)($options.tabs, (tab, i) => {
+        return ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
+          key: $options.getKey(tab,i)
+        }, [
+          ($props.lazy ? ($data.d_activeIndex === i) : true)
+            ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("div", _hoisted_8, [
+                ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_2__.resolveDynamicComponent)(tab)))
+              ], 512)), [
+                [vue__WEBPACK_IMPORTED_MODULE_2__.vShow, $props.lazy ? true: ($data.d_activeIndex === i)]
+              ])
+            : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true)
+        ], 64))
+      }), 128))
+    ])
+  ], 2))
+}
+
+function styleInject(css, ref) {
+  if ( ref === void 0 ) ref = {};
+  var insertAt = ref.insertAt;
+
+  if (!css || typeof document === 'undefined') { return; }
+
+  var head = document.head || document.getElementsByTagName('head')[0];
+  var style = document.createElement('style');
+  style.type = 'text/css';
+
+  if (insertAt === 'top') {
+    if (head.firstChild) {
+      head.insertBefore(style, head.firstChild);
+    } else {
+      head.appendChild(style);
+    }
+  } else {
+    head.appendChild(style);
+  }
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+}
+
+var css_248z = "\n.p-tabview-nav-container {\n    position: relative;\n}\n.p-tabview-scrollable .p-tabview-nav-container {\n    overflow: hidden;\n}\n.p-tabview-nav-content {\n    overflow-x: auto;\n    overflow-y: hidden;\n    scroll-behavior: smooth;\n    scrollbar-width: none;\n    -ms-scroll-chaining: contain auto;\n        overscroll-behavior: contain auto;\n}\n.p-tabview-nav {\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    margin: 0;\n    padding: 0;\n    list-style-type: none;\n    -webkit-box-flex: 1;\n        -ms-flex: 1 1 auto;\n            flex: 1 1 auto;\n}\n.p-tabview-nav-link {\n    cursor: pointer;\n    -webkit-user-select: none;\n       -moz-user-select: none;\n        -ms-user-select: none;\n            user-select: none;\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-align: center;\n        -ms-flex-align: center;\n            align-items: center;\n    position: relative;\n    text-decoration: none;\n    overflow: hidden;\n}\n.p-tabview-ink-bar {\n    display: none;\n    z-index: 1;\n}\n.p-tabview-nav-link:focus {\n    z-index: 1;\n}\n.p-tabview-title {\n    line-height: 1;\n    white-space: nowrap;\n}\n.p-tabview-nav-btn {\n    position: absolute;\n    top: 0;\n    z-index: 2;\n    height: 100%;\n    display: -webkit-box;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-align: center;\n        -ms-flex-align: center;\n            align-items: center;\n    -webkit-box-pack: center;\n        -ms-flex-pack: center;\n            justify-content: center;\n}\n.p-tabview-nav-prev {\n    left: 0;\n}\n.p-tabview-nav-next {\n    right: 0;\n}\n.p-tabview-nav-content::-webkit-scrollbar {\n    display: none;\n}\n";
+styleInject(css_248z);
+
+script.render = render;
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
+
+/***/ }),
+
 /***/ "./node_modules/primevue/tooltip/tooltip.esm.js":
 /*!******************************************************!*\
   !*** ./node_modules/primevue/tooltip/tooltip.esm.js ***!
@@ -57438,7 +57778,7 @@ module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"P
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_pages_Access_vue":"a18ed856923fae52","resources_js_pages_auth_ForgotPassword_vue":"c9f401672b6f2423","resources_js_pages_auth_Login_vue":"cb0cb153b976d2c1","resources_js_pages_auth_ResetPassword_vue":"1078df5cebf2e3c6","resources_js_pages_auth_VerifyEmail_vue":"2c5cb3cdec6b103a","resources_js_pages_customer_Create_vue":"2ab1bfe966d63c05","resources_js_pages_customer_Edit_vue":"eec13676f1adcd9d","resources_js_pages_customer_Index_vue":"4259b986f780abc9","resources_js_pages_customer_TableHeader_js":"71be5afdca048a9c","resources_js_pages_discount_Index_vue":"233f32fa40a8873f","resources_js_pages_expense_Create_vue":"e126aeeceebab2d9","resources_js_pages_expense_Index_vue":"366a899860cfffd9","resources_js_pages_expense_Show_vue":"0477597884668aa1","resources_js_pages_expense_TableHeader_js":"72e3dee74175b1c0","resources_js_pages_laundry_Create_vue":"af84a8b9ddaf4406","resources_js_pages_laundry_Edit_vue":"bdb956a88c1696cb","resources_js_pages_laundry_Index_vue":"28054a4617f340a0","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Report_vue":"d24c1606a05c9043","resources_js_pages_mutation_TableHeader_js":"82c2999bd7d098a1","resources_js_pages_outlet_Create_vue":"e331847fbc3b8be5","resources_js_pages_outlet_Edit_vue":"4167cc036f2e0427","resources_js_pages_outlet_Index_vue":"b772fcbc6d0ae225","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_product_Create_vue":"d1cd523702069b99","resources_js_pages_product_Edit_vue":"09eaa29d70ca40a1","resources_js_pages_product_Index_vue":"3af202784c744a88","resources_js_pages_product_TableHeader_js":"b8eaaa9de25a2322","resources_js_pages_transaction_Create_vue":"84996ab918119341","resources_js_pages_transaction_Index_vue":"0098f876145404c5","resources_js_pages_transaction_Report_vue":"79eae94abc7140c4","resources_js_pages_transaction_Show_vue":"57f1269962828f65","resources_js_pages_transaction_TableHeader_js":"ba35ab28bb4ac891","resources_js_pages_user_Create_vue":"bf32e243021c2c18","resources_js_pages_user_Edit_vue":"a89fcc013120d065","resources_js_pages_user_Index_vue":"45349fb80815d068","resources_js_pages_user_Show_vue":"75c79b3167b7f393","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
+/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_pages_Access_vue":"a18ed856923fae52","resources_js_pages_auth_ForgotPassword_vue":"c9f401672b6f2423","resources_js_pages_auth_Login_vue":"cb0cb153b976d2c1","resources_js_pages_auth_ResetPassword_vue":"1078df5cebf2e3c6","resources_js_pages_auth_VerifyEmail_vue":"2c5cb3cdec6b103a","resources_js_pages_customer_Create_vue":"43d285d678ba8793","resources_js_pages_customer_Edit_vue":"01d10f0dd19b734c","resources_js_pages_customer_Index_vue":"0ca5a813eacb510a","resources_js_pages_customer_TableHeader_js":"71be5afdca048a9c","resources_js_pages_discount_Index_vue":"92526f49d3e0a66d","resources_js_pages_expense_Create_vue":"18c4b47fcb9e103a","resources_js_pages_expense_Index_vue":"d195311d84b82d44","resources_js_pages_expense_Show_vue":"4801bedc7912088f","resources_js_pages_expense_TableHeader_js":"72e3dee74175b1c0","resources_js_pages_laundry_Create_vue":"aae1027a621900d5","resources_js_pages_laundry_Edit_vue":"160898ea138ee162","resources_js_pages_laundry_Index_vue":"29e5e4317fa0862d","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Report_vue":"d74f6004bddcfdc6","resources_js_pages_mutation_TableHeader_js":"82c2999bd7d098a1","resources_js_pages_outlet_Create_vue":"48bdc532cf3f8c62","resources_js_pages_outlet_Edit_vue":"32338ffd7c28e656","resources_js_pages_outlet_Index_vue":"e1f9a19ae0ffa3df","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_product_Create_vue":"4e737e98d38eca28","resources_js_pages_product_Edit_vue":"ddac8c4ce1363cc3","resources_js_pages_product_Index_vue":"ff1e209ae8b6ebbd","resources_js_pages_product_TableHeader_js":"b8eaaa9de25a2322","resources_js_pages_transaction_Create_vue":"bc8669735a72a0ec","resources_js_pages_transaction_Index_vue":"6da809da30371f6f","resources_js_pages_transaction_Report_vue":"eeca91c15c146171","resources_js_pages_transaction_Show_vue":"2087aac76bbbf7f1","resources_js_pages_transaction_TableHeader_js":"ba35ab28bb4ac891","resources_js_pages_user_Create_vue":"1f5759b89d51290b","resources_js_pages_user_Edit_vue":"8e9cac16a201e333","resources_js_pages_user_Index_vue":"e798523892e8e90c","resources_js_pages_user_Show_vue":"ec4048350fb26f43","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
 /******/ 		};
 /******/ 	})();
 /******/ 	
@@ -57665,7 +58005,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var primevue_paginator__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! primevue/paginator */ "./node_modules/primevue/paginator/paginator.esm.js");
 /* harmony import */ var primevue_password__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! primevue/password */ "./node_modules/primevue/password/password.esm.js");
 /* harmony import */ var primevue_ripple__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! primevue/ripple */ "./node_modules/primevue/ripple/ripple.esm.js");
-/* harmony import */ var primevue_tooltip__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! primevue/tooltip */ "./node_modules/primevue/tooltip/tooltip.esm.js");
+/* harmony import */ var primevue_tabview__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! primevue/tabview */ "./node_modules/primevue/tabview/tabview.esm.js");
+/* harmony import */ var primevue_tabpanel__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! primevue/tabpanel */ "./node_modules/primevue/tabpanel/tabpanel.esm.js");
+/* harmony import */ var primevue_tooltip__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! primevue/tooltip */ "./node_modules/primevue/tooltip/tooltip.esm.js");
+
+
 
 
 
@@ -57716,7 +58060,7 @@ __webpack_require__.r(__webpack_exports__);
       methods: {
         route: route
       }
-    }).directive('styleclass', primevue_styleclass__WEBPACK_IMPORTED_MODULE_9__["default"]).directive('ripple', primevue_ripple__WEBPACK_IMPORTED_MODULE_26__["default"]).directive('tooltip', primevue_tooltip__WEBPACK_IMPORTED_MODULE_27__["default"]).component('AutoComplete', primevue_autocomplete__WEBPACK_IMPORTED_MODULE_10__["default"]).component('Button', primevue_button__WEBPACK_IMPORTED_MODULE_12__["default"]).component('Badge', primevue_badge__WEBPACK_IMPORTED_MODULE_11__["default"]).component('Card', primevue_card__WEBPACK_IMPORTED_MODULE_14__["default"]).component('Calendar', primevue_calendar__WEBPACK_IMPORTED_MODULE_13__["default"]).component('Column', primevue_column__WEBPACK_IMPORTED_MODULE_15__["default"]).component('DataTable', primevue_datatable__WEBPACK_IMPORTED_MODULE_16__["default"]).component('Dialog', primevue_dialog__WEBPACK_IMPORTED_MODULE_17__["default"]).component('Divider', primevue_divider__WEBPACK_IMPORTED_MODULE_18__["default"]).component('Dropdown', primevue_dropdown__WEBPACK_IMPORTED_MODULE_19__["default"]).component('Editor', primevue_editor__WEBPACK_IMPORTED_MODULE_20__["default"]).component('InputNumber', primevue_inputnumber__WEBPACK_IMPORTED_MODULE_21__["default"]).component('InputText', primevue_inputtext__WEBPACK_IMPORTED_MODULE_22__["default"]).component('Message', primevue_message__WEBPACK_IMPORTED_MODULE_23__["default"]).component('Paginator', primevue_paginator__WEBPACK_IMPORTED_MODULE_24__["default"]).component('Password', primevue_password__WEBPACK_IMPORTED_MODULE_25__["default"]).mount(el);
+    }).directive('styleclass', primevue_styleclass__WEBPACK_IMPORTED_MODULE_9__["default"]).directive('ripple', primevue_ripple__WEBPACK_IMPORTED_MODULE_26__["default"]).directive('tooltip', primevue_tooltip__WEBPACK_IMPORTED_MODULE_29__["default"]).component('AutoComplete', primevue_autocomplete__WEBPACK_IMPORTED_MODULE_10__["default"]).component('Button', primevue_button__WEBPACK_IMPORTED_MODULE_12__["default"]).component('Badge', primevue_badge__WEBPACK_IMPORTED_MODULE_11__["default"]).component('Card', primevue_card__WEBPACK_IMPORTED_MODULE_14__["default"]).component('Calendar', primevue_calendar__WEBPACK_IMPORTED_MODULE_13__["default"]).component('Column', primevue_column__WEBPACK_IMPORTED_MODULE_15__["default"]).component('DataTable', primevue_datatable__WEBPACK_IMPORTED_MODULE_16__["default"]).component('Dialog', primevue_dialog__WEBPACK_IMPORTED_MODULE_17__["default"]).component('Divider', primevue_divider__WEBPACK_IMPORTED_MODULE_18__["default"]).component('Dropdown', primevue_dropdown__WEBPACK_IMPORTED_MODULE_19__["default"]).component('Editor', primevue_editor__WEBPACK_IMPORTED_MODULE_20__["default"]).component('InputNumber', primevue_inputnumber__WEBPACK_IMPORTED_MODULE_21__["default"]).component('InputText', primevue_inputtext__WEBPACK_IMPORTED_MODULE_22__["default"]).component('Message', primevue_message__WEBPACK_IMPORTED_MODULE_23__["default"]).component('Paginator', primevue_paginator__WEBPACK_IMPORTED_MODULE_24__["default"]).component('Password', primevue_password__WEBPACK_IMPORTED_MODULE_25__["default"]).component('TabView', primevue_tabview__WEBPACK_IMPORTED_MODULE_27__["default"]).component('TabPanel', primevue_tabpanel__WEBPACK_IMPORTED_MODULE_28__["default"]).mount(el);
   }
 });
 _inertiajs_progress__WEBPACK_IMPORTED_MODULE_7__.InertiaProgress.init({

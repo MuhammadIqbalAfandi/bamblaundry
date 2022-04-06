@@ -28,11 +28,11 @@ const submit = () => {
   <Head title="Pengaturan Diskon" />
 
   <AppLayout>
-    <h1>Diskon</h1>
-
     <div class="grid">
       <div class="col-fixed">
         <Card>
+          <template #title> Diskon </template>
+
           <template #content>
             <AppInputNumber
               label="Jumlah diskon"

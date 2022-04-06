@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', [TransactionController::class, 'index']);
 
     Route::delete('/users/block/{user}', [UserController::class, 'block'])->name('users.block');
+    Route::post('/users/change-password/{user}', [UserController::class, 'changePassword'])->name('users.change-password');
     Route::resource('/users', UserController::class);
 
     Route::resource('/customers', CustomerController::class);

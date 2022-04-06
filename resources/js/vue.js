@@ -26,6 +26,8 @@ import Message from 'primevue/message'
 import Paginator from 'primevue/paginator'
 import Password from 'primevue/password'
 import Ripple from 'primevue/ripple'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
 import Tooltip from 'primevue/tooltip'
 
 createInertiaApp({
@@ -55,6 +57,8 @@ createInertiaApp({
       .component('Message', Message)
       .component('Paginator', Paginator)
       .component('Password', Password)
+      .component('TabView', TabView)
+      .component('TabPanel', TabPanel)
       .mount(el)
   },
 })

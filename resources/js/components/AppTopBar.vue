@@ -36,10 +36,10 @@ defineEmits(['menu-toggle'])
         <Link
           :href="route('users.show', $page.props.auth.user.id)"
           class="p-link layout-topbar-button"
-          v-tooltip.bottom="'Pengaturan Profil'"
+          v-tooltip.bottom="'Profil Saya'"
         >
           <i class="pi pi-user"></i>
-          <span>Pengaturan Profil</span>
+          <span>Profil Saya</span>
         </Link>
 
         <Link

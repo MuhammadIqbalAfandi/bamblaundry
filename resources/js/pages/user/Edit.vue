@@ -120,7 +120,13 @@ watch(errors, () => {
                   :href="route('users.block', user.id)"
                 />
 
-                <Button label="Simpan" class="p-button-text" icon="pi pi-check" @click="submit" />
+                <Button
+                  label="Simpan"
+                  class="p-button-text"
+                  icon="pi pi-check"
+                  :disabled="form.processing"
+                  @click="submit"
+                />
               </div>
             </div>
           </template>
