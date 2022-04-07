@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [TransactionController::class, 'index']);
 
     Route::delete('/users/block/{user}', [UserController::class, 'block'])->name('users.block');
