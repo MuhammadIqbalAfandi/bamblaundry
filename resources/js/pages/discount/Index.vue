@@ -29,7 +29,7 @@ const submit = () => {
 
   <AppLayout>
     <div class="grid">
-      <div class="col-fixed">
+      <div class="col-12 md:col-8">
         <Card>
           <template #title> Diskon </template>
 
@@ -66,11 +66,3 @@ const submit = () => {
     </div>
   </AppLayout>
 </template>
-
-<style scoped>
-@media screen and (max-width: 640px) {
-  .col-fixed {
-    width: 100%;
-  }
-}
-</style>
