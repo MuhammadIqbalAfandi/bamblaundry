@@ -1,14 +1,23 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/inertia-vue3'
+import { computed, watch } from 'vue'
+import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 import AppInputText from '@/components/AppInputText.vue'
 import AppDropdown from '@/components/AppDropdown.vue'
+import AppPassword from '@/components/AppPassword.vue'
 
 const props = defineProps({
   user: Object,
   roles: Array,
   outlets: Array,
   genders: Array,
+})
+
+const errors = computed(() => usePage().props.value.errors)
+
+watch(errors, () => {
+  form.clearErrors()
+  formChangePassword.clearErrors()
 })
 
 const form = useForm({
@@ -31,7 +40,9 @@ const formChangePassword = useForm({
 })
 
 const changePassword = () => {
-  formChangePassword.post(route('users.change-password', props.user.id))
+  formChangePassword.post(route('users.change-password', props.user.id), {
+    onSuccess: () => formChangePassword.reset(),
+  })
 }
 </script>
 
@@ -88,51 +99,30 @@ const changePassword = () => {
               </TabPanel>
               <TabPanel header="Ubah Password">
                 <div class="grid">
-                  <div class="col-12 md:col-6">
-                    <div class="field">
-                      <label for="old_password">Password Lama</label>
-                      <Password
-                        id="old_password"
-                        label="Password Lama"
-                        placeholder="password lama"
-                        class="w-full"
-                        inputClass="w-full"
-                        :toggleMask="true"
-                        :error="form.errors.old_password"
-                        v-model="formChangePassword.old_password"
-                      />
-                    </div>
+                  <div class="col-12">
+                    <AppPassword
+                      label="Password Lama"
+                      placeholder="password lama"
+                      :error="formChangePassword.errors.old_password"
+                      v-model="formChangePassword.old_password"
+                    />
                   </div>
 
-                  <div class="col-12 md:col-6">
-                    <div class="field">
-                      <label for="new_password">Password Baru</label>
-                      <Password
-                        id="new_password"
-                        label="Password Baru"
-                        placeholder="password baru"
-                        class="w-full"
-                        inputClass="w-full"
-                        :toggleMask="true"
-                        :error="formChangePassword.errors.new_password"
-                        v-model="formChangePassword.new_password"
-                      />
-                    </div>
+                  <div class="col-12">
+                    <AppPassword
+                      label="Password Baru"
+                      placeholder="password baru"
+                      :error="formChangePassword.errors.new_password"
+                      v-model="formChangePassword.new_password"
+                    />
                   </div>
 
-                  <div class="col-12 md:col-6">
-                    <div class="field">
-                      <label for="new_password_confirmation">Konfirmasi Password</label>
-                      <Password
-                        id="new_password_confirmation"
-                        label="Konfirmasi Password"
-                        placeholder="konfirmasi password"
-                        class="w-full"
-                        inputClass="w-full"
-                        :toggleMask="true"
-                        v-model="formChangePassword.new_password_confirmation"
-                      />
-                    </div>
+                  <div class="col-12">
+                    <AppPassword
+                      label="Konfirmasi Password"
+                      placeholder="konfirmasi password"
+                      v-model="formChangePassword.new_password_confirmation"
+                    />
                   </div>
 
                   <div class="col-12 flex justify-content-end">
