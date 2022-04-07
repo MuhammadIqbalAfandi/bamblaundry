@@ -17,6 +17,6 @@ export const TransactionBasketTable = [
 
 export const TransactionReportTable = [
   { field: 'createdAt', header: 'Tanggal' },
-  { field: 'numberOfTransaction', header: 'Jumlah Transaksi' },
-  { field: 'price', header: 'Total Nilai' },
+  { field: 'totalTransaction', header: 'Jumlah Transaksi' },
+  { field: 'totalPrice', header: 'Total Nilai' },
 ]

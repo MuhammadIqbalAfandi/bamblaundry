@@ -2170,10 +2170,10 @@ var TransactionReportTable = [{
   field: 'createdAt',
   header: 'Tanggal'
 }, {
-  field: 'numberOfTransaction',
+  field: 'totalTransaction',
   header: 'Jumlah Transaksi'
 }, {
-  field: 'price',
+  field: 'totalPrice',
   header: 'Total Nilai'
 }];
 

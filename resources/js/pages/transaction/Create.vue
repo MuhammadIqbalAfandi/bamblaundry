@@ -178,7 +178,7 @@ const addTransactionBasket = () => {
       id: form.laundry.id,
       item: form.laundry.name,
       unit: form.laundry.unit,
-      quantity: form.quantityLaundry,
+      quantity: form.quantityLaundry.toFixed(1),
       price: form.laundry.price,
       discount: 0,
       totalPrice: form.quantityLaundry * form.laundry.price,

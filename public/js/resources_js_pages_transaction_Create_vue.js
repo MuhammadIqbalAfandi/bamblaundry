@@ -870,7 +870,7 @@ __webpack_require__.r(__webpack_exports__);
           id: form.laundry.id,
           item: form.laundry.name,
           unit: form.laundry.unit,
-          quantity: form.quantityLaundry,
+          quantity: form.quantityLaundry.toFixed(1),
           price: form.laundry.price,
           discount: 0,
           totalPrice: form.quantityLaundry * form.laundry.price
@@ -2327,10 +2327,10 @@ var TransactionReportTable = [{
   field: 'createdAt',
   header: 'Tanggal'
 }, {
-  field: 'numberOfTransaction',
+  field: 'totalTransaction',
   header: 'Jumlah Transaksi'
 }, {
-  field: 'price',
+  field: 'totalPrice',
   header: 'Total Nilai'
 }];
 

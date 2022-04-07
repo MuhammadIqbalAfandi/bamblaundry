@@ -1192,7 +1192,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             options: $props.outlets
           }, null, 8
           /* PROPS */
-          , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [$props.transactions.data.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["AppButton"], {
+          , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [$props.transactions.total ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["AppButton"], {
             key: 0,
             label: "Export excel",
             "class-button": "p-button-text md:w-16rem",
@@ -1220,7 +1220,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
                 icon: "pi pi-link",
                 "class": "p-button-text p-button-icon-only p-button-rounded p-button-text",
-                href: "/transactions?startDate=".concat(data.startDate, "&endDate=").concat(data.startDate)
+                href: "/transactions?startDate=".concat(data.date, "&endDate=").concat(data.date)
               }, null, 8
               /* PROPS */
               , ["href"])];
@@ -1301,10 +1301,10 @@ var TransactionReportTable = [{
   field: 'createdAt',
   header: 'Tanggal'
 }, {
-  field: 'numberOfTransaction',
+  field: 'totalTransaction',
   header: 'Jumlah Transaksi'
 }, {
-  field: 'price',
+  field: 'totalPrice',
   header: 'Total Nilai'
 }];
 

@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Exports\TransactionExport;
 use App\Models\Outlet;
 use App\Models\Transaction;
-use Carbon\Carbon;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Services\TransactionService;
+use Inertia\Controller;
+use Inertia\Inertia;
 
 class ReportTransactionController extends Controller
 {
@@ -17,18 +18,21 @@ class ReportTransactionController extends Controller
      */
     public function index()
     {
+        $transactions = Transaction::filter(request()->only('startDate', 'endDate', 'outlet'))
+            ->get()
+            ->groupBy('created_at')
+            ->transform(fn($transactions) => [[
+                'date' => $transactions->first()->getRawOriginal('created_at'),
+                'createdAt' => $transactions->first()->created_at,
+                'totalTransaction' => $transactions->count(),
+                'totalPrice' => (new TransactionService)->totalPriceGroupAsString($transactions),
+            ]])
+            ->flatten(1)
+            ->toArray();
+
         return inertia('transaction/Report', [
             'filters' => request()->all('startDate', 'endDate', 'outlet'),
-            'transactions' => Transaction::filter(request()->only('startDate', 'endDate', 'outlet'))
-                ->latest()
-                ->paginate(10)
-                ->withQueryString()
-                ->through(fn($transaction) => [
-                    'startDate' => Carbon::parse($transaction->getRawOriginal('created_at'))->translatedFormat('Y-m-d'),
-                    'createdAt' => $transaction->created_at,
-                    'price' => $transaction->totalPriceAsFullString(),
-                ])
-            ,
+            'transactions' => (new TransactionService)->getPaginator($transactions),
             'outlets' => Outlet::all()
                 ->transform(fn($outlet) => [
                     'label' => $outlet->name,
@@ -42,6 +46,6 @@ class ReportTransactionController extends Controller
      */
     public function exportExcel()
     {
-        return Excel::download(new TransactionExport(request()), 'report-transaction.xls');
+        return new TransactionExport(request());
     }
 }

@@ -123,7 +123,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
           </div>
           <div class="col-12 md:col-4 flex justify-content-end">
             <AppButton
-              v-if="mutations.data.length"
+              v-if="mutations.total"
               label="Export excel"
               class-button="p-button-text md:w-16rem"
               icon="pi pi-file-excel"

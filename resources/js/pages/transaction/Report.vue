@@ -115,7 +115,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
           </div>
           <div class="col-12 md:col-4 flex justify-content-end">
             <AppButton
-              v-if="transactions.data.length"
+              v-if="transactions.total"
               label="Export excel"
               class-button="p-button-text md:w-16rem"
               icon="pi pi-file-excel"
@@ -138,7 +138,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
           <AppButton
             icon="pi pi-link"
             class="p-button-text p-button-icon-only p-button-rounded p-button-text"
-            :href="`/transactions?startDate=${data.startDate}&endDate=${data.startDate}`"
+            :href="`/transactions?startDate=${data.date}&endDate=${data.date}`"
           />
         </template>
       </Column>
