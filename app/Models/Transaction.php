@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use App\Models\Customer;
-use App\Models\Helpers\CurrencyFormat;
 use App\Models\Mutation;
 use App\Models\Outlet;
 use App\Models\TransactionDetail;
 use App\Models\TransactionStatus;
 use App\Models\User;
+use App\Services\CurrencyFormatService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
-    use HasFactory, CurrencyFormat;
+    use HasFactory;
 
     protected $fillable = [
         'transaction_number',
@@ -27,17 +27,17 @@ class Transaction extends Model
         'outlet_id',
     ];
 
-    public function createdAt(): Attribute
+    protected function createdAt(): Attribute
     {
         return Attribute::make(
             get:fn($value) => Carbon::parse($value)->translatedFormat('l d/m/Y')
         );
     }
 
-    public function discount(): Attribute
+    protected function discount(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $this->setRupiahFormat($value, 0, true)
+            get:fn($value) => (new CurrencyFormatService)->setRupiahFormat($value, true)
         );
     }
 
@@ -90,26 +90,6 @@ class Transaction extends Model
         });
     }
 
-    public function totalPrice()
-    {
-        $price = $this->transactionDetails->sum(function ($transactionDetail) {
-            $price = $transactionDetail->getRawOriginal('price') * $transactionDetail->quantity;
-            return $price - $price * ($transactionDetail->getRawOriginal('discount') / 100);
-        });
-
-        return $price - $this->getRawOriginal('discount');
-    }
-
-    public function totalPriceAsString()
-    {
-        return $this->setRupiahFormat($this->totalPrice());
-    }
-
-    public function totalPriceAsFullString()
-    {
-        return $this->setRupiahFormat($this->totalPrice(), 0, true);
-    }
-
     public function subTotal()
     {
         $subTotal = $this->transactionDetails->sum(function ($transactionDetail) {
@@ -122,6 +102,26 @@ class Transaction extends Model
 
     public function subTotalAsString()
     {
-        return $this->setRupiahFormat($this->subTotal());
+        return (new CurrencyFormatService)->setRupiahFormat($this->subTotal());
+    }
+
+    public function totalPrice()
+    {
+        $totalPrice = $this->subTotal() - $this->getRawOriginal('discount');
+        if ($totalPrice < 0) {
+            return 0;
+        } else {
+            return $totalPrice;
+        }
+    }
+
+    public function totalPriceAsString()
+    {
+        return (new CurrencyFormatService)->setRupiahFormat($this->totalPrice());
+    }
+
+    public function totalPriceAsFullString()
+    {
+        return (new CurrencyFormatService)->setRupiahFormat($this->totalPrice(), true);
     }
 }

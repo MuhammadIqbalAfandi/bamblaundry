@@ -55,6 +55,8 @@ class TransactionExport implements ShouldAutoSize, Responsable, FromView, WithSt
             4 => [
                 'font' => ['bold' => true],
             ],
+            'C' => ['alignment' => ['horizontal' => 'left']],
+            'D' => ['alignment' => ['horizontal' => 'left']],
             $lastRow => [
                 'font' => ['bold' => true, 'size' => 12],
                 'alignment' => ['horizontal' => 'left'],

@@ -22,7 +22,7 @@
                     <td>{{ ++$index }}</td>
                     <td>{{ $transaction['createdAt'] }}</td>
                     <td>{{ $transaction['totalTransaction'] }}</td>
-                    <td>{{ (new App\Services\CurrencyFormatService)->setRupiahFormat($transaction['totalPrice'], 0, true) }}</td>
+                    <td>{{ (new App\Services\CurrencyFormatService)->setRupiahFormat($transaction['totalPrice'], true) }}</td>
                 </tr>
             @endforeach
         @endforeach
@@ -32,7 +32,7 @@
         <tr>
             <td colspan="2">Transaksi / Nilai</td>
             <td>{{ $transactions->sum('totalTransaction') }}</td>
-            <td>{{ (new App\Services\CurrencyFormatService)->setRupiahFormat($transactions->sum('totalPrice'), 0, true)  }}</td>
+            <td>{{ (new App\Services\CurrencyFormatService)->setRupiahFormat($transactions->sum('totalPrice'), true) }}</td>
         </tr>
     </tbody>
 </table>

@@ -158,16 +158,27 @@ class TransactionController extends Controller
                 }
             }
 
-            $transaction->mutation()->create([
-                'type' => 1,
-                'amount' => $transaction->totalPrice(),
-                'outlet_id' => $request->user()->outlet_id,
-            ]);
+            if ($request->discount) {
+                $transaction->mutation()->create([
+                    'type' => 1,
+                    'amount' => $transaction->totalPrice() < 0 ? $transaction->subTotal() : $transaction->totalPrice(),
+                    'outlet_id' => $request->user()->outlet_id,
+                ]);
+
+                $transaction->mutation()->create([
+                    'type' => 2,
+                    'amount' => $transaction->totalPrice() < 0 ? $transaction->subTotal() : $transaction->totalPrice(),
+                    'outlet_id' => $request->user()->outlet_id,
+                ]);
+            } else {
+                $transaction->mutation()->create([
+                    'type' => 1,
+                    'amount' => $transaction->totalPrice(),
+                    'outlet_id' => $request->user()->outlet_id,
+                ]);
+            }
 
             DB::commit();
-
-            // $thermalPrinting = new ThermalPrinting($transaction);
-            // $thermalPrinting->startPrinting(2);
 
             // $transaction = Transaction::with(['outlet', 'customer', 'transactionDetails.laundry'])->latest()->first();
 

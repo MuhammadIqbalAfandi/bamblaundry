@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use App\Models\Helpers\CurrencyFormat;
 use App\Models\Laundry;
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Services\CurrencyFormatService;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TransactionDetail extends Model
 {
-    use HasFactory, CurrencyFormat;
+    use HasFactory;
 
     protected $fillable = [
         'price',
@@ -26,7 +26,7 @@ class TransactionDetail extends Model
     protected function price(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $this->setRupiahFormat($value, 0, true)
+            get:fn($value) => (new CurrencyFormatService)->setRupiahFormat($value, true)
         );
     }
 
@@ -62,11 +62,11 @@ class TransactionDetail extends Model
 
     public function totalPriceAsString()
     {
-        return $this->setRupiahFormat($this->totalPrice());
+        return (new CurrencyFormatService)->setRupiahFormat($this->totalPrice());
     }
 
     public function totalPriceAsFullString()
     {
-        return $this->setRupiahFormat($this->totalPrice(), 0, true);
+        return (new CurrencyFormatService)->setRupiahFormat($this->totalPrice(), true);
     }
 }

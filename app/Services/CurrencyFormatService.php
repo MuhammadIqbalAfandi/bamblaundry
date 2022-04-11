@@ -4,12 +4,20 @@ namespace App\Services;
 
 class CurrencyFormatService
 {
-    public function setRupiahFormat(int $number, int $decimal = 0, bool $sign = false)
+    public function setRupiahFormat(int $number, bool $sign = false)
     {
         if ($sign) {
-            return 'Rp' . number_format($number, $decimal, ',', '.');
+            if ($number < 0) {
+                return '-Rp' . number_format(abs($number), 0, ',', '.');
+            } else {
+                return 'Rp' . number_format($number, 0, ',', '.');
+            }
         } else {
-            return number_format($number, $decimal, ',', '.');
+            if ($number < 0) {
+                return '-' . number_format(abs($number), 0, ',', '.');
+            } else {
+                return number_format($number, 0, ',', '.');
+            }
         }
     }
 }

@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Helpers\CurrencyFormat;
-use App\Models\Helpers\HasMutation;
+use App\Services\CurrencyFormatService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Mutation extends Model
 {
-    use HasFactory, CurrencyFormat, HasMutation;
+    use HasFactory;
 
     protected $fillable = [
         'type',
@@ -21,22 +20,27 @@ class Mutation extends Model
         'expense_id',
     ];
 
-    public function createdAt(): Attribute
+    protected function createdAt(): Attribute
     {
         return Attribute::make(
             get:fn($value) => Carbon::parse($value)->translatedFormat('l d/m/Y')
         );
     }
 
-    public function amount(): Attribute
+    protected function amount(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $this->transaction_id ? $this->setRupiahFormat($value, 0, true)
-            : '- ' . $this->setRupiahFormat($value, 0, true)
+            get:function ($value) {
+                if ($this->getRawOriginal('type') == 1) {
+                    return (new CurrencyFormatService)->setRupiahFormat($value, true);
+                } else {
+                    return (new CurrencyFormatService)->setRupiahFormat(-$value, true);
+                }
+            },
         );
     }
 
-    public function type(): Attribute
+    protected function type(): Attribute
     {
         return Attribute::make(
             get:fn($value) => $value == 1 ? __('words.income') : __('words.expense')

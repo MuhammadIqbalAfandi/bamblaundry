@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Helpers;
+namespace App\Services;
 
 use App\Models\Transaction;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;

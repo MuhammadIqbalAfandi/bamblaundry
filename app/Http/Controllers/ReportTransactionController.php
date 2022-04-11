@@ -30,9 +30,11 @@ class ReportTransactionController extends Controller
             ->flatten(1)
             ->toArray();
 
+        $transaction = (new TransactionService)->getPaginator($transactions);
+
         return inertia('transaction/Report', [
             'filters' => request()->all('startDate', 'endDate', 'outlet'),
-            'transactions' => (new TransactionService)->getPaginator($transactions),
+            'transactions' => $transaction,
             'outlets' => Outlet::all()
                 ->transform(fn($outlet) => [
                     'label' => $outlet->name,

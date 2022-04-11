@@ -24,8 +24,7 @@ class TransactionService
 
     public function totalPrice(Collection $collections)
     {
-        $collections->transform(fn($transactions) => $transactions->totalPrice());
-        return $collections;
+        return $collections->transform(fn($transactions) => $transactions->totalPrice());
     }
 
     public function totalPriceGroup(Collection $collections)
@@ -35,6 +34,6 @@ class TransactionService
 
     public function totalPriceGroupAsString(Collection $collections)
     {
-        return (new CurrencyFormatService)->setRupiahFormat($this->totalPriceGroup($collections), 0, true);
+        return (new CurrencyFormatService)->setRupiahFormat($this->totalPriceGroup($collections), true);
     }
 }

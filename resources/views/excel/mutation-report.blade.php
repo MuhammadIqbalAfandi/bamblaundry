@@ -33,15 +33,15 @@
         </tr>
         <tr>
             <td colspan="3">Pendapatan</td>
-            <td>{{ App\Models\Mutation::totalIncomeAsString($mutations) }}</td>
+            <td>{{ (new App\Services\MutationService)->totalIncomeAsString($mutations) }}</td>
         </tr>
         <tr>
             <td colspan="3">Pengeluran</td>
-            <td>{{ App\Models\Mutation::totalExpenseAsString($mutations) }}</td>
+            <td>{{ (new App\Services\MutationService)->totalExpenseAsString($mutations) }}</td>
         </tr>
         <tr>
             <td colspan="3">Jumlah</td>
-            <td>{{ App\Models\Mutation::totalAmount($mutations) }}</td>
+            <td>{{ (new App\Services\MutationService)->totalAmount($mutations) }}</td>
         </tr>
     </tbody>
 </table>

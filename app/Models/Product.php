@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use App\Models\Helpers\CurrencyFormat;
+use App\Services\CurrencyFormatService;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory, CurrencyFormat;
+    use HasFactory;
 
     protected $fillable = [
         'name',
@@ -34,7 +34,7 @@ class Product extends Model
     protected function price(): Attribute
     {
         return Attribute::make(
-            get:fn($value) => $this->setRupiahFormat($value, 0, true)
+            get:fn($value) => (new CurrencyFormatService)->setRupiahFormat($value, true)
         );
     }
 
