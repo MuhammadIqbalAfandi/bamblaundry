@@ -52,7 +52,7 @@ watch(
             <AppButton
               label="Tambah Outlet"
               icon="pi pi-pencil"
-              class="p-button-text"
+              class="p-button-outlined"
               :href="route('outlets.create')"
             />
           </div>

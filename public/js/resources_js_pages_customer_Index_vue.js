@@ -1128,7 +1128,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             href: _ctx.route('customers.create'),
             label: "Tambah Customer",
             icon: "pi pi-pencil",
-            "class": "p-button-text"
+            "class": "p-button-outlined"
           }, null, 8
           /* PROPS */
           , ["href"])])])];

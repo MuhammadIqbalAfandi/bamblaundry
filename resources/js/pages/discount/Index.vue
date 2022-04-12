@@ -48,14 +48,14 @@ const submit = () => {
               <Button
                 label="Edit"
                 icon="pi pi-pencil"
-                class="p-button-text p-button-warning mb-3 sm:mb-0"
+                class="p-button-outlined p-button-warning mb-3 sm:mb-0"
                 @click="btnDisabled = false"
               />
 
               <Button
                 label="Simpan"
                 icon="pi pi-check"
-                class="p-button-text"
+                class="p-button-outlined"
                 :disabled="form.processing"
                 @click="submit"
               />

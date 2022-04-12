@@ -1545,19 +1545,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["visible"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Hapus",
             icon: "pi pi-trash",
-            "class": "p-button-text p-button-danger",
+            "class": "p-button-outlined p-button-danger",
             onClick: $setup.confirmDialog
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             label: "Blokir",
             icon: "pi pi-ban",
             method: "delete",
-            "class": "p-button-text p-button-danger md:mr-3",
+            "class": "p-button-outlined p-button-danger md:mr-3",
             href: _ctx.route('users.block', $props.user.id)
           }, null, 8
           /* PROPS */
           , ["href"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Simpan",
-            "class": "p-button-text",
+            "class": "p-button-outlined",
             icon: "pi pi-check",
             disabled: $setup.form.processing,
             onClick: $setup.submit

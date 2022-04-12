@@ -1110,14 +1110,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Edit",
             icon: "pi pi-pencil",
-            "class": "p-button-text p-button-warning mb-3 sm:mb-0",
+            "class": "p-button-outlined p-button-warning mb-3 sm:mb-0",
             onClick: _cache[1] || (_cache[1] = function ($event) {
               return $setup.btnDisabled = false;
             })
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Simpan",
             icon: "pi pi-check",
-            "class": "p-button-text",
+            "class": "p-button-outlined",
             disabled: $setup.form.processing,
             onClick: $setup.submit
           }, null, 8

@@ -111,7 +111,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
           <div class="col-12 md:col-4 flex justify-content-end">
             <AppButton
               label="Tambah Pengeluaran"
-              class="p-button-text"
+              class="p-button-outlined"
               icon="pi pi-pencil"
               :href="route('expenses.create')"
             />

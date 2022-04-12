@@ -1189,7 +1189,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           /* PROPS */
           , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             label: "Tambah Pengeluaran",
-            "class": "p-button-text",
+            "class": "p-button-outlined",
             icon: "pi pi-pencil",
             href: _ctx.route('expenses.create')
           }, null, 8

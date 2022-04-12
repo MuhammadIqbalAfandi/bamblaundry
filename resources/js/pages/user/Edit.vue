@@ -109,20 +109,20 @@ watch(errors, () => {
                 @cancel="onCancel"
               />
 
-              <Button label="Hapus" icon="pi pi-trash" class="p-button-text p-button-danger" @click="confirmDialog" />
+              <Button label="Hapus" icon="pi pi-trash" class="p-button-outlined p-button-danger" @click="confirmDialog" />
 
               <div class="flex flex-column sm:flex-row align-items-center sm:justify-content-center">
                 <AppButton
                   label="Blokir"
                   icon="pi pi-ban"
                   method="delete"
-                  class="p-button-text p-button-danger md:mr-3"
+                  class="p-button-outlined p-button-danger md:mr-3"
                   :href="route('users.block', user.id)"
                 />
 
                 <Button
                   label="Simpan"
-                  class="p-button-text"
+                  class="p-button-outlined"
                   icon="pi pi-check"
                   :disabled="form.processing"
                   @click="submit"

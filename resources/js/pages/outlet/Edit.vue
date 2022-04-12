@@ -71,9 +71,9 @@ const onCancel = () => (visibleDialog.value = false)
                 @cancel="onCancel"
               />
 
-              <Button label="Hapus" icon="pi pi-trash" class="p-button-text p-button-danger" @click="confirmDialog" />
+              <Button label="Hapus" icon="pi pi-trash" class="p-button-outlined p-button-danger" @click="confirmDialog" />
 
-              <Button label="Simpan" icon="pi pi-check" class="p-button-text" @click="submit" />
+              <Button label="Simpan" icon="pi pi-check" class="p-button-outlined" @click="submit" />
             </div>
           </template>
         </Card>

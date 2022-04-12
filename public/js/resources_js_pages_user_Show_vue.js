@@ -1405,7 +1405,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   , ["modelValue", "options", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
                     label: "Simpan",
                     icon: "pi pi-check",
-                    "class": "p-button-text",
+                    "class": "p-button-outlined",
                     disabled: $setup.form.processing,
                     onClick: $setup.submit
                   }, null, 8
@@ -1451,7 +1451,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   , ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
                     label: "Simpan",
                     icon: "pi pi-check",
-                    "class": "p-button-text",
+                    "class": "p-button-outlined",
                     disabled: $setup.formChangePassword.processing,
                     onClick: $setup.changePassword
                   }, null, 8

@@ -61,7 +61,7 @@ const submit = () => {
               <Button
                 label="Simpan"
                 icon="pi pi-check"
-                class="p-button-text"
+                class="p-button-outlined"
                 :disabled="form.processing"
                 @click="submit"
               />

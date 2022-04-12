@@ -1954,7 +1954,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           /* PROPS */
           , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             label: "Tambah Transaksi",
-            "class": "p-button-text md:w-16rem",
+            "class": "p-button-outlined md:w-16rem",
             icon: "pi pi-pencil",
             href: _ctx.route('transactions.create')
           }, null, 8

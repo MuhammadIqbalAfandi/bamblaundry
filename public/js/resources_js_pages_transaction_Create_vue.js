@@ -2045,7 +2045,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           /* PROPS */
           , ["modelValue", "label", "disabled", "error"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Tambahkan",
-            "class": "p-button-text",
+            "class": "p-button-outlined",
             icon: "pi pi-shopping-cart",
             onClick: $setup.addTransactionBasket
           })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [_hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DataTable, {
@@ -2179,7 +2179,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Simpan Transaksi",
             icon: "pi pi-check",
-            "class": "p-button-text",
+            "class": "p-button-outlined",
             disabled: $setup.form.processing || $setup.transactionBasket.length === 0 || Object.keys($setup.form.customer).length === 0,
             onClick: $setup.submit
           }, null, 8

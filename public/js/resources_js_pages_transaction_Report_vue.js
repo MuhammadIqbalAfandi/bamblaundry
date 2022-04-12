@@ -1195,7 +1195,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [$props.transactions.total ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["AppButton"], {
             key: 0,
             label: "Export excel",
-            "class-button": "p-button-text md:w-16rem",
+            "class-button": "p-button-outlined md:w-16rem",
             icon: "pi pi-file-excel",
             "inertia-link": false,
             href: $setup.exportExcelLink

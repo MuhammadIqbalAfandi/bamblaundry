@@ -53,7 +53,7 @@ watch(
               :href="route('customers.create')"
               label="Tambah Customer"
               icon="pi pi-pencil"
-              class="p-button-text"
+              class="p-button-outlined"
             />
           </div>
         </div>

@@ -1621,12 +1621,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["visible"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Hapus",
             icon: "pi pi-trash",
-            "class": "p-button-text p-button-danger",
+            "class": "p-button-outlined p-button-danger",
             onClick: $setup.confirmDialog
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Simpan",
             icon: "pi pi-check",
-            "class": "p-button-text",
+            "class": "p-button-outlined",
             onClick: $setup.submit
           })])];
         }),

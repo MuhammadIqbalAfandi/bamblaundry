@@ -1126,7 +1126,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["modelValue"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             label: "Tambah Product",
             icon: "pi pi-pencil",
-            "class": "p-button-text",
+            "class": "p-button-outlined",
             href: _ctx.route('products.create')
           }, null, 8
           /* PROPS */

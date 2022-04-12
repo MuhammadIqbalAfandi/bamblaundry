@@ -383,7 +383,7 @@ const submit = () => {
               <div class="col-12 sm:col-6 sm:col-offset-6 flex justify-content-end">
                 <Button
                   label="Tambahkan"
-                  class="p-button-text"
+                  class="p-button-outlined"
                   icon="pi pi-shopping-cart"
                   @click="addTransactionBasket"
                 />
@@ -484,7 +484,7 @@ const submit = () => {
               <Button
                 label="Simpan Transaksi"
                 icon="pi pi-check"
-                class="p-button-text"
+                class="p-button-outlined"
                 :disabled="form.processing || transactionBasket.length === 0 || Object.keys(form.customer).length === 0"
                 @click="submit"
               />

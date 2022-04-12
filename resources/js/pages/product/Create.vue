@@ -47,7 +47,7 @@ const submit = () => {
 
           <template #footer>
             <div class="flex justify-content-end">
-              <Button label="Simpan" icon="pi pi-check" class="p-button-text" @click="submit" />
+              <Button label="Simpan" icon="pi pi-check" class="p-button-outlined" @click="submit" />
             </div>
           </template>
         </Card>
