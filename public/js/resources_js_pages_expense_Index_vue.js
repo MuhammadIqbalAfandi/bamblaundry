@@ -444,7 +444,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       }
     });
-    (0,vue__WEBPACK_IMPORTED_MODULE_1__.watch)(filterForm, lodash_throttle__WEBPACK_IMPORTED_MODULE_4___default()(function () {
+    (0,vue__WEBPACK_IMPORTED_MODULE_1__.watch)(filterForm, function () {
       if (filterForm.dates) {
         if (filterForm.dates[1]) {
           filterForm.startDate = dayjs__WEBPACK_IMPORTED_MODULE_3___default()(filterForm.dates[0]).format('YYYY-MM-DD');
@@ -465,13 +465,19 @@ __webpack_require__.r(__webpack_exports__);
       }), {
         preserveState: true
       });
-    }, 300));
+    });
+
+    var filterReset = function filterReset() {
+      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_0__.Inertia.get('/expenses');
+    };
+
     var isAdmin = (0,vue__WEBPACK_IMPORTED_MODULE_1__.computed)(function () {
       return (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.usePage)().props.value.isAdmin;
     });
     var __returned__ = {
       props: props,
       filterForm: filterForm,
+      filterReset: filterReset,
       isAdmin: isAdmin,
       Inertia: _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_0__.Inertia,
       watch: vue__WEBPACK_IMPORTED_MODULE_1__.watch,
@@ -1138,12 +1144,17 @@ var _hoisted_6 = {
   "class": "col-12 md:col-4"
 };
 var _hoisted_7 = {
+  "class": "col-auto mt-2 ml-2"
+};
+var _hoisted_8 = {
   "class": "col-12 md:col-4 flex justify-content-end"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Calendar = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Calendar");
 
   var _component_Dropdown = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Dropdown");
+
+  var _component_Button = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Button");
 
   var _component_Column = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Column");
 
@@ -1170,7 +1181,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "selection-mode": "range",
             placeholder: "filter waktu...",
             "date-format": "dd/mm/yy",
-            "show-button-bar": true,
             "manual-input": false
           }, null, 8
           /* PROPS */
@@ -1187,7 +1197,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             options: $props.outlets
           }, null, 8
           /* PROPS */
-          , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
+          , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
+            label: "reset",
+            "class": "p-button-link",
+            onClick: $setup.filterReset
+          })])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             label: "Tambah Pengeluaran",
             "class": "p-button-outlined",
             icon: "pi pi-pencil",

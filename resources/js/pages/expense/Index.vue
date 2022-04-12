@@ -34,35 +34,36 @@ onMounted(() => {
   }
 })
 
-watch(
-  filterForm,
-  throttle(() => {
-    if (filterForm.dates) {
-      if (filterForm.dates[1]) {
-        filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
-        filterForm.endDate = dayjs(filterForm.dates[1]).format('YYYY-MM-DD')
-      } else {
-        filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
-        filterForm.endDate = null
-      }
+watch(filterForm, () => {
+  if (filterForm.dates) {
+    if (filterForm.dates[1]) {
+      filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
+      filterForm.endDate = dayjs(filterForm.dates[1]).format('YYYY-MM-DD')
     } else {
+      filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
       filterForm.endDate = null
-      filterForm.startDate = null
     }
+  } else {
+    filterForm.endDate = null
+    filterForm.startDate = null
+  }
 
-    Inertia.get(
-      '/expenses',
-      pickBy({
-        startDate: filterForm.startDate,
-        endDate: filterForm.endDate,
-        outlet: filterForm.outlet,
-      }),
-      {
-        preserveState: true,
-      }
-    )
-  }, 300)
-)
+  Inertia.get(
+    '/expenses',
+    pickBy({
+      startDate: filterForm.startDate,
+      endDate: filterForm.endDate,
+      outlet: filterForm.outlet,
+    }),
+    {
+      preserveState: true,
+    }
+  )
+})
+
+const filterReset = () => {
+  Inertia.get('/expenses')
+}
 
 const isAdmin = computed(() => usePage().props.value.isAdmin)
 </script>
@@ -91,7 +92,6 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
                   selection-mode="range"
                   placeholder="filter waktu..."
                   date-format="dd/mm/yy"
-                  :show-button-bar="true"
                   :manual-input="false"
                 />
               </div>
@@ -105,6 +105,9 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
                   option-value="value"
                   :options="outlets"
                 />
+              </div>
+              <div class="col-auto mt-2 ml-2">
+                <Button label="reset" class="p-button-link" @click="filterReset" />
               </div>
             </div>
           </div>

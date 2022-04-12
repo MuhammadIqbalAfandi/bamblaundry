@@ -34,7 +34,9 @@ class ReportTransactionController extends Controller
 
         return inertia('transaction/Report', [
             'filters' => request()->all('startDate', 'endDate', 'outlet'),
-            'transactions' => $transaction,
+            'transactions' => Inertia::lazy(
+                fn() => $transaction
+            ),
             'outlets' => Outlet::all()
                 ->transform(fn($outlet) => [
                     'label' => $outlet->name,

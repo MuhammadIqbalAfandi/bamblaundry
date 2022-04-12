@@ -3,7 +3,6 @@ import { Inertia } from '@inertiajs/inertia'
 import { watch, computed, onMounted, ref } from 'vue'
 import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
 import dayjs from 'dayjs'
-import throttle from 'lodash/throttle'
 import pickBy from 'lodash/pickBy'
 import AppLayout from '@/layouts/AppLayout.vue'
 import AppPagination from '@/components/AppPagination.vue'
@@ -12,7 +11,14 @@ import AppButton from '@/components/AppButton.vue'
 import TableHeader from './TableHeader'
 
 const props = defineProps({
-  mutations: Object,
+  mutations: {
+    type: Object,
+    default: {
+      data: [],
+      links: [],
+      total: 0,
+    },
+  },
   filters: Object,
   outlets: Array,
 })
@@ -34,38 +40,36 @@ onMounted(() => {
   }
 })
 
-watch(
-  filterForm,
-  throttle(() => {
-    if (filterForm.dates) {
-      if (filterForm.dates[1]) {
-        filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
-        filterForm.endDate = dayjs(filterForm.dates[1]).format('YYYY-MM-DD')
-      } else {
-        filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
-        filterForm.endDate = null
-      }
+watch(filterForm, () => {
+  if (filterForm.dates) {
+    if (filterForm.dates[1]) {
+      filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
+      filterForm.endDate = dayjs(filterForm.dates[1]).format('YYYY-MM-DD')
     } else {
+      filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
       filterForm.endDate = null
-      filterForm.startDate = null
     }
+  } else {
+    filterForm.endDate = null
+    filterForm.startDate = null
+  }
 
-    Inertia.get(
-      '/reports/mutations',
-      pickBy({
-        startDate: filterForm.startDate,
-        endDate: filterForm.endDate,
-        outlet: filterForm.outlet,
-      }),
-      {
-        preserveState: true,
-      }
-    )
+  Inertia.reload({
+    data: pickBy({
+      startDate: filterForm.startDate,
+      endDate: filterForm.endDate,
+      outlet: filterForm.outlet,
+    }),
+    only: ['mutations'],
+  })
 
-    const params = window.location.search
-    exportExcelLink.value = `/reports/mutations/export/excel${params}`
-  }, 300)
-)
+  const params = window.location.search
+  exportExcelLink.value = `/reports/mutations/export/excel${params}`
+})
+
+const filterReset = () => {
+  Inertia.get('/reports/mutations')
+}
 
 const linkReference = (data) => {
   if (data.transactionId) {
@@ -104,7 +108,6 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
                   selection-mode="range"
                   placeholder="filter waktu..."
                   date-format="dd/mm/yy"
-                  :show-button-bar="true"
                   :manual-input="false"
                 />
               </div>
@@ -118,6 +121,9 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
                   option-value="value"
                   :options="outlets"
                 />
+              </div>
+              <div class="col-auto mt-2 ml-2">
+                <Button label="reset" class="p-button-link" @click="filterReset" />
               </div>
             </div>
           </div>

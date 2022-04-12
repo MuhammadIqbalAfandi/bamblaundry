@@ -38,36 +38,37 @@ onMounted(() => {
   }
 })
 
-watch(
-  filterForm,
-  throttle(() => {
-    if (filterForm.dates) {
-      if (filterForm.dates[1]) {
-        filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
-        filterForm.endDate = dayjs(filterForm.dates[1]).format('YYYY-MM-DD')
-      } else {
-        filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
-        filterForm.endDate = null
-      }
+watch(filterForm, () => {
+  if (filterForm.dates) {
+    if (filterForm.dates[1]) {
+      filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
+      filterForm.endDate = dayjs(filterForm.dates[1]).format('YYYY-MM-DD')
     } else {
+      filterForm.startDate = dayjs(filterForm.dates[0]).format('YYYY-MM-DD')
       filterForm.endDate = null
-      filterForm.startDate = null
     }
+  } else {
+    filterForm.endDate = null
+    filterForm.startDate = null
+  }
 
-    Inertia.get(
-      '/transactions',
-      pickBy({
-        search: filterForm.search,
-        startDate: filterForm.startDate,
-        endDate: filterForm.endDate,
-        outlet: filterForm.outlet,
-      }),
-      {
-        preserveState: true,
-      }
-    )
-  }, 300)
-)
+  Inertia.get(
+    '/transactions',
+    pickBy({
+      search: filterForm.search,
+      startDate: filterForm.startDate,
+      endDate: filterForm.endDate,
+      outlet: filterForm.outlet,
+    }),
+    {
+      preserveState: true,
+    }
+  )
+})
+
+const filterReset = () => {
+  Inertia.get('/transactions')
+}
 
 const transactionId = ref()
 
@@ -163,23 +164,20 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
         <div class="grid">
           <div class="col-12 md:col-8">
             <div class="grid">
-              <div class="col-12 md:col-4">
+              <div class="col-12 md:col-3">
                 <InputText class="w-full" placeholder="cari..." v-model="filterForm.search" />
               </div>
-
-              <div class="col-12 md:col-4">
+              <div class="col-12 md:col-3">
                 <Calendar
                   class="w-full"
                   v-model="filterForm.dates"
                   selection-mode="range"
                   placeholder="filter waktu..."
                   date-format="dd/mm/yy"
-                  :show-button-bar="true"
                   :manual-input="false"
                 />
               </div>
-
-              <div class="col-12 md:col-4">
+              <div class="col-12 md:col-3">
                 <Dropdown
                   v-if="isAdmin"
                   class="w-full"
@@ -189,6 +187,9 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
                   option-value="value"
                   :options="outlets"
                 />
+              </div>
+              <div class="col-auto mt-2 ml-2">
+                <Button label="reset" class="p-button-link" @click="filterReset" />
               </div>
             </div>
           </div>
