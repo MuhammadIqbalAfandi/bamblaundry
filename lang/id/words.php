@@ -17,5 +17,13 @@ return [
     'female' => 'Perempuan',
     'income' => 'Pendapatan',
     'expense' => 'Pengeluaran',
+    'today' => 'Hari ini',
+    'total' => 'Total',
+    'transaction' => 'Transaksi',
+    'expense' => 'Pengeluaran',
+    'laundry_type' => 'Jenis Laundry',
+    'product_type' => 'Jenis Product',
+    'transaction_statistic' => 'Statistik Transaksi',
+    'expense_statistic' => 'Statistik Pengeluaran',
 
 ];

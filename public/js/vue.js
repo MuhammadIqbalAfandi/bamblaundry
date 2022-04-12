@@ -32744,6 +32744,170 @@ script.render = render;
 
 /***/ }),
 
+/***/ "./node_modules/primevue/chart/chart.esm.js":
+/*!**************************************************!*\
+  !*** ./node_modules/primevue/chart/chart.esm.js ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+
+var script = {
+    name: 'Chart',
+    emits: ['select', 'loaded'],
+    props: {
+        type: String,
+        data: null,
+        options: null,
+        plugins: null,
+        width: {
+            type: Number,
+            default: 300
+        },
+        height: {
+            type: Number,
+            default: 150
+        },
+    },
+    chart: null,
+    mounted() {
+        this.initChart();
+    },
+    beforeUnmount() {
+        if (this.chart) {
+            this.chart.destroy();
+            this.chart = null;
+        }
+    },
+    watch: {
+        /*
+         * Use deep watch to enable triggering watch for changes within structure
+         * otherwise the entire data object needs to be replaced to trigger watch
+         */
+        data: {
+            handler() {
+                this.reinit();
+            },
+            deep: true
+        },
+        type() {
+            this.reinit();
+        },
+        options() {
+            this.reinit();
+        }
+    },
+    methods: {
+        initChart() {
+            __webpack_require__.e(/*! import() */ "node_modules_chart_js_auto_auto_esm_js").then(__webpack_require__.bind(__webpack_require__, /*! chart.js/auto */ "./node_modules/chart.js/auto/auto.esm.js")).then((module) => {
+                if (this.chart) {
+                    this.chart.destroy();
+                    this.chart = null;
+                }
+
+                if (module && module.default) {
+                    this.chart = new module.default(this.$refs.canvas, {
+                        type: this.type,
+                        data: this.data,
+                        options: this.options,
+                        plugins: this.plugins
+                    });
+                }
+
+                this.$emit('loaded', this.chart);
+            });
+        },
+        getCanvas() {
+            return this.$canvas;
+        },
+        getChart() {
+            return this.chart;
+        },
+        getBase64Image() {
+            return this.chart.toBase64Image();
+        },
+        refresh() {
+            if (this.chart) {
+                this.chart.update();
+            }
+        },
+        reinit() {
+            this.initChart();
+        },
+        onCanvasClick(event) {
+            if (this.chart) {
+                const element = this.chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
+                const dataset = this.chart.getElementsAtEventForMode(event, 'dataset', { intersect: true }, false);
+
+                if (element && element[0] && dataset) {
+                    this.$emit('select', {originalEvent: event, element: element[0], dataset: dataset});
+                }
+            }
+        },
+        generateLegend() {
+            if (this.chart) {
+                return this.chart.generateLegend();
+            }
+        }
+    }
+};
+
+const _hoisted_1 = { class: "p-chart" };
+
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_1, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("canvas", {
+      ref: "canvas",
+      width: $props.width,
+      height: $props.height,
+      onClick: _cache[1] || (_cache[1] = $event => ($options.onCanvasClick($event)))
+    }, null, 8, ["width", "height"])
+  ]))
+}
+
+function styleInject(css, ref) {
+  if ( ref === void 0 ) ref = {};
+  var insertAt = ref.insertAt;
+
+  if (!css || typeof document === 'undefined') { return; }
+
+  var head = document.head || document.getElementsByTagName('head')[0];
+  var style = document.createElement('style');
+  style.type = 'text/css';
+
+  if (insertAt === 'top') {
+    if (head.firstChild) {
+      head.insertBefore(style, head.firstChild);
+    } else {
+      head.appendChild(style);
+    }
+  } else {
+    head.appendChild(style);
+  }
+
+  if (style.styleSheet) {
+    style.styleSheet.cssText = css;
+  } else {
+    style.appendChild(document.createTextNode(css));
+  }
+}
+
+var css_248z = "\n.p-chart {\n    position: relative;\n}\n";
+styleInject(css_248z);
+
+script.render = render;
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
+
+/***/ }),
+
 /***/ "./node_modules/primevue/column/column.esm.js":
 /*!****************************************************!*\
   !*** ./node_modules/primevue/column/column.esm.js ***!
@@ -57469,6 +57633,14 @@ var map = {
 		"./resources/js/pages/expense/TableHeader.js",
 		"resources_js_pages_expense_TableHeader_js"
 	],
+	"./home/Index": [
+		"./resources/js/pages/home/Index.vue",
+		"resources_js_pages_home_Index_vue"
+	],
+	"./home/Index.vue": [
+		"./resources/js/pages/home/Index.vue",
+		"resources_js_pages_home_Index_vue"
+	],
 	"./laundry/Create": [
 		"./resources/js/pages/laundry/Create.vue",
 		"resources_js_pages_laundry_Create_vue"
@@ -57778,7 +57950,7 @@ module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"P
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "js/" + chunkId + ".js?id=" + {"resources_js_pages_Access_vue":"a18ed856923fae52","resources_js_pages_auth_ForgotPassword_vue":"c9f401672b6f2423","resources_js_pages_auth_Login_vue":"cb0cb153b976d2c1","resources_js_pages_auth_ResetPassword_vue":"1078df5cebf2e3c6","resources_js_pages_auth_VerifyEmail_vue":"a0ee23b849c826b1","resources_js_pages_customer_Create_vue":"a3cba38b65a678ea","resources_js_pages_customer_Edit_vue":"6529085778080d36","resources_js_pages_customer_Index_vue":"aea07a25c21bfc45","resources_js_pages_customer_TableHeader_js":"71be5afdca048a9c","resources_js_pages_discount_Index_vue":"31e829a87f7e517d","resources_js_pages_expense_Create_vue":"f625b4fbdf8889af","resources_js_pages_expense_Index_vue":"ad6478718f2fbf90","resources_js_pages_expense_Show_vue":"4801bedc7912088f","resources_js_pages_expense_TableHeader_js":"72e3dee74175b1c0","resources_js_pages_laundry_Create_vue":"17128fbd0e28898d","resources_js_pages_laundry_Edit_vue":"2bd6d1f463c9a9a3","resources_js_pages_laundry_Index_vue":"96eee4afb428456e","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Report_vue":"aaaf24154a43b9f5","resources_js_pages_mutation_TableHeader_js":"82c2999bd7d098a1","resources_js_pages_outlet_Create_vue":"bdf868378013b7e7","resources_js_pages_outlet_Edit_vue":"77775fdca5fe7621","resources_js_pages_outlet_Index_vue":"2e36a83555378ccb","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_product_Create_vue":"0d0dddb2e60ec31c","resources_js_pages_product_Edit_vue":"59d0ee7b5403f776","resources_js_pages_product_Index_vue":"73a854a747e35d21","resources_js_pages_product_TableHeader_js":"b8eaaa9de25a2322","resources_js_pages_transaction_Create_vue":"ea4b3be68403cd31","resources_js_pages_transaction_Index_vue":"1dcdc1cb350a954b","resources_js_pages_transaction_Report_vue":"bd0a1b87dd8a494b","resources_js_pages_transaction_Show_vue":"ebd8059da08e93b1","resources_js_pages_transaction_TableHeader_js":"be63e672e103818b","resources_js_pages_user_Create_vue":"da0b02d8fda8f9a0","resources_js_pages_user_Edit_vue":"cf9a306d21f40913","resources_js_pages_user_Index_vue":"badcb54776b8c7e0","resources_js_pages_user_Show_vue":"1474a0ad843dc2d5","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
+/******/ 			return "js/" + chunkId + ".js?id=" + {"node_modules_chart_js_auto_auto_esm_js":"10c6b388645ceb22","resources_js_pages_Access_vue":"a18ed856923fae52","resources_js_pages_auth_ForgotPassword_vue":"c9f401672b6f2423","resources_js_pages_auth_Login_vue":"cb0cb153b976d2c1","resources_js_pages_auth_ResetPassword_vue":"1078df5cebf2e3c6","resources_js_pages_auth_VerifyEmail_vue":"a0ee23b849c826b1","resources_js_pages_customer_Create_vue":"4eb00b7c0775dd1a","resources_js_pages_customer_Edit_vue":"407b38d3ec33b8b6","resources_js_pages_customer_Index_vue":"eafddf3436e2b29d","resources_js_pages_customer_TableHeader_js":"71be5afdca048a9c","resources_js_pages_discount_Index_vue":"327c24c11bd53001","resources_js_pages_expense_Create_vue":"9f6647ce9c66b103","resources_js_pages_expense_Index_vue":"a5e56c318045f4f1","resources_js_pages_expense_Show_vue":"0c0ebfedc527579a","resources_js_pages_expense_TableHeader_js":"72e3dee74175b1c0","resources_js_pages_home_Index_vue":"12befeb6d38abe88","resources_js_pages_laundry_Create_vue":"17d4fff3f6a0d4e0","resources_js_pages_laundry_Edit_vue":"fe0751be3876e35b","resources_js_pages_laundry_Index_vue":"25198930a0d0f20d","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Report_vue":"f819d667c2cadeb7","resources_js_pages_mutation_TableHeader_js":"82c2999bd7d098a1","resources_js_pages_outlet_Create_vue":"0326fbf87091b62e","resources_js_pages_outlet_Edit_vue":"6dd0ae9ed18a73a6","resources_js_pages_outlet_Index_vue":"cb5a9b7dfa2a0b91","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_product_Create_vue":"96daef068f670441","resources_js_pages_product_Edit_vue":"826dfb5798505c8c","resources_js_pages_product_Index_vue":"f5218c4863b86c19","resources_js_pages_product_TableHeader_js":"b8eaaa9de25a2322","resources_js_pages_transaction_Create_vue":"6008f897e5067e30","resources_js_pages_transaction_Index_vue":"19eb0dbf87a58e45","resources_js_pages_transaction_Report_vue":"ecb8a20a69a65ae7","resources_js_pages_transaction_Show_vue":"ac25925f62d145de","resources_js_pages_transaction_TableHeader_js":"be63e672e103818b","resources_js_pages_user_Create_vue":"21f3591e9d0b4199","resources_js_pages_user_Edit_vue":"76820bdf6c8bfc24","resources_js_pages_user_Index_vue":"4433ed4ee64b6df6","resources_js_pages_user_Show_vue":"b8e5b5a526f42dbd","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
 /******/ 		};
 /******/ 	})();
 /******/ 	
@@ -57993,21 +58165,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var primevue_button__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! primevue/button */ "./node_modules/primevue/button/button.esm.js");
 /* harmony import */ var primevue_calendar__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! primevue/calendar */ "./node_modules/primevue/calendar/calendar.esm.js");
 /* harmony import */ var primevue_card__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! primevue/card */ "./node_modules/primevue/card/card.esm.js");
-/* harmony import */ var primevue_column__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! primevue/column */ "./node_modules/primevue/column/column.esm.js");
-/* harmony import */ var primevue_datatable__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! primevue/datatable */ "./node_modules/primevue/datatable/datatable.esm.js");
-/* harmony import */ var primevue_dialog__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! primevue/dialog */ "./node_modules/primevue/dialog/dialog.esm.js");
-/* harmony import */ var primevue_divider__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! primevue/divider */ "./node_modules/primevue/divider/divider.esm.js");
-/* harmony import */ var primevue_dropdown__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! primevue/dropdown */ "./node_modules/primevue/dropdown/dropdown.esm.js");
-/* harmony import */ var primevue_editor__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! primevue/editor */ "./node_modules/primevue/editor/editor.esm.js");
-/* harmony import */ var primevue_inputnumber__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! primevue/inputnumber */ "./node_modules/primevue/inputnumber/inputnumber.esm.js");
-/* harmony import */ var primevue_inputtext__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! primevue/inputtext */ "./node_modules/primevue/inputtext/inputtext.esm.js");
-/* harmony import */ var primevue_message__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! primevue/message */ "./node_modules/primevue/message/message.esm.js");
-/* harmony import */ var primevue_paginator__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! primevue/paginator */ "./node_modules/primevue/paginator/paginator.esm.js");
-/* harmony import */ var primevue_password__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! primevue/password */ "./node_modules/primevue/password/password.esm.js");
-/* harmony import */ var primevue_ripple__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! primevue/ripple */ "./node_modules/primevue/ripple/ripple.esm.js");
-/* harmony import */ var primevue_tabview__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! primevue/tabview */ "./node_modules/primevue/tabview/tabview.esm.js");
-/* harmony import */ var primevue_tabpanel__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! primevue/tabpanel */ "./node_modules/primevue/tabpanel/tabpanel.esm.js");
-/* harmony import */ var primevue_tooltip__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! primevue/tooltip */ "./node_modules/primevue/tooltip/tooltip.esm.js");
+/* harmony import */ var primevue_chart__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! primevue/chart */ "./node_modules/primevue/chart/chart.esm.js");
+/* harmony import */ var primevue_column__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! primevue/column */ "./node_modules/primevue/column/column.esm.js");
+/* harmony import */ var primevue_datatable__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! primevue/datatable */ "./node_modules/primevue/datatable/datatable.esm.js");
+/* harmony import */ var primevue_dialog__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! primevue/dialog */ "./node_modules/primevue/dialog/dialog.esm.js");
+/* harmony import */ var primevue_divider__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! primevue/divider */ "./node_modules/primevue/divider/divider.esm.js");
+/* harmony import */ var primevue_dropdown__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! primevue/dropdown */ "./node_modules/primevue/dropdown/dropdown.esm.js");
+/* harmony import */ var primevue_editor__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! primevue/editor */ "./node_modules/primevue/editor/editor.esm.js");
+/* harmony import */ var primevue_inputnumber__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! primevue/inputnumber */ "./node_modules/primevue/inputnumber/inputnumber.esm.js");
+/* harmony import */ var primevue_inputtext__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! primevue/inputtext */ "./node_modules/primevue/inputtext/inputtext.esm.js");
+/* harmony import */ var primevue_message__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! primevue/message */ "./node_modules/primevue/message/message.esm.js");
+/* harmony import */ var primevue_paginator__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! primevue/paginator */ "./node_modules/primevue/paginator/paginator.esm.js");
+/* harmony import */ var primevue_password__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! primevue/password */ "./node_modules/primevue/password/password.esm.js");
+/* harmony import */ var primevue_ripple__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! primevue/ripple */ "./node_modules/primevue/ripple/ripple.esm.js");
+/* harmony import */ var primevue_tabview__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! primevue/tabview */ "./node_modules/primevue/tabview/tabview.esm.js");
+/* harmony import */ var primevue_tabpanel__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! primevue/tabpanel */ "./node_modules/primevue/tabpanel/tabpanel.esm.js");
+/* harmony import */ var primevue_tooltip__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! primevue/tooltip */ "./node_modules/primevue/tooltip/tooltip.esm.js");
+
 
 
 
@@ -58060,7 +58234,7 @@ __webpack_require__.r(__webpack_exports__);
       methods: {
         route: route
       }
-    }).directive('styleclass', primevue_styleclass__WEBPACK_IMPORTED_MODULE_9__["default"]).directive('ripple', primevue_ripple__WEBPACK_IMPORTED_MODULE_26__["default"]).directive('tooltip', primevue_tooltip__WEBPACK_IMPORTED_MODULE_29__["default"]).component('AutoComplete', primevue_autocomplete__WEBPACK_IMPORTED_MODULE_10__["default"]).component('Button', primevue_button__WEBPACK_IMPORTED_MODULE_12__["default"]).component('Badge', primevue_badge__WEBPACK_IMPORTED_MODULE_11__["default"]).component('Card', primevue_card__WEBPACK_IMPORTED_MODULE_14__["default"]).component('Calendar', primevue_calendar__WEBPACK_IMPORTED_MODULE_13__["default"]).component('Column', primevue_column__WEBPACK_IMPORTED_MODULE_15__["default"]).component('DataTable', primevue_datatable__WEBPACK_IMPORTED_MODULE_16__["default"]).component('Dialog', primevue_dialog__WEBPACK_IMPORTED_MODULE_17__["default"]).component('Divider', primevue_divider__WEBPACK_IMPORTED_MODULE_18__["default"]).component('Dropdown', primevue_dropdown__WEBPACK_IMPORTED_MODULE_19__["default"]).component('Editor', primevue_editor__WEBPACK_IMPORTED_MODULE_20__["default"]).component('InputNumber', primevue_inputnumber__WEBPACK_IMPORTED_MODULE_21__["default"]).component('InputText', primevue_inputtext__WEBPACK_IMPORTED_MODULE_22__["default"]).component('Message', primevue_message__WEBPACK_IMPORTED_MODULE_23__["default"]).component('Paginator', primevue_paginator__WEBPACK_IMPORTED_MODULE_24__["default"]).component('Password', primevue_password__WEBPACK_IMPORTED_MODULE_25__["default"]).component('TabView', primevue_tabview__WEBPACK_IMPORTED_MODULE_27__["default"]).component('TabPanel', primevue_tabpanel__WEBPACK_IMPORTED_MODULE_28__["default"]).mount(el);
+    }).directive('styleclass', primevue_styleclass__WEBPACK_IMPORTED_MODULE_9__["default"]).directive('ripple', primevue_ripple__WEBPACK_IMPORTED_MODULE_27__["default"]).directive('tooltip', primevue_tooltip__WEBPACK_IMPORTED_MODULE_30__["default"]).component('AutoComplete', primevue_autocomplete__WEBPACK_IMPORTED_MODULE_10__["default"]).component('Button', primevue_button__WEBPACK_IMPORTED_MODULE_12__["default"]).component('Badge', primevue_badge__WEBPACK_IMPORTED_MODULE_11__["default"]).component('Card', primevue_card__WEBPACK_IMPORTED_MODULE_14__["default"]).component('Calendar', primevue_calendar__WEBPACK_IMPORTED_MODULE_13__["default"]).component('Chart', primevue_chart__WEBPACK_IMPORTED_MODULE_15__["default"]).component('Column', primevue_column__WEBPACK_IMPORTED_MODULE_16__["default"]).component('DataTable', primevue_datatable__WEBPACK_IMPORTED_MODULE_17__["default"]).component('Dialog', primevue_dialog__WEBPACK_IMPORTED_MODULE_18__["default"]).component('Divider', primevue_divider__WEBPACK_IMPORTED_MODULE_19__["default"]).component('Dropdown', primevue_dropdown__WEBPACK_IMPORTED_MODULE_20__["default"]).component('Editor', primevue_editor__WEBPACK_IMPORTED_MODULE_21__["default"]).component('InputNumber', primevue_inputnumber__WEBPACK_IMPORTED_MODULE_22__["default"]).component('InputText', primevue_inputtext__WEBPACK_IMPORTED_MODULE_23__["default"]).component('Message', primevue_message__WEBPACK_IMPORTED_MODULE_24__["default"]).component('Paginator', primevue_paginator__WEBPACK_IMPORTED_MODULE_25__["default"]).component('Password', primevue_password__WEBPACK_IMPORTED_MODULE_26__["default"]).component('TabView', primevue_tabview__WEBPACK_IMPORTED_MODULE_28__["default"]).component('TabPanel', primevue_tabpanel__WEBPACK_IMPORTED_MODULE_29__["default"]).mount(el);
   }
 });
 _inertiajs_progress__WEBPACK_IMPORTED_MODULE_7__.InertiaProgress.init({

@@ -1,5 +1,9 @@
 export default [
   {
+    label: 'Home',
+    items: [{ label: 'Dashboard', icon: 'pi pi-home', to: '/dashboards', component: 'home/Index' }],
+  },
+  {
     label: 'Menu',
     items: [
       { label: 'Transaksi', icon: 'pi pi-shopping-cart', to: '/transactions', component: 'transaction/Index' },

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LaundryController;
@@ -25,7 +26,9 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/', [TransactionController::class, 'index']);
+    Route::get('/', DashboardController::class);
+
+    Route::get('/dashboards', DashboardController::class);
 
     Route::delete('/users/block/{user}', [UserController::class, 'block'])->name('users.block');
     Route::post('/users/change-password/{user}', [UserController::class, 'changePassword'])->name('users.change-password');

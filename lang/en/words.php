@@ -17,5 +17,13 @@ return [
     'female' => 'Female',
     'income' => 'Income',
     'expense' => 'Expense',
+    'today' => 'Today',
+    'total' => 'Total',
+    'transaction' => 'Transaction',
+    'expense' => 'Expense',
+    'laundry_type' => 'Laundry Type',
+    'product_type' => 'Product Type',
+    'transaction_statistic' => 'Transaction Statistic',
+    'expense_statistic' => 'Expense Statistic',
 
 ];
