@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('password')->default(bcrypt('12345678'));
             $table->enum('gender_id', [1, 2]); // 1(female) 2(male)
             $table->foreignId('role_id')->constrained();
-            $table->foreignId('outlet_id')->constrained();
+            $table->foreignId('outlet_id')->nullable()->default(null)->constrained();
             $table->rememberToken();
             $table->timestamps();
         });

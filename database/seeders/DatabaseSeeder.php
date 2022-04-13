@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Database\Seeders\OutletSeeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\TransactionStatusSeeder;
 use Database\Seeders\UserSeeder;
@@ -20,7 +19,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DiscountSeeder::class,
             TransactionStatusSeeder::class,
-            OutletSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
         ]);

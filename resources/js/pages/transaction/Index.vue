@@ -143,8 +143,6 @@ const overlayToggle = (event, data) => {
 
   overlayMenu.value.toggle(event)
 }
-
-const isAdmin = computed(() => usePage().props.value.isAdmin)
 </script>
 
 <template>
@@ -177,9 +175,8 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
                   :manual-input="false"
                 />
               </div>
-              <div class="col-12 md:col-3">
+              <div v-if="$page.props.auth.user.role_id === 1" class="col-12 md:col-3">
                 <Dropdown
-                  v-if="isAdmin"
                   class="w-full"
                   placeholder="pilih outlet..."
                   v-model="filterForm.outlet"
@@ -193,7 +190,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
               </div>
             </div>
           </div>
-          <div class="col-12 md:col-4 flex justify-content-end">
+          <div v-if="$page.props.auth.user.role_id !== 1" class="col-12 md:col-4 flex justify-content-end">
             <AppButton
               label="Tambah Transaksi"
               class="p-button-outlined md:w-16rem"

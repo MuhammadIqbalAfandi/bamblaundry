@@ -6,6 +6,7 @@ use App\Exports\TransactionExport;
 use App\Models\Outlet;
 use App\Models\Transaction;
 use App\Services\TransactionService;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Controller;
 use Inertia\Inertia;
 
@@ -18,6 +19,12 @@ class ReportTransactionController extends Controller
      */
     public function index()
     {
+        if (Gate::allows('isOutletHead')) {
+            request()->merge(['outlet' => request()->user()->outlet_id]);
+        } else if (Gate::allows('isEmployee')) {
+            request()->merge(['outlet' => request()->user()->outlet_id]);
+        }
+
         $transactions = Transaction::filter(request()->only('startDate', 'endDate', 'outlet'))
             ->get()
             ->groupBy('created_at')

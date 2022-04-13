@@ -9,6 +9,7 @@ use App\Models\Outlet;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ExpenseController extends Controller
@@ -20,6 +21,12 @@ class ExpenseController extends Controller
      */
     public function index()
     {
+        if (Gate::allows('isOutletHead')) {
+            request()->merge(['outlet' => request()->user()->outlet_id]);
+        } else if (Gate::allows('isEmployee')) {
+            request()->merge(['outlet' => request()->user()->outlet_id]);
+        }
+
         return inertia('expense/Index', [
             'filters' => request()->all('startDate', 'endDate', 'outlet'),
             'expenses' => Expense::filter(request()->only('startDate', 'endDate', 'outlet'))

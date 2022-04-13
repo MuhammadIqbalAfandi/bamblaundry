@@ -76,7 +76,7 @@ watch(errors, () => {
                 />
               </div>
 
-              <div class="col-12 md:col-6">
+              <div v-if="user.role_id !== 1" class="col-12 md:col-6">
                 <AppDropdown
                   label="Hak Akses"
                   placeholder="Pilih satu"
@@ -86,7 +86,7 @@ watch(errors, () => {
                 />
               </div>
 
-              <div class="col-12 md:col-6">
+              <div v-if="user.role_id !== 1" class="col-12 md:col-6">
                 <AppDropdown
                   label="Outlet"
                   placeholder="Pilih satu"
@@ -109,7 +109,12 @@ watch(errors, () => {
                 @cancel="onCancel"
               />
 
-              <Button label="Hapus" icon="pi pi-trash" class="p-button-outlined p-button-danger" @click="confirmDialog" />
+              <Button
+                label="Hapus"
+                icon="pi pi-trash"
+                class="p-button-outlined p-button-danger"
+                @click="confirmDialog"
+              />
 
               <div class="flex flex-column sm:flex-row align-items-center sm:justify-content-center">
                 <AppButton

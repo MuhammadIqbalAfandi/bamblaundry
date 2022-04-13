@@ -9,7 +9,6 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\Outlet;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -21,10 +20,6 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (!Auth::user()->hasRole('Admin')) {
-            return inertia('Access');
-        }
-
         return inertia('user/Index', [
             'filters' => request()->all('search'),
             'users' => User::filter(request()->only('search'))
@@ -38,7 +33,7 @@ class UserController extends Controller
                     'email' => $user->email,
                     'gender' => $user->gender_id,
                     'role' => $user->role->name,
-                    'outlet' => $user->outlet->name,
+                    'outlet' => $user->outlet->name ?? '',
                     'status' => $user->status,
                 ]),
         ]);
@@ -51,10 +46,6 @@ class UserController extends Controller
      */
     public function create()
     {
-        if (!Auth::user()->hasRole('Admin')) {
-            return inertia('Access');
-        }
-
         return inertia('user/Create', [
             'roles' => Role::whereNotIn('id', [1])
                 ->get()
@@ -131,10 +122,6 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        if (!Auth::user()->hasRole('Admin')) {
-            return inertia('Access');
-        }
-
         return inertia('user/Edit', [
             'user' => [
                 'id' => $user->id,
@@ -218,11 +205,11 @@ class UserController extends Controller
      */
     public function changePassword(ChangePasswordRequest $request)
     {
-        if (!Hash::check($request->old_password, auth()->user()->password)) {
+        if (!Hash::check($request->old_password, $request->user()->password)) {
             return back()->with('error', __('messages.error.store.change-password'));
         }
 
-        auth()->user()->update(['password' => bcrypt($request->new_password)]);
+        $request->user()->update(['password' => bcrypt($request->new_password)]);
 
         return back()->with('success', __('messages.success.update.change-password'));
     }

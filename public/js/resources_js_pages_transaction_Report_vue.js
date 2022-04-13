@@ -302,15 +302,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
-/* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
-/* harmony import */ var _components_AppTopBar_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/components/AppTopBar.vue */ "./resources/js/components/AppTopBar.vue");
-/* harmony import */ var _components_AppSidebar_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/components/AppSidebar.vue */ "./resources/js/components/AppSidebar.vue");
-/* harmony import */ var _components_AppFooter_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/components/AppFooter.vue */ "./resources/js/components/AppFooter.vue");
-/* harmony import */ var _components_AppMessage_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/components/AppMessage.vue */ "./resources/js/components/AppMessage.vue");
-/* harmony import */ var _utils_menu__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/utils/menu */ "./resources/js/utils/menu.js");
-/* harmony import */ var _utils_menu_admin__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/utils/menu-admin */ "./resources/js/utils/menu-admin.js");
-
-
+/* harmony import */ var _components_AppTopBar_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/components/AppTopBar.vue */ "./resources/js/components/AppTopBar.vue");
+/* harmony import */ var _components_AppSidebar_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/components/AppSidebar.vue */ "./resources/js/components/AppSidebar.vue");
+/* harmony import */ var _components_AppFooter_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/components/AppFooter.vue */ "./resources/js/components/AppFooter.vue");
+/* harmony import */ var _components_AppMessage_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/components/AppMessage.vue */ "./resources/js/components/AppMessage.vue");
+/* harmony import */ var _utils_menu__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/utils/menu */ "./resources/js/utils/menu.js");
 
 
 
@@ -353,9 +349,6 @@ __webpack_require__.r(__webpack_exports__);
       menuClick.value = false;
     };
 
-    var isAdmin = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
-      return (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.usePage)().props.value.isAdmin;
-    });
     var __returned__ = {
       containerClass: containerClass,
       mobileMenuActive: mobileMenuActive,
@@ -364,16 +357,13 @@ __webpack_require__.r(__webpack_exports__);
       isDesktop: isDesktop,
       onMenuToggle: onMenuToggle,
       onWrapperClick: onWrapperClick,
-      isAdmin: isAdmin,
       ref: vue__WEBPACK_IMPORTED_MODULE_0__.ref,
       computed: vue__WEBPACK_IMPORTED_MODULE_0__.computed,
-      usePage: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.usePage,
-      AppTopBar: _components_AppTopBar_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-      AppSidebar: _components_AppSidebar_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
-      AppFooter: _components_AppFooter_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
-      AppMessage: _components_AppMessage_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
-      menu: _utils_menu__WEBPACK_IMPORTED_MODULE_6__["default"],
-      menuAdmin: _utils_menu_admin__WEBPACK_IMPORTED_MODULE_7__["default"]
+      AppTopBar: _components_AppTopBar_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
+      AppSidebar: _components_AppSidebar_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+      AppFooter: _components_AppFooter_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
+      AppMessage: _components_AppMessage_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
+      menu: _utils_menu__WEBPACK_IMPORTED_MODULE_5__["default"]
     };
     Object.defineProperty(__returned__, '__isScriptSetup', {
       enumerable: false,
@@ -479,15 +469,11 @@ __webpack_require__.r(__webpack_exports__);
     };
 
     var exportExcelLink = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)('/reports/transactions/export/excel');
-    var isAdmin = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
-      return (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.usePage)().props.value.isAdmin;
-    });
     var __returned__ = {
       props: props,
       filterForm: filterForm,
       filterReset: filterReset,
       exportExcelLink: exportExcelLink,
-      isAdmin: isAdmin,
       watch: vue__WEBPACK_IMPORTED_MODULE_0__.watch,
       computed: vue__WEBPACK_IMPORTED_MODULE_0__.computed,
       onMounted: vue__WEBPACK_IMPORTED_MODULE_0__.onMounted,
@@ -1100,7 +1086,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppTopBar"], {
     onMenuToggle: $setup.onMenuToggle
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppSidebar"], {
-    model: $setup.isAdmin ? $setup.menuAdmin : $setup.menu
+    model: $setup.menu[_ctx.$page.props.auth.user.role_id]
   }, null, 8
   /* PROPS */
   , ["model"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppMessage"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppFooter"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
@@ -1150,6 +1136,7 @@ var _hoisted_5 = {
   "class": "col-12 md:col-4"
 };
 var _hoisted_6 = {
+  key: 0,
   "class": "col-12 md:col-4"
 };
 var _hoisted_7 = {
@@ -1193,8 +1180,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "manual-input": false
           }, null, 8
           /* PROPS */
-          , ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [$setup.isAdmin ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Dropdown, {
-            key: 0,
+          , ["modelValue"])]), _ctx.$page.props.auth.user.role_id === 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Dropdown, {
             "class": "w-full",
             placeholder: "pilih outlet...",
             modelValue: $setup.filterForm.outlet,
@@ -1206,7 +1192,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             options: $props.outlets
           }, null, 8
           /* PROPS */
-          , ["modelValue", "options"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
+          , ["modelValue", "options"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "reset",
             "class": "p-button-link",
             onClick: $setup.filterReset
@@ -1328,92 +1314,6 @@ var TransactionReportTable = [{
 
 /***/ }),
 
-/***/ "./resources/js/utils/menu-admin.js":
-/*!******************************************!*\
-  !*** ./resources/js/utils/menu-admin.js ***!
-  \******************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
-  label: 'Home',
-  items: [{
-    label: 'Dashboard',
-    icon: 'pi pi-home',
-    to: '/dashboards',
-    component: 'home/Index'
-  }]
-}, {
-  label: 'Menu',
-  items: [{
-    label: 'Transaksi',
-    icon: 'pi pi-shopping-cart',
-    to: '/transactions',
-    component: 'transaction/Index'
-  }, {
-    label: 'Pengeluaran',
-    icon: 'pi pi-wallet',
-    to: '/expenses',
-    component: 'expense/Index'
-  }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
-    items: [{
-      label: 'Mutasi',
-      icon: 'pi pi-circle',
-      to: '/reports/mutations',
-      component: 'mutation/Report'
-    }, {
-      label: 'Transaksi',
-      icon: 'pi pi-circle',
-      to: '/reports/transactions',
-      component: 'transaction/Report'
-    }]
-  }]
-}, {
-  label: 'Master',
-  items: [{
-    label: 'User',
-    icon: 'pi pi-user',
-    to: '/users',
-    component: 'user/Index'
-  }, {
-    label: 'Customer',
-    icon: 'pi pi-users',
-    to: '/customers',
-    component: 'customer/Index'
-  }, {
-    label: 'Outlet',
-    icon: 'pi pi-share-alt',
-    to: '/outlets',
-    component: 'outlet/Index'
-  }, {
-    label: 'Laundry',
-    icon: 'pi pi-table',
-    to: '/laundries',
-    component: 'laundry/Index'
-  }, {
-    label: 'Product',
-    icon: 'pi pi-table',
-    to: '/products',
-    component: 'product/Index'
-  }]
-}, {
-  label: 'Pengaturan',
-  items: [{
-    label: 'Diskon',
-    icon: 'pi pi-percentage',
-    to: '/discounts',
-    component: 'discount/Index'
-  }]
-}]);
-
-/***/ }),
-
 /***/ "./resources/js/utils/menu.js":
 /*!************************************!*\
   !*** ./resources/js/utils/menu.js ***!
@@ -1425,60 +1325,189 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([{
-  label: 'Home',
-  items: [{
-    label: 'Dashboard',
-    icon: 'pi pi-home',
-    to: '/dashboards',
-    component: 'home/Index'
-  }]
-}, {
-  label: 'Menu',
-  items: [{
-    label: 'Transaksi',
-    icon: 'pi pi-shopping-cart',
-    to: '/transactions',
-    component: 'transaction/Index'
-  }, {
-    label: 'Pengeluaran',
-    icon: 'pi pi-wallet',
-    to: '/expenses',
-    component: 'expense/Index'
-  }, {
-    label: 'Laporan',
-    icon: 'pi pi-book',
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  // Owner
+  1: [{
+    label: 'Home',
     items: [{
-      label: 'Mutasi',
-      icon: 'pi pi-circle',
-      to: '/reports/mutations',
-      component: 'mutation/Report'
-    }, {
+      label: 'Dashboard',
+      icon: 'pi pi-home',
+      to: '/dashboards',
+      component: 'home/Index'
+    }]
+  }, {
+    label: 'Menu',
+    items: [{
       label: 'Transaksi',
-      icon: 'pi pi-circle',
-      to: '/reports/transactions',
-      component: 'transaction/Report'
+      icon: 'pi pi-shopping-cart',
+      to: '/transactions',
+      component: 'transaction/Index'
+    }, {
+      label: 'Pengeluaran',
+      icon: 'pi pi-wallet',
+      to: '/expenses',
+      component: 'expense/Index'
+    }, {
+      label: 'Laporan',
+      icon: 'pi pi-book',
+      items: [{
+        label: 'Mutasi',
+        icon: 'pi pi-circle',
+        to: '/reports/mutations',
+        component: 'mutation/Report'
+      }, {
+        label: 'Transaksi',
+        icon: 'pi pi-circle',
+        to: '/reports/transactions',
+        component: 'transaction/Report'
+      }]
+    }]
+  }, {
+    label: 'Master',
+    items: [{
+      label: 'User',
+      icon: 'pi pi-user',
+      to: '/users',
+      component: 'user/Index'
+    }, {
+      label: 'Customer',
+      icon: 'pi pi-users',
+      to: '/customers',
+      component: 'customer/Index'
+    }, {
+      label: 'Outlet',
+      icon: 'pi pi-share-alt',
+      to: '/outlets',
+      component: 'outlet/Index'
+    }, {
+      label: 'Laundry',
+      icon: 'pi pi-table',
+      to: '/laundries',
+      component: 'laundry/Index'
+    }, {
+      label: 'Product',
+      icon: 'pi pi-table',
+      to: '/products',
+      component: 'product/Index'
+    }]
+  }, {
+    label: 'Pengaturan',
+    items: [{
+      label: 'Diskon',
+      icon: 'pi pi-percentage',
+      to: '/discounts',
+      component: 'discount/Index'
+    }]
+  }],
+  // Head Outlet
+  2: [{
+    label: 'Home',
+    items: [{
+      label: 'Dashboard',
+      icon: 'pi pi-home',
+      to: '/dashboards',
+      component: 'home/Index'
+    }]
+  }, {
+    label: 'Menu',
+    items: [{
+      label: 'Transaksi',
+      icon: 'pi pi-shopping-cart',
+      to: '/transactions',
+      component: 'transaction/Index'
+    }, {
+      label: 'Pengeluaran',
+      icon: 'pi pi-wallet',
+      to: '/expenses',
+      component: 'expense/Index'
+    }, {
+      label: 'Laporan',
+      icon: 'pi pi-book',
+      items: [{
+        label: 'Mutasi',
+        icon: 'pi pi-circle',
+        to: '/reports/mutations',
+        component: 'mutation/Report'
+      }, {
+        label: 'Transaksi',
+        icon: 'pi pi-circle',
+        to: '/reports/transactions',
+        component: 'transaction/Report'
+      }]
+    }]
+  }, {
+    label: 'Master',
+    items: [{
+      label: 'Customer',
+      icon: 'pi pi-users',
+      to: '/customers',
+      component: 'customer/Index'
+    }, {
+      label: 'Laundry',
+      icon: 'pi pi-table',
+      to: '/laundries',
+      component: 'laundry/Index'
+    }, {
+      label: 'Product',
+      icon: 'pi pi-table',
+      to: '/products',
+      component: 'product/Index'
+    }]
+  }, {
+    label: 'Pengaturan',
+    items: [{
+      label: 'Diskon',
+      icon: 'pi pi-percentage',
+      to: '/discounts',
+      component: 'discount/Index'
+    }]
+  }],
+  // Employee
+  3: [{
+    label: 'Home',
+    items: [{
+      label: 'Dashboard',
+      icon: 'pi pi-home',
+      to: '/dashboards',
+      component: 'home/Index'
+    }]
+  }, {
+    label: 'Menu',
+    items: [{
+      label: 'Transaksi',
+      icon: 'pi pi-shopping-cart',
+      to: '/transactions',
+      component: 'transaction/Index'
+    }, {
+      label: 'Pengeluaran',
+      icon: 'pi pi-wallet',
+      to: '/expenses',
+      component: 'expense/Index'
+    }, {
+      label: 'Laporan',
+      icon: 'pi pi-book',
+      items: [{
+        label: 'Mutasi',
+        icon: 'pi pi-circle',
+        to: '/reports/mutations',
+        component: 'mutation/Report'
+      }, {
+        label: 'Transaksi',
+        icon: 'pi pi-circle',
+        to: '/reports/transactions',
+        component: 'transaction/Report'
+      }]
+    }]
+  }, {
+    label: 'Master',
+    items: [{
+      label: 'Customer',
+      icon: 'pi pi-users',
+      to: '/customers',
+      component: 'customer/Index'
     }]
   }]
-}, {
-  label: 'Master',
-  items: [{
-    label: 'Customer',
-    icon: 'pi pi-users',
-    to: '/customers',
-    component: 'customer/Index'
-  }, {
-    label: 'Laundry',
-    icon: 'pi pi-table',
-    to: '/laundries',
-    component: 'laundry/Index'
-  }, {
-    label: 'Product',
-    icon: 'pi pi-table',
-    to: '/products',
-    component: 'product/Index'
-  }]
-}]);
+});
 
 /***/ }),
 

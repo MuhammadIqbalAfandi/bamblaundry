@@ -57553,14 +57553,6 @@ function compileToFunction(template, options) {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var map = {
-	"./Access": [
-		"./resources/js/pages/Access.vue",
-		"resources_js_pages_Access_vue"
-	],
-	"./Access.vue": [
-		"./resources/js/pages/Access.vue",
-		"resources_js_pages_Access_vue"
-	],
 	"./auth/ForgotPassword": [
 		"./resources/js/pages/auth/ForgotPassword.vue",
 		"resources_js_pages_auth_ForgotPassword_vue"
@@ -57632,6 +57624,14 @@ var map = {
 	"./discount/Index.vue": [
 		"./resources/js/pages/discount/Index.vue",
 		"resources_js_pages_discount_Index_vue"
+	],
+	"./error/403": [
+		"./resources/js/pages/error/403.vue",
+		"resources_js_pages_error_403_vue"
+	],
+	"./error/403.vue": [
+		"./resources/js/pages/error/403.vue",
+		"resources_js_pages_error_403_vue"
 	],
 	"./expense/Create": [
 		"./resources/js/pages/expense/Create.vue",
@@ -57982,7 +57982,7 @@ module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"P
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "js/" + chunkId + ".js?id=" + {"node_modules_chart_js_auto_auto_esm_js":"10c6b388645ceb22","resources_js_pages_Access_vue":"a18ed856923fae52","resources_js_pages_auth_ForgotPassword_vue":"c9f401672b6f2423","resources_js_pages_auth_Login_vue":"cb0cb153b976d2c1","resources_js_pages_auth_ResetPassword_vue":"1078df5cebf2e3c6","resources_js_pages_auth_VerifyEmail_vue":"a0ee23b849c826b1","resources_js_pages_customer_Create_vue":"4eb00b7c0775dd1a","resources_js_pages_customer_Edit_vue":"407b38d3ec33b8b6","resources_js_pages_customer_Index_vue":"eafddf3436e2b29d","resources_js_pages_customer_TableHeader_js":"71be5afdca048a9c","resources_js_pages_discount_Index_vue":"327c24c11bd53001","resources_js_pages_expense_Create_vue":"9f6647ce9c66b103","resources_js_pages_expense_Index_vue":"a5e56c318045f4f1","resources_js_pages_expense_Show_vue":"0c0ebfedc527579a","resources_js_pages_expense_TableHeader_js":"72e3dee74175b1c0","resources_js_pages_home_Index_vue":"566746c84bea4d9c","resources_js_pages_laundry_Create_vue":"17d4fff3f6a0d4e0","resources_js_pages_laundry_Edit_vue":"fe0751be3876e35b","resources_js_pages_laundry_Index_vue":"25198930a0d0f20d","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Report_vue":"f819d667c2cadeb7","resources_js_pages_mutation_TableHeader_js":"82c2999bd7d098a1","resources_js_pages_outlet_Create_vue":"0326fbf87091b62e","resources_js_pages_outlet_Edit_vue":"6dd0ae9ed18a73a6","resources_js_pages_outlet_Index_vue":"cb5a9b7dfa2a0b91","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_product_Create_vue":"96daef068f670441","resources_js_pages_product_Edit_vue":"826dfb5798505c8c","resources_js_pages_product_Index_vue":"f5218c4863b86c19","resources_js_pages_product_TableHeader_js":"b8eaaa9de25a2322","resources_js_pages_transaction_Create_vue":"6008f897e5067e30","resources_js_pages_transaction_Index_vue":"19eb0dbf87a58e45","resources_js_pages_transaction_Report_vue":"ecb8a20a69a65ae7","resources_js_pages_transaction_Show_vue":"ac25925f62d145de","resources_js_pages_transaction_TableHeader_js":"be63e672e103818b","resources_js_pages_user_Create_vue":"21f3591e9d0b4199","resources_js_pages_user_Edit_vue":"76820bdf6c8bfc24","resources_js_pages_user_Index_vue":"4433ed4ee64b6df6","resources_js_pages_user_Show_vue":"b8e5b5a526f42dbd","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
+/******/ 			return "js/" + chunkId + ".js?id=" + {"node_modules_chart_js_auto_auto_esm_js":"10c6b388645ceb22","resources_js_pages_auth_ForgotPassword_vue":"c9f401672b6f2423","resources_js_pages_auth_Login_vue":"cb0cb153b976d2c1","resources_js_pages_auth_ResetPassword_vue":"1078df5cebf2e3c6","resources_js_pages_auth_VerifyEmail_vue":"a0ee23b849c826b1","resources_js_pages_customer_Create_vue":"561d6fe4182be011","resources_js_pages_customer_Edit_vue":"d5ee193500d6f904","resources_js_pages_customer_Index_vue":"b9dbbd1944dce6af","resources_js_pages_customer_TableHeader_js":"71be5afdca048a9c","resources_js_pages_discount_Index_vue":"6cc73a3522285ff2","resources_js_pages_error_403_vue":"c50d0857d1b86c44","resources_js_pages_expense_Create_vue":"f09c1c439353cf32","resources_js_pages_expense_Index_vue":"1cc7ff83844782c7","resources_js_pages_expense_Show_vue":"8f1af2beaf6b7e98","resources_js_pages_expense_TableHeader_js":"72e3dee74175b1c0","resources_js_pages_home_Index_vue":"2e57fa80a6bfbb71","resources_js_pages_laundry_Create_vue":"2055c744774bbd67","resources_js_pages_laundry_Edit_vue":"6e10e259467ca214","resources_js_pages_laundry_Index_vue":"475a922321c132fe","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Report_vue":"6a8673c2755e2584","resources_js_pages_mutation_TableHeader_js":"82c2999bd7d098a1","resources_js_pages_outlet_Create_vue":"3cabaefb0e8b66d6","resources_js_pages_outlet_Edit_vue":"7c82d756894f5a8b","resources_js_pages_outlet_Index_vue":"cf0b6e9d2e97aaba","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_product_Create_vue":"4dca5e63fe78748e","resources_js_pages_product_Edit_vue":"2d1386e600c8fb2c","resources_js_pages_product_Index_vue":"45ee91c3aaba3a6d","resources_js_pages_product_TableHeader_js":"b8eaaa9de25a2322","resources_js_pages_transaction_Create_vue":"74c505b88f81b040","resources_js_pages_transaction_Index_vue":"6ec2c51b19bdc88b","resources_js_pages_transaction_Report_vue":"c5358859e0c9c931","resources_js_pages_transaction_Show_vue":"a15732326f571abe","resources_js_pages_transaction_TableHeader_js":"be63e672e103818b","resources_js_pages_user_Create_vue":"8a7bfbd7569a1ce0","resources_js_pages_user_Edit_vue":"5151c40acf8afd77","resources_js_pages_user_Index_vue":"cff9404fe7748b56","resources_js_pages_user_Show_vue":"f34ecd041690cfdb","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
 /******/ 		};
 /******/ 	})();
 /******/ 	

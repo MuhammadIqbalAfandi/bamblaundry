@@ -13,8 +13,8 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionStatus;
 use Exception;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class TransactionController extends Controller
@@ -26,15 +26,15 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        if (Auth::user()->hasRole('Admin')) {
-            $transactions = Transaction::latest();
-        } else {
-            $transactions = Transaction::where('outlet_id', Auth::user()->outlet_id)->latest();
+        if (Gate::allows('isOutletHead')) {
+            request()->merge(['outlet' => request()->user()->outlet_id]);
+        } else if (Gate::allows('isEmployee')) {
+            request()->merge(['outlet' => request()->user()->outlet_id]);
         }
 
         return inertia('transaction/Index', [
             'filters' => request()->all('search', 'startDate', 'endDate', 'outlet'),
-            'transactions' => $transactions
+            'transactions' => Transaction::latest()
                 ->filter(request()->only('search', 'startDate', 'endDate', 'outlet'))
                 ->latest()
                 ->paginate(10)

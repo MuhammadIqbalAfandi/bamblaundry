@@ -80,8 +80,6 @@ const linkReference = (data) => {
 }
 
 const exportExcelLink = ref('/reports/mutations/export/excel')
-
-const isAdmin = computed(() => usePage().props.value.isAdmin)
 </script>
 
 <template>
@@ -111,9 +109,8 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
                   :manual-input="false"
                 />
               </div>
-              <div class="col-12 md:col-4">
+              <div v-if="$page.props.auth.user.role_id === 1" class="col-12 md:col-4">
                 <Dropdown
-                  v-if="isAdmin"
                   class="w-full"
                   placeholder="pilih outlet..."
                   v-model="filterForm.outlet"

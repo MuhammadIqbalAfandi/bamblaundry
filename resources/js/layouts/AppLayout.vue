@@ -1,13 +1,11 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { usePage } from '@inertiajs/inertia-vue3'
 import AppTopBar from '@/components/AppTopBar.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
 import AppFooter from '@/components/AppFooter.vue'
 import AppMessage from '@/components/AppMessage.vue'
 
 import menu from '@/utils/menu'
-import menuAdmin from '@/utils/menu-admin'
 
 const containerClass = computed(() => {
   return [
@@ -45,8 +43,6 @@ const onWrapperClick = () => {
 
   menuClick.value = false
 }
-
-const isAdmin = computed(() => usePage().props.value.isAdmin)
 </script>
 
 <template>
@@ -54,7 +50,7 @@ const isAdmin = computed(() => usePage().props.value.isAdmin)
     <AppTopBar @menu-toggle="onMenuToggle" />
 
     <div class="layout-sidebar">
-      <AppSidebar :model="isAdmin ? menuAdmin : menu" />
+      <AppSidebar :model="menu[$page.props.auth.user.role_id]" />
     </div>
 
     <div class="layout-main-container">

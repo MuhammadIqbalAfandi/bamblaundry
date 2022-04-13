@@ -6,6 +6,7 @@ use App\Exports\MutationExport;
 use App\Http\Controllers\Controller;
 use App\Models\Mutation;
 use App\Models\Outlet;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ReportMutationController extends Controller
@@ -17,6 +18,12 @@ class ReportMutationController extends Controller
      */
     public function index()
     {
+        if (Gate::allows('isOutletHead')) {
+            request()->merge(['outlet' => request()->user()->outlet_id]);
+        } else if (Gate::allows('isEmployee')) {
+            request()->merge(['outlet' => request()->user()->outlet_id]);
+        }
+
         return inertia('mutation/Report', [
             'filters' => request()->all('startDate', 'endDate', 'outlet'),
             'mutations' => Inertia::lazy(
