@@ -3,8 +3,9 @@
 namespace App\Services;
 
 use App\Services\CurrencyFormatService;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection as SupportCollection;
 
 class TransactionService
 {
@@ -22,18 +23,30 @@ class TransactionService
         ]);
     }
 
-    public function totalPrice(Collection $collections)
+    public function totalPrice(EloquentCollection $collections)
     {
         return $collections->transform(fn($transactions) => $transactions->totalPrice());
     }
 
-    public function totalPriceGroup(Collection $collections)
+    public function totalPriceGroup(EloquentCollection $collections)
     {
         return $this->totalPrice($collections)->sum();
     }
 
-    public function totalPriceGroupAsString(Collection $collections)
+    public function totalPriceGroupAsString(EloquentCollection $collections)
     {
         return (new CurrencyFormatService)->setRupiahFormat($this->totalPriceGroup($collections), true);
+    }
+
+    public function totalPerMonth(EloquentCollection $collections)
+    {
+        return $collections->transform(fn($collection) => $collection->count());
+    }
+
+    public function statisticData(SupportCollection $collections)
+    {
+        $collections = $collections->take(-2);
+        $collections->transform(fn($collections) => $this->totalPerMonth($collections));
+        return $collections;
     }
 }

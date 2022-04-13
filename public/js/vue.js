@@ -8679,8 +8679,17 @@ function warn(msg, ...args) {
 let activeEffectScope;
 class EffectScope {
     constructor(detached = false) {
+        /**
+         * @internal
+         */
         this.active = true;
+        /**
+         * @internal
+         */
         this.effects = [];
+        /**
+         * @internal
+         */
         this.cleanups = [];
         if (!detached && activeEffectScope) {
             this.parent = activeEffectScope;
@@ -8690,21 +8699,30 @@ class EffectScope {
     }
     run(fn) {
         if (this.active) {
+            const currentEffectScope = activeEffectScope;
             try {
                 activeEffectScope = this;
                 return fn();
             }
             finally {
-                activeEffectScope = this.parent;
+                activeEffectScope = currentEffectScope;
             }
         }
         else if ((true)) {
             warn(`cannot run an inactive effect scope.`);
         }
     }
+    /**
+     * This should only be called on non-detached scopes
+     * @internal
+     */
     on() {
         activeEffectScope = this;
     }
+    /**
+     * This should only be called on non-detached scopes
+     * @internal
+     */
     off() {
         activeEffectScope = this.parent;
     }
@@ -8933,9 +8951,7 @@ function trackEffects(dep, debuggerEventExtraInfo) {
         dep.add(activeEffect);
         activeEffect.deps.push(dep);
         if (( true) && activeEffect.onTrack) {
-            activeEffect.onTrack(Object.assign({
-                effect: activeEffect
-            }, debuggerEventExtraInfo));
+            activeEffect.onTrack(Object.assign({ effect: activeEffect }, debuggerEventExtraInfo));
         }
     }
 }
@@ -11654,13 +11670,11 @@ function watchEffect(effect, options) {
 }
 function watchPostEffect(effect, options) {
     return doWatch(effect, null, (( true)
-        ? Object.assign(options || {}, { flush: 'post' })
-        : 0));
+        ? Object.assign(Object.assign({}, options), { flush: 'post' }) : 0));
 }
 function watchSyncEffect(effect, options) {
     return doWatch(effect, null, (( true)
-        ? Object.assign(options || {}, { flush: 'sync' })
-        : 0));
+        ? Object.assign(Object.assign({}, options), { flush: 'sync' }) : 0));
 }
 // initial value for watchers to trigger on undefined initial values
 const INITIAL_WATCHER_VALUE = {};
@@ -11975,7 +11989,9 @@ const BaseTransitionImpl = {
             // check mode
             if (( true) &&
                 mode &&
-                mode !== 'in-out' && mode !== 'out-in' && mode !== 'default') {
+                mode !== 'in-out' &&
+                mode !== 'out-in' &&
+                mode !== 'default') {
                 warn(`invalid <transition> mode: ${mode}`);
             }
             // at this point children has a guaranteed length of 1.
@@ -12202,20 +12218,24 @@ function setTransitionHooks(vnode, hooks) {
         vnode.transition = hooks;
     }
 }
-function getTransitionRawChildren(children, keepComment = false) {
+function getTransitionRawChildren(children, keepComment = false, parentKey) {
     let ret = [];
     let keyedFragmentCount = 0;
     for (let i = 0; i < children.length; i++) {
-        const child = children[i];
+        let child = children[i];
+        // #5360 inherit parent key in case of <template v-for>
+        const key = parentKey == null
+            ? child.key
+            : String(parentKey) + String(child.key != null ? child.key : i);
         // handle fragment children case, e.g. v-for
         if (child.type === Fragment) {
             if (child.patchFlag & 128 /* KEYED_FRAGMENT */)
                 keyedFragmentCount++;
-            ret = ret.concat(getTransitionRawChildren(child.children, keepComment));
+            ret = ret.concat(getTransitionRawChildren(child.children, keepComment, key));
         }
         // comment placeholders should be skipped, e.g. v-if
         else if (keepComment || child.type !== Comment) {
-            ret.push(child);
+            ret.push(key != null ? cloneVNode(child, { key }) : child);
         }
     }
     // #1126 if a transition children list contains multiple sub fragments, these
@@ -13185,6 +13205,10 @@ function updateProps(instance, rawProps, rawPrevProps, optimized) {
             const propsToUpdate = instance.vnode.dynamicProps;
             for (let i = 0; i < propsToUpdate.length; i++) {
                 let key = propsToUpdate[i];
+                // skip if the prop key is a declared emit event listener
+                if (isEmitListener(instance.emitsOptions, key)) {
+                    continue;
+                }
                 // PROPS flag guarantees rawProps to be non-null
                 const value = rawProps[key];
                 if (options) {
@@ -13710,7 +13734,8 @@ function withDirectives(vnode, directives) {
         ( true) && warn(`withDirectives can only be used inside render functions.`);
         return vnode;
     }
-    const instance = internalInstance.proxy;
+    const instance = getExposeProxy(internalInstance) ||
+        internalInstance.proxy;
     const bindings = vnode.dirs || (vnode.dirs = []);
     for (let i = 0; i < directives.length; i++) {
         let [dir, value, arg, modifiers = _vue_shared__WEBPACK_IMPORTED_MODULE_1__.EMPTY_OBJ] = directives[i];
@@ -13782,6 +13807,9 @@ function createAppContext() {
 let uid = 0;
 function createAppAPI(render, hydrate) {
     return function createApp(rootComponent, rootProps = null) {
+        if (!(0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.isFunction)(rootComponent)) {
+            rootComponent = Object.assign({}, rootComponent);
+        }
         if (rootProps != null && !(0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.isObject)(rootProps)) {
             ( true) && warn(`root props passed to app.mount() must be an object.`);
             rootProps = null;
@@ -13979,6 +14007,9 @@ function setRef(rawRef, oldRawRef, parentSuspense, vnode, isUnmount = false) {
                         if (!(0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.isArray)(existing)) {
                             if (_isString) {
                                 refs[ref] = [refValue];
+                                if ((0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.hasOwn)(setupState, ref)) {
+                                    setupState[ref] = refs[ref];
+                                }
                             }
                             else {
                                 ref.value = [refValue];
@@ -14355,7 +14386,7 @@ function startMeasure(instance, type) {
         perf.mark(`vue-${type}-${instance.uid}`);
     }
     if (true) {
-        devtoolsPerfStart(instance, type, supported ? perf.now() : Date.now());
+        devtoolsPerfStart(instance, type, isSupported() ? perf.now() : Date.now());
     }
 }
 function endMeasure(instance, type) {
@@ -14368,7 +14399,7 @@ function endMeasure(instance, type) {
         perf.clearMarks(endTag);
     }
     if (true) {
-        devtoolsPerfEnd(instance, type, supported ? perf.now() : Date.now());
+        devtoolsPerfEnd(instance, type, isSupported() ? perf.now() : Date.now());
     }
 }
 function isSupported() {
@@ -16793,9 +16824,10 @@ const PublicInstanceProxyHandlers = {
     },
     defineProperty(target, key, descriptor) {
         if (descriptor.get != null) {
-            this.set(target, key, descriptor.get(), null);
+            // invalidate key cache of a getter based property #5417
+            target.$.accessCache[key] = 0;
         }
-        else if (descriptor.value != null) {
+        else if ((0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.hasOwn)(descriptor, 'value')) {
             this.set(target, key, descriptor.value, null);
         }
         return Reflect.defineProperty(target, key, descriptor);
@@ -17686,7 +17718,7 @@ function isMemoSame(cached, memo) {
 }
 
 // Core API ------------------------------------------------------------------
-const version = "3.2.31";
+const version = "3.2.32";
 const _ssrUtils = {
     createComponentInstance,
     setupComponent,
@@ -57950,7 +57982,7 @@ module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"P
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "js/" + chunkId + ".js?id=" + {"node_modules_chart_js_auto_auto_esm_js":"10c6b388645ceb22","resources_js_pages_Access_vue":"a18ed856923fae52","resources_js_pages_auth_ForgotPassword_vue":"c9f401672b6f2423","resources_js_pages_auth_Login_vue":"cb0cb153b976d2c1","resources_js_pages_auth_ResetPassword_vue":"1078df5cebf2e3c6","resources_js_pages_auth_VerifyEmail_vue":"a0ee23b849c826b1","resources_js_pages_customer_Create_vue":"4eb00b7c0775dd1a","resources_js_pages_customer_Edit_vue":"407b38d3ec33b8b6","resources_js_pages_customer_Index_vue":"eafddf3436e2b29d","resources_js_pages_customer_TableHeader_js":"71be5afdca048a9c","resources_js_pages_discount_Index_vue":"327c24c11bd53001","resources_js_pages_expense_Create_vue":"9f6647ce9c66b103","resources_js_pages_expense_Index_vue":"a5e56c318045f4f1","resources_js_pages_expense_Show_vue":"0c0ebfedc527579a","resources_js_pages_expense_TableHeader_js":"72e3dee74175b1c0","resources_js_pages_home_Index_vue":"12befeb6d38abe88","resources_js_pages_laundry_Create_vue":"17d4fff3f6a0d4e0","resources_js_pages_laundry_Edit_vue":"fe0751be3876e35b","resources_js_pages_laundry_Index_vue":"25198930a0d0f20d","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Report_vue":"f819d667c2cadeb7","resources_js_pages_mutation_TableHeader_js":"82c2999bd7d098a1","resources_js_pages_outlet_Create_vue":"0326fbf87091b62e","resources_js_pages_outlet_Edit_vue":"6dd0ae9ed18a73a6","resources_js_pages_outlet_Index_vue":"cb5a9b7dfa2a0b91","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_product_Create_vue":"96daef068f670441","resources_js_pages_product_Edit_vue":"826dfb5798505c8c","resources_js_pages_product_Index_vue":"f5218c4863b86c19","resources_js_pages_product_TableHeader_js":"b8eaaa9de25a2322","resources_js_pages_transaction_Create_vue":"6008f897e5067e30","resources_js_pages_transaction_Index_vue":"19eb0dbf87a58e45","resources_js_pages_transaction_Report_vue":"ecb8a20a69a65ae7","resources_js_pages_transaction_Show_vue":"ac25925f62d145de","resources_js_pages_transaction_TableHeader_js":"be63e672e103818b","resources_js_pages_user_Create_vue":"21f3591e9d0b4199","resources_js_pages_user_Edit_vue":"76820bdf6c8bfc24","resources_js_pages_user_Index_vue":"4433ed4ee64b6df6","resources_js_pages_user_Show_vue":"b8e5b5a526f42dbd","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
+/******/ 			return "js/" + chunkId + ".js?id=" + {"node_modules_chart_js_auto_auto_esm_js":"10c6b388645ceb22","resources_js_pages_Access_vue":"a18ed856923fae52","resources_js_pages_auth_ForgotPassword_vue":"c9f401672b6f2423","resources_js_pages_auth_Login_vue":"cb0cb153b976d2c1","resources_js_pages_auth_ResetPassword_vue":"1078df5cebf2e3c6","resources_js_pages_auth_VerifyEmail_vue":"a0ee23b849c826b1","resources_js_pages_customer_Create_vue":"4eb00b7c0775dd1a","resources_js_pages_customer_Edit_vue":"407b38d3ec33b8b6","resources_js_pages_customer_Index_vue":"eafddf3436e2b29d","resources_js_pages_customer_TableHeader_js":"71be5afdca048a9c","resources_js_pages_discount_Index_vue":"327c24c11bd53001","resources_js_pages_expense_Create_vue":"9f6647ce9c66b103","resources_js_pages_expense_Index_vue":"a5e56c318045f4f1","resources_js_pages_expense_Show_vue":"0c0ebfedc527579a","resources_js_pages_expense_TableHeader_js":"72e3dee74175b1c0","resources_js_pages_home_Index_vue":"566746c84bea4d9c","resources_js_pages_laundry_Create_vue":"17d4fff3f6a0d4e0","resources_js_pages_laundry_Edit_vue":"fe0751be3876e35b","resources_js_pages_laundry_Index_vue":"25198930a0d0f20d","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Report_vue":"f819d667c2cadeb7","resources_js_pages_mutation_TableHeader_js":"82c2999bd7d098a1","resources_js_pages_outlet_Create_vue":"0326fbf87091b62e","resources_js_pages_outlet_Edit_vue":"6dd0ae9ed18a73a6","resources_js_pages_outlet_Index_vue":"cb5a9b7dfa2a0b91","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_product_Create_vue":"96daef068f670441","resources_js_pages_product_Edit_vue":"826dfb5798505c8c","resources_js_pages_product_Index_vue":"f5218c4863b86c19","resources_js_pages_product_TableHeader_js":"b8eaaa9de25a2322","resources_js_pages_transaction_Create_vue":"6008f897e5067e30","resources_js_pages_transaction_Index_vue":"19eb0dbf87a58e45","resources_js_pages_transaction_Report_vue":"ecb8a20a69a65ae7","resources_js_pages_transaction_Show_vue":"ac25925f62d145de","resources_js_pages_transaction_TableHeader_js":"be63e672e103818b","resources_js_pages_user_Create_vue":"21f3591e9d0b4199","resources_js_pages_user_Edit_vue":"76820bdf6c8bfc24","resources_js_pages_user_Index_vue":"4433ed4ee64b6df6","resources_js_pages_user_Show_vue":"b8e5b5a526f42dbd","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
 /******/ 		};
 /******/ 	})();
 /******/ 	

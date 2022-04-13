@@ -8,20 +8,43 @@ defineProps({
   chartStatistics: Object,
 })
 
-const basicData = ref({
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-  datasets: [
-    {
-      label: 'My First dataset',
-      backgroundColor: '#42A5F5',
-      data: [65, 59, 80, 81, 56, 55, 40],
+const chartData = (chartData) => {
+  const colors = ['#42A5F5', '#FFA726']
+
+  const data = {
+    datasets: [],
+  }
+
+  let id = 0
+  for (const key in chartData) {
+    data.datasets.push({
+      label: key,
+      backgroundColor: colors[id],
+      data: chartData[key],
+    })
+
+    id++
+  }
+
+  return data
+}
+
+const chartOptions = ref({
+  responsive: true,
+  maintainAspectRatio: false,
+  datasetFill: false,
+  scales: {
+    y: {
+      ticks: {
+        beginAtZero: true,
+        callback: function (label) {
+          if (Math.floor(label) === label) {
+            return label
+          }
+        },
+      },
     },
-    {
-      label: 'My Second dataset',
-      backgroundColor: '#FFA726',
-      data: [28, 48, 40, 19, 86, 27, 90],
-    },
-  ],
+  },
 })
 </script>
 
@@ -35,7 +58,7 @@ const basicData = ref({
           <template #content>
             <div class="flex justify-content-between mb-3">
               <div>
-                <span class="block text-500 font-medium mb-3">{{ cardStatistic.label }}</span>
+                <span class="block text-500 font-medium mb-3">{{ cardStatistic.title }}</span>
                 <div v-if="cardStatistic.value" class="text-900 font-medium text-xl">{{ cardStatistic.value }}</div>
               </div>
               <div
@@ -51,11 +74,11 @@ const basicData = ref({
         </Card>
       </div>
 
-      <div class="col-12 md:col-6">
+      <div v-for="chartStatistic in chartStatistics" class="col-12 md:col-6">
         <Card>
-          <template #title>Statistik Transaksi</template>
+          <template #title>{{ chartStatistic.title }}</template>
           <template #content>
-            <Chart type="bar" :data="basicData" />
+            <Chart type="bar" :data="chartData(chartStatistic.data)" :options="chartOptions" />
           </template>
         </Card>
       </div>

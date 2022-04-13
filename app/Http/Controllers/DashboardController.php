@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Services\ExpenseService;
 use App\Services\TransactionService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -26,30 +27,39 @@ class DashboardController extends Controller
         $laundries = Laundry::get();
         $products = Product::get();
 
+        $transactionChartStatistic = Transaction::get()->groupBy([
+            fn($transaction) => Carbon::parse($transaction->getRawOriginal('created_at'))->format('Y'),
+            fn($transaction) => Carbon::parse($transaction->getRawOriginal('created_at'))->format('M'),
+        ]);
+        $expenseChartStatistic = Expense::get()->groupBy([
+            fn($expense) => Carbon::parse($expense->getRawOriginal('created_at'))->format('Y'),
+            fn($expense) => Carbon::parse($expense->getRawOriginal('created_at'))->format('M'),
+        ]);
+
         return inertia('home/Index', [
             'cardStatistics' => [
                 [
-                    'label' => __('words.transaction'),
+                    'title' => __('words.transaction'),
                     'icon' => 'pi pi-shopping-cart',
                     'amount' => $transactions->count(),
                     'amountLabel' => __('words.today'),
                     'value' => (new TransactionService)->totalPriceGroupAsString($transactions),
                 ],
                 [
-                    'label' => __('words.expense'),
+                    'title' => __('words.expense'),
                     'icon' => 'pi pi-wallet',
                     'amount' => $expenses->count(),
                     'amountLabel' => __('words.today'),
                     'value' => (new ExpenseService)->totalPriceAsString($expenses),
                 ],
                 [
-                    'label' => __('words.laundry_type'),
+                    'title' => __('words.laundry_type'),
                     'icon' => 'pi pi-table',
                     'amountLabel' => __('words.total'),
                     'amount' => $laundries->count(),
                 ],
                 [
-                    'label' => __('words.product_type'),
+                    'title' => __('words.product_type'),
                     'icon' => 'pi pi-table',
                     'amountLabel' => __('words.total'),
                     'amount' => $products->count(),
@@ -57,8 +67,12 @@ class DashboardController extends Controller
             ],
             'chartStatistics' => [
                 [
-                    'label' => __('words.transaction_statistic'),
-                    'data' => $transactions->groupBy([])
+                    'title' => __('words.transaction_statistic'),
+                    'data' => (new TransactionService)->statisticData($transactionChartStatistic),
+                ],
+                [
+                    'title' => __('words.expense_statistic'),
+                    'data' => (new ExpenseService)->statisticData($expenseChartStatistic),
                 ],
             ],
         ]);

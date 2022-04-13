@@ -333,20 +333,46 @@ __webpack_require__.r(__webpack_exports__);
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
-    var basicData = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)({
-      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-      datasets: [{
-        label: 'My First dataset',
-        backgroundColor: '#42A5F5',
-        data: [65, 59, 80, 81, 56, 55, 40]
-      }, {
-        label: 'My Second dataset',
-        backgroundColor: '#FFA726',
-        data: [28, 48, 40, 19, 86, 27, 90]
-      }]
+
+    var chartData = function chartData(_chartData) {
+      var colors = ['#42A5F5', '#FFA726'];
+      var data = {
+        datasets: []
+      };
+      var id = 0;
+
+      for (var key in _chartData) {
+        data.datasets.push({
+          label: key,
+          backgroundColor: colors[id],
+          data: _chartData[key]
+        });
+        id++;
+      }
+
+      return data;
+    };
+
+    var chartOptions = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)({
+      responsive: true,
+      maintainAspectRatio: false,
+      datasetFill: false,
+      scales: {
+        y: {
+          ticks: {
+            beginAtZero: true,
+            callback: function callback(label) {
+              if (Math.floor(label) === label) {
+                return label;
+              }
+            }
+          }
+        }
+      }
     });
     var __returned__ = {
-      basicData: basicData,
+      chartData: chartData,
+      chartOptions: chartOptions,
       ref: vue__WEBPACK_IMPORTED_MODULE_0__.ref,
       Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.Head,
       AppLayout: _layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
@@ -886,9 +912,6 @@ var _hoisted_8 = {
 var _hoisted_9 = {
   "class": "col-12 md:col-6"
 };
-
-var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Statistik Transaksi");
-
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Card = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Card");
 
@@ -903,7 +926,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           "class": "h-full"
         }, {
           content: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(cardStatistic.label), 1
+            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(cardStatistic.title), 1
             /* TEXT */
             ), cardStatistic.value ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(cardStatistic.value), 1
             /* TEXT */
@@ -925,22 +948,31 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         )]);
       }), 256
       /* UNKEYED_FRAGMENT */
-      )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Card, null, {
-        title: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [_hoisted_10];
-        }),
-        content: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Chart, {
-            type: "bar",
-            data: $setup.basicData
-          }, null, 8
-          /* PROPS */
-          , ["data"])];
-        }),
-        _: 1
-        /* STABLE */
+      )), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.chartStatistics, function (chartStatistic) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Card, null, {
+          title: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(chartStatistic.title), 1
+            /* TEXT */
+            )];
+          }),
+          content: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Chart, {
+              type: "bar",
+              data: $setup.chartData(chartStatistic.data),
+              options: $setup.chartOptions
+            }, null, 8
+            /* PROPS */
+            , ["data", "options"])];
+          }),
+          _: 2
+          /* DYNAMIC */
 
-      })])])];
+        }, 1024
+        /* DYNAMIC_SLOTS */
+        )]);
+      }), 256
+      /* UNKEYED_FRAGMENT */
+      ))])];
     }),
     _: 1
     /* STABLE */
