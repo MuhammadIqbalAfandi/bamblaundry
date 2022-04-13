@@ -5,10 +5,10 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 try {
 
-    echo '> Starting server on ws://127.0.0.1:5544 ...', "\n";
+    echo '> Starting server on ws://103.157.96.20:5544 ...', "\n";
 
     $websocket = new Hoa\Websocket\Server(
-        new Hoa\Socket\Server('ws://127.0.0.1:5544')
+        new Hoa\Socket\Server('ws://103.157.96.20:5544')
     );
 
     $websocket->on('open', function (Hoa\Event\Bucket $bucket) {

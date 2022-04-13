@@ -5,7 +5,7 @@ require_once __DIR__ . '/ThermalPrinting.php';
 
 try {
     $socket = new Hoa\Websocket\Client(
-        new Hoa\Socket\Client('ws://43.230.131.149:5544')
+        new Hoa\Socket\Client('ws://103.157.96.20:5544')
     );
     $socket->setHost('escpos-server');
     $socket->on('message', function (\Hoa\Event\Bucket $bucket) {

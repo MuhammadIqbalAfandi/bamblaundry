@@ -155,7 +155,7 @@ class TransactionController extends Controller
             // $thermalPrinting->startPrinting(2);
             try {
                 $socket = new WebsocketClient(
-                    new SocketClient('ws://43.230.131.149:5544')
+                    new SocketClient('ws://103.157.96.20:5544')
                 );
                 $socket->setHost('escpos-server');
                 $socket->connect();
