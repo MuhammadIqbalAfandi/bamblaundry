@@ -23,10 +23,6 @@ const description = computed(() => {
     403: 'Sorry, you are forbidden from accessing this page.',
   }[props.status]
 })
-
-const back = () => {
-  window.history.back()
-}
 </script>
 
 <template>
@@ -57,7 +53,7 @@ const back = () => {
             <span class="text-600 text-center">{{ description }}</span>
             <div class="col-12 mt-5 text-center">
               <i class="pi pi-fw pi-arrow-left text-blue-500 mr-2" style="vertical-align: center"></i>
-              <Link href="#" class="text-blue-500" @click="back">Kembali ke Dashboard</Link>
+              <Link href="/" class="text-blue-500">Kembali ke Dashboard</Link>
             </div>
           </div>
         </div>

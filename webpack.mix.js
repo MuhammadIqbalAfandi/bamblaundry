@@ -15,7 +15,7 @@ mix
   .js('resources/js/vue.js', 'public/js')
   .webpackConfig(require('./webpack.config'))
   .vue()
-  .browserSync('http://bamslaundry.test/')
+  .browserSync('http://bambslaundry.test/')
   .disableNotifications()
 
 if (mix.inProduction()) {
