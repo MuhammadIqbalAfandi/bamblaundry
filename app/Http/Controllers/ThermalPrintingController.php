@@ -27,7 +27,7 @@ class ThermalPrintingController extends Controller
 
         try {
             $socket = new WebsocketClient(
-                new SocketClient('ws://127.0.0.1:5544')
+                new SocketClient('ws://103.157.96.20:5544')
             );
             $socket->setHost('escpos-server');
             $socket->connect();

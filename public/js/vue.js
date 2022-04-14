@@ -8864,10 +8864,17 @@ class ReactiveEffect {
             activeEffect = this.parent;
             shouldTrack = lastShouldTrack;
             this.parent = undefined;
+            if (this.deferStop) {
+                this.stop();
+            }
         }
     }
     stop() {
-        if (this.active) {
+        // stopped while running itself - defer the cleanup
+        if (activeEffect === this) {
+            this.deferStop = true;
+        }
+        else if (this.active) {
             cleanupEffect(this);
             if (this.onStop) {
                 this.onStop();
@@ -9050,7 +9057,9 @@ function triggerEffects(dep, debuggerEventExtraInfo) {
 }
 
 const isNonTrackableKeys = /*#__PURE__*/ (0,_vue_shared__WEBPACK_IMPORTED_MODULE_0__.makeMap)(`__proto__,__v_isRef,__isVue`);
-const builtInSymbols = new Set(Object.getOwnPropertyNames(Symbol)
+const builtInSymbols = new Set(
+/*#__PURE__*/
+Object.getOwnPropertyNames(Symbol)
     .map(key => Symbol[key])
     .filter(_vue_shared__WEBPACK_IMPORTED_MODULE_0__.isSymbol));
 const get = /*#__PURE__*/ createGetter();
@@ -9202,13 +9211,13 @@ const readonlyHandlers = {
     get: readonlyGet,
     set(target, key) {
         if ((true)) {
-            console.warn(`Set operation on key "${String(key)}" failed: target is readonly.`, target);
+            warn(`Set operation on key "${String(key)}" failed: target is readonly.`, target);
         }
         return true;
     },
     deleteProperty(target, key) {
         if ((true)) {
-            console.warn(`Delete operation on key "${String(key)}" failed: target is readonly.`, target);
+            warn(`Delete operation on key "${String(key)}" failed: target is readonly.`, target);
         }
         return true;
     }
@@ -9811,7 +9820,7 @@ function computed(getterOrOptions, debugOptions, isSSR = false) {
 }
 
 var _a;
-const tick = Promise.resolve();
+const tick = /*#__PURE__*/ Promise.resolve();
 const queue = [];
 let queued = false;
 const scheduler = (fn) => {
@@ -10262,7 +10271,7 @@ let preFlushIndex = 0;
 const pendingPostFlushCbs = [];
 let activePostFlushCbs = null;
 let postFlushIndex = 0;
-const resolvedPromise = Promise.resolve();
+const resolvedPromise = /*#__PURE__*/ Promise.resolve();
 let currentFlushPromise = null;
 let currentPreFlushParentJob = null;
 const RECURSION_LIMIT = 100;
@@ -10681,6 +10690,8 @@ function devtoolsComponentEmit(component, event, params) {
 }
 
 function emit$1(instance, event, ...rawArgs) {
+    if (instance.isUnmounted)
+        return;
     const props = instance.vnode.props || _vue_shared__WEBPACK_IMPORTED_MODULE_1__.EMPTY_OBJ;
     if ((true)) {
         const { emitsOptions, propsOptions: [propsOptions] } = instance;
@@ -11977,10 +11988,24 @@ const BaseTransitionImpl = {
             if (!children || !children.length) {
                 return;
             }
-            // warn multiple elements
-            if (( true) && children.length > 1) {
-                warn('<transition> can only be used on a single element or component. Use ' +
-                    '<transition-group> for lists.');
+            let child = children[0];
+            if (children.length > 1) {
+                let hasFound = false;
+                // locate first non-comment child
+                for (const c of children) {
+                    if (c.type !== Comment) {
+                        if (( true) && hasFound) {
+                            // warn more than one non-comment child
+                            warn('<transition> can only be used on a single element or component. ' +
+                                'Use <transition-group> for lists.');
+                            break;
+                        }
+                        child = c;
+                        hasFound = true;
+                        if (false)
+                            {}
+                    }
+                }
             }
             // there's no need to track reactivity for these props so use the raw
             // props for a bit better perf
@@ -11994,8 +12019,6 @@ const BaseTransitionImpl = {
                 mode !== 'default') {
                 warn(`invalid <transition> mode: ${mode}`);
             }
-            // at this point children has a guaranteed length of 1.
-            const child = children[0];
             if (state.isLeaving) {
                 return emptyPlaceholder(child);
             }
@@ -15554,7 +15577,23 @@ function baseCreateRenderer(options, createHydrationFns) {
     const remove = vnode => {
         const { type, el, anchor, transition } = vnode;
         if (type === Fragment) {
-            removeFragment(el, anchor);
+            if (( true) &&
+                vnode.patchFlag > 0 &&
+                vnode.patchFlag & 2048 /* DEV_ROOT_FRAGMENT */ &&
+                transition &&
+                !transition.persisted) {
+                vnode.children.forEach(child => {
+                    if (child.type === Comment) {
+                        hostRemove(child.el);
+                    }
+                    else {
+                        remove(child);
+                    }
+                });
+            }
+            else {
+                removeFragment(el, anchor);
+            }
             return;
         }
         if (type === Static) {
@@ -16578,7 +16617,10 @@ function renderSlot(slots, name, props = {},
 // this is not a user-facing function, so the fallback is always generated by
 // the compiler and guaranteed to be a function returning an array
 fallback, noSlotted) {
-    if (currentRenderingInstance.isCE) {
+    if (currentRenderingInstance.isCE ||
+        (currentRenderingInstance.parent &&
+            isAsyncWrapper(currentRenderingInstance.parent) &&
+            currentRenderingInstance.parent.isCE)) {
         return createVNode('slot', name === 'default' ? null : { name }, fallback && fallback());
     }
     let slot = slots[name];
@@ -16651,7 +16693,10 @@ const getPublicInstance = (i) => {
         return getExposeProxy(i) || i.proxy;
     return getPublicInstance(i.parent);
 };
-const publicPropertiesMap = (0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.extend)(Object.create(null), {
+const publicPropertiesMap = 
+// Move PURE marker to new line to workaround compiler discarding it
+// due to type annotation
+/*#__PURE__*/ (0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.extend)(Object.create(null), {
     $: i => i,
     $el: i => i.vnode.el,
     $data: i => i.data,
@@ -16825,7 +16870,7 @@ const PublicInstanceProxyHandlers = {
     defineProperty(target, key, descriptor) {
         if (descriptor.get != null) {
             // invalidate key cache of a getter based property #5417
-            target.$.accessCache[key] = 0;
+            target._.accessCache[key] = 0;
         }
         else if ((0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.hasOwn)(descriptor, 'value')) {
             this.set(target, key, descriptor.value, null);
@@ -17034,6 +17079,7 @@ function setupComponent(instance, isSSR = false) {
     return setupResult;
 }
 function setupStatefulComponent(instance, isSSR) {
+    var _a;
     const Component = instance.type;
     if ((true)) {
         if (Component.name) {
@@ -17091,6 +17137,13 @@ function setupStatefulComponent(instance, isSSR) {
                 // async setup returned Promise.
                 // bail here and wait for re-entry.
                 instance.asyncDep = setupResult;
+                if (( true) && !instance.suspense) {
+                    const name = (_a = Component.name) !== null && _a !== void 0 ? _a : 'Anonymous';
+                    warn(`Component <${name}>: setup function returned a promise, but no ` +
+                        `<Suspense> boundary was found in the parent component tree. ` +
+                        `A component with async setup() must be nested in a <Suspense> ` +
+                        `in order to be rendered.`);
+                }
             }
         }
         else {
@@ -17718,7 +17771,7 @@ function isMemoSame(cached, memo) {
 }
 
 // Core API ------------------------------------------------------------------
-const version = "3.2.32";
+const version = "3.2.33";
 const _ssrUtils = {
     createComponentInstance,
     setupComponent,
@@ -17909,7 +17962,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const svgNS = 'http://www.w3.org/2000/svg';
 const doc = (typeof document !== 'undefined' ? document : null);
-const templateContainer = doc && doc.createElement('template');
+const templateContainer = doc && /*#__PURE__*/ doc.createElement('template');
 const nodeOps = {
     insert: (child, parent, anchor) => {
         parent.insertBefore(child, anchor || null);
@@ -18060,6 +18113,8 @@ function setStyle(style, name, val) {
         val.forEach(v => setStyle(style, name, v));
     }
     else {
+        if (val == null)
+            val = '';
         if (name.startsWith('--')) {
             // custom property definition
             style.setProperty(name, val);
@@ -18154,31 +18209,28 @@ prevChildren, parentComponent, parentSuspense, unmountChildren) {
         }
         return;
     }
+    let needRemove = false;
     if (value === '' || value == null) {
         const type = typeof el[key];
         if (type === 'boolean') {
             // e.g. <select multiple> compiles to { multiple: '' }
-            el[key] = (0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.includeBooleanAttr)(value);
-            return;
+            value = (0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.includeBooleanAttr)(value);
         }
         else if (value == null && type === 'string') {
             // e.g. <div :id="null">
-            el[key] = '';
-            el.removeAttribute(key);
-            return;
+            value = '';
+            needRemove = true;
         }
         else if (type === 'number') {
             // e.g. <img :width="null">
             // the value of some IDL attr must be greater than 0, e.g. input.size = 0 -> error
-            try {
-                el[key] = 0;
-            }
-            catch (_a) { }
-            el.removeAttribute(key);
-            return;
+            value = 0;
+            needRemove = true;
         }
     }
-    // some properties perform value validation and throw
+    // some properties perform value validation and throw,
+    // some properties has getter, no setter, will error in 'use strict'
+    // eg. <select :type="null"></select> <select :willValidate="null"></select>
     try {
         el[key] = value;
     }
@@ -18188,31 +18240,35 @@ prevChildren, parentComponent, parentSuspense, unmountChildren) {
                 `value ${value} is invalid.`, e);
         }
     }
+    needRemove && el.removeAttribute(key);
 }
 
 // Async edge case fix requires storing an event listener's attach timestamp.
-let _getNow = Date.now;
-let skipTimestampCheck = false;
-if (typeof window !== 'undefined') {
-    // Determine what event timestamp the browser is using. Annoyingly, the
-    // timestamp can either be hi-res (relative to page load) or low-res
-    // (relative to UNIX epoch), so in order to compare time we have to use the
-    // same timestamp type when saving the flush timestamp.
-    if (_getNow() > document.createEvent('Event').timeStamp) {
-        // if the low-res timestamp which is bigger than the event timestamp
-        // (which is evaluated AFTER) it means the event is using a hi-res timestamp,
-        // and we need to use the hi-res version for event listeners as well.
-        _getNow = () => performance.now();
+const [_getNow, skipTimestampCheck] = /*#__PURE__*/ (() => {
+    let _getNow = Date.now;
+    let skipTimestampCheck = false;
+    if (typeof window !== 'undefined') {
+        // Determine what event timestamp the browser is using. Annoyingly, the
+        // timestamp can either be hi-res (relative to page load) or low-res
+        // (relative to UNIX epoch), so in order to compare time we have to use the
+        // same timestamp type when saving the flush timestamp.
+        if (Date.now() > document.createEvent('Event').timeStamp) {
+            // if the low-res timestamp which is bigger than the event timestamp
+            // (which is evaluated AFTER) it means the event is using a hi-res timestamp,
+            // and we need to use the hi-res version for event listeners as well.
+            _getNow = () => performance.now();
+        }
+        // #3485: Firefox <= 53 has incorrect Event.timeStamp implementation
+        // and does not fire microtasks in between event propagation, so safe to exclude.
+        const ffMatch = navigator.userAgent.match(/firefox\/(\d+)/i);
+        skipTimestampCheck = !!(ffMatch && Number(ffMatch[1]) <= 53);
     }
-    // #3485: Firefox <= 53 has incorrect Event.timeStamp implementation
-    // and does not fire microtasks in between event propagation, so safe to exclude.
-    const ffMatch = navigator.userAgent.match(/firefox\/(\d+)/i);
-    skipTimestampCheck = !!(ffMatch && Number(ffMatch[1]) <= 53);
-}
+    return [_getNow, skipTimestampCheck];
+})();
 // To avoid the overhead of repeatedly calling performance.now(), we cache
 // and use the same timestamp for all event listeners attached in the same tick.
 let cachedNow = 0;
-const p = Promise.resolve();
+const p = /*#__PURE__*/ Promise.resolve();
 const reset = () => {
     cachedNow = 0;
 };
@@ -18337,13 +18393,13 @@ function shouldSetAsProp(el, key, value, isSVG) {
         }
         return false;
     }
-    // spellcheck and draggable are numerated attrs, however their
-    // corresponding DOM properties are actually booleans - this leads to
-    // setting it with a string "false" value leading it to be coerced to
-    // `true`, so we need to always treat them as attributes.
+    // these are enumerated attrs, however their corresponding DOM properties
+    // are actually booleans - this leads to setting it with a string "false"
+    // value leading it to be coerced to `true`, so we need to always treat
+    // them as attributes.
     // Note that `contentEditable` doesn't have this problem: its DOM
     // property is also enumerated string values.
-    if (key === 'spellcheck' || key === 'draggable') {
+    if (key === 'spellcheck' || key === 'draggable' || key === 'translate') {
         return false;
     }
     // #1787, #2840 form property on form elements is readonly and must be set as
@@ -19448,7 +19504,7 @@ function initVShowForSSR() {
     };
 }
 
-const rendererOptions = (0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.extend)({ patchProp }, nodeOps);
+const rendererOptions = /*#__PURE__*/ (0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.extend)({ patchProp }, nodeOps);
 // lazy create the renderer - this makes core renderer logic tree-shakable
 // in case the user only imports reactivity utilities from Vue.
 let renderer;
@@ -28763,7 +28819,7 @@ const ToastSeverities = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
 /* harmony import */ var primevue_overlayeventbus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primevue/overlayeventbus */ "./node_modules/primevue/overlayeventbus/overlayeventbus.esm.js");
@@ -29346,89 +29402,96 @@ var script = {
     }
 };
 
-const _hoisted_1 = { class: "p-autocomplete-token-label" };
-const _hoisted_2 = { class: "p-autocomplete-input-token" };
-const _hoisted_3 = {
+const _hoisted_1 = ["aria-owns", "aria-expanded"];
+const _hoisted_2 = ["value", "aria-controls"];
+const _hoisted_3 = { class: "p-autocomplete-token-label" };
+const _hoisted_4 = ["onClick"];
+const _hoisted_5 = { class: "p-autocomplete-input-token" };
+const _hoisted_6 = ["aria-controls"];
+const _hoisted_7 = {
   key: 2,
   class: "p-autocomplete-loader pi pi-spinner pi-spin"
 };
-const _hoisted_4 = { class: "p-autocomplete-item-group" };
+const _hoisted_8 = ["id"];
+const _hoisted_9 = ["onClick", "data-index"];
+const _hoisted_10 = { class: "p-autocomplete-item-group" };
+const _hoisted_11 = ["onClick", "data-group", "data-index"];
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_Button = (0,vue__WEBPACK_IMPORTED_MODULE_5__.resolveComponent)("Button");
   const _component_VirtualScroller = (0,vue__WEBPACK_IMPORTED_MODULE_5__.resolveComponent)("VirtualScroller");
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_5__.resolveDirective)("ripple");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("span", {
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("span", {
     ref: "container",
-    class: $options.containerClass,
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeClass)($options.containerClass),
     "aria-haspopup": "listbox",
     "aria-owns": $options.listId,
     "aria-expanded": $data.overlayVisible,
-    style: $props.style
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeStyle)($props.style)
   }, [
     (!$props.multiple)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("input", (0,vue__WEBPACK_IMPORTED_MODULE_5__.mergeProps)({
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("input", (0,vue__WEBPACK_IMPORTED_MODULE_5__.mergeProps)({
           key: 0,
           ref: "input",
           class: $options.inputFieldClass,
           style: $props.inputStyle
         }, _ctx.$attrs, {
           value: $options.inputValue,
-          onClick: _cache[1] || (_cache[1] = (...args) => ($options.onInputClicked && $options.onInputClicked(...args))),
-          onInput: _cache[2] || (_cache[2] = (...args) => ($options.onInput && $options.onInput(...args))),
-          onFocus: _cache[3] || (_cache[3] = (...args) => ($options.onFocus && $options.onFocus(...args))),
-          onBlur: _cache[4] || (_cache[4] = (...args) => ($options.onBlur && $options.onBlur(...args))),
-          onKeydown: _cache[5] || (_cache[5] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
-          onChange: _cache[6] || (_cache[6] = (...args) => ($options.onChange && $options.onChange(...args))),
+          onClick: _cache[0] || (_cache[0] = (...args) => ($options.onInputClicked && $options.onInputClicked(...args))),
+          onInput: _cache[1] || (_cache[1] = (...args) => ($options.onInput && $options.onInput(...args))),
+          onFocus: _cache[2] || (_cache[2] = (...args) => ($options.onFocus && $options.onFocus(...args))),
+          onBlur: _cache[3] || (_cache[3] = (...args) => ($options.onBlur && $options.onBlur(...args))),
+          onKeydown: _cache[4] || (_cache[4] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
+          onChange: _cache[5] || (_cache[5] = (...args) => ($options.onChange && $options.onChange(...args))),
           type: "text",
           autoComplete: "off",
           role: "searchbox",
           "aria-autocomplete": "list",
           "aria-controls": $options.listId
-        }), null, 16, ["value", "aria-controls"]))
+        }), null, 16, _hoisted_2))
       : (0,vue__WEBPACK_IMPORTED_MODULE_5__.createCommentVNode)("", true),
     ($props.multiple)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("ul", {
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("ul", {
           key: 1,
           ref: "multiContainer",
-          class: $options.multiContainerClass,
-          onClick: _cache[12] || (_cache[12] = (...args) => ($options.onMultiContainerClick && $options.onMultiContainerClick(...args)))
+          class: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeClass)($options.multiContainerClass),
+          onClick: _cache[11] || (_cache[11] = (...args) => ($options.onMultiContainerClick && $options.onMultiContainerClick(...args)))
         }, [
-          ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)($props.modelValue, (item, i) => {
-            return ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("li", {
+          ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)($props.modelValue, (item, i) => {
+            return ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("li", {
               key: i,
               class: "p-autocomplete-token"
             }, [
               (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderSlot)(_ctx.$slots, "chip", { value: item }, () => [
-                (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("span", _hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_5__.toDisplayString)($options.getItemContent(item)), 1)
+                (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("span", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_5__.toDisplayString)($options.getItemContent(item)), 1)
               ]),
-              (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("span", {
+              (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("span", {
                 class: "p-autocomplete-token-icon pi pi-times-circle",
                 onClick: $event => ($options.removeItem($event, i))
-              }, null, 8, ["onClick"])
+              }, null, 8, _hoisted_4)
             ]))
           }), 128)),
-          (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("li", _hoisted_2, [
-            (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("input", (0,vue__WEBPACK_IMPORTED_MODULE_5__.mergeProps)({
+          (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("li", _hoisted_5, [
+            (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("input", (0,vue__WEBPACK_IMPORTED_MODULE_5__.mergeProps)({
               ref: "input",
               type: "text",
               autoComplete: "off"
             }, _ctx.$attrs, {
-              onInput: _cache[7] || (_cache[7] = (...args) => ($options.onInput && $options.onInput(...args))),
-              onFocus: _cache[8] || (_cache[8] = (...args) => ($options.onFocus && $options.onFocus(...args))),
-              onBlur: _cache[9] || (_cache[9] = (...args) => ($options.onBlur && $options.onBlur(...args))),
-              onKeydown: _cache[10] || (_cache[10] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
-              onChange: _cache[11] || (_cache[11] = (...args) => ($options.onChange && $options.onChange(...args))),
+              onInput: _cache[6] || (_cache[6] = (...args) => ($options.onInput && $options.onInput(...args))),
+              onFocus: _cache[7] || (_cache[7] = (...args) => ($options.onFocus && $options.onFocus(...args))),
+              onBlur: _cache[8] || (_cache[8] = (...args) => ($options.onBlur && $options.onBlur(...args))),
+              onKeydown: _cache[9] || (_cache[9] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
+              onChange: _cache[10] || (_cache[10] = (...args) => ($options.onChange && $options.onChange(...args))),
               role: "searchbox",
               "aria-autocomplete": "list",
               "aria-controls": $options.listId
-            }), null, 16, ["aria-controls"])
+            }), null, 16, _hoisted_6)
           ])
         ], 2))
       : (0,vue__WEBPACK_IMPORTED_MODULE_5__.createCommentVNode)("", true),
     ($data.searching)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("i", _hoisted_3))
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("i", _hoisted_7))
       : (0,vue__WEBPACK_IMPORTED_MODULE_5__.createCommentVNode)("", true),
     ($props.dropdown)
       ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)(_component_Button, {
@@ -29453,12 +29516,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, {
         default: (0,vue__WEBPACK_IMPORTED_MODULE_5__.withCtx)(() => [
           ($data.overlayVisible)
-            ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("div", {
+            ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("div", {
                 key: 0,
                 ref: $options.overlayRef,
-                class: $options.panelStyleClass,
-                style: {'max-height': $options.virtualScrollerDisabled ? $props.scrollHeight : ''},
-                onClick: _cache[13] || (_cache[13] = (...args) => ($options.onOverlayClick && $options.onOverlayClick(...args)))
+                class: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeClass)($options.panelStyleClass),
+                style: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeStyle)({'max-height': $options.virtualScrollerDisabled ? $props.scrollHeight : ''}),
+                onClick: _cache[12] || (_cache[12] = (...args) => ($options.onOverlayClick && $options.onOverlayClick(...args)))
               }, [
                 (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderSlot)(_ctx.$slots, "header", {
                   value: $props.modelValue,
@@ -29470,16 +29533,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   disabled: $options.virtualScrollerDisabled
                 }), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createSlots)({
                   content: (0,vue__WEBPACK_IMPORTED_MODULE_5__.withCtx)(({ styleClass, contentRef, items, getItemOptions, contentStyle }) => [
-                    (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("ul", {
+                    (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("ul", {
                       id: $options.listId,
                       ref: (el) => $options.listRef(el, contentRef),
-                      class: ['p-autocomplete-items', styleClass],
-                      style: contentStyle,
+                      class: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeClass)(['p-autocomplete-items', styleClass]),
+                      style: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeStyle)(contentStyle),
                       role: "listbox"
                     }, [
                       (!$props.optionGroupLabel)
-                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, { key: 0 }, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)(items, (item, i) => {
-                            return (0,vue__WEBPACK_IMPORTED_MODULE_5__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("li", {
+                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, { key: 0 }, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)(items, (item, i) => {
+                            return (0,vue__WEBPACK_IMPORTED_MODULE_5__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("li", {
                               class: "p-autocomplete-item",
                               key: $options.getOptionRenderKey(item),
                               onClick: $event => ($options.selectItem($event, item)),
@@ -29492,15 +29555,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                               }, () => [
                                 (0,vue__WEBPACK_IMPORTED_MODULE_5__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_5__.toDisplayString)($options.getItemContent(item)), 1)
                               ])
-                            ], 8, ["onClick", "data-index"])), [
+                            ], 8, _hoisted_9)), [
                               [_directive_ripple]
                             ])
                           }), 128))
-                        : ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, { key: 1 }, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)(items, (optionGroup, i) => {
-                            return ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
+                        : ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, { key: 1 }, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)(items, (optionGroup, i) => {
+                            return ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
                               key: $options.getOptionGroupRenderKey(optionGroup)
                             }, [
-                              (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("li", _hoisted_4, [
+                              (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("li", _hoisted_10, [
                                 (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderSlot)(_ctx.$slots, "optiongroup", {
                                   item: optionGroup,
                                   index: $options.getOptionIndex(i, getItemOptions)
@@ -29508,8 +29571,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                                   (0,vue__WEBPACK_IMPORTED_MODULE_5__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_5__.toDisplayString)($options.getOptionGroupLabel(optionGroup)), 1)
                                 ])
                               ]),
-                              ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)($options.getOptionGroupChildren(optionGroup), (item, j) => {
-                                return (0,vue__WEBPACK_IMPORTED_MODULE_5__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("li", {
+                              ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)($options.getOptionGroupChildren(optionGroup), (item, j) => {
+                                return (0,vue__WEBPACK_IMPORTED_MODULE_5__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("li", {
                                   class: "p-autocomplete-item",
                                   key: j,
                                   onClick: $event => ($options.selectItem($event, item)),
@@ -29523,13 +29586,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                                   }, () => [
                                     (0,vue__WEBPACK_IMPORTED_MODULE_5__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_5__.toDisplayString)($options.getItemContent(item)), 1)
                                   ])
-                                ], 8, ["onClick", "data-group", "data-index"])), [
+                                ], 8, _hoisted_11)), [
                                   [_directive_ripple]
                                 ])
                               }), 128))
                             ], 64))
                           }), 128))
-                    ], 14, ["id"])
+                    ], 14, _hoisted_8)
                   ]),
                   _: 2
                 }, [
@@ -29552,7 +29615,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         _: 3
       }, 8, ["onEnter", "onLeave", "onAfterLeave"])
     ], 8, ["to", "disabled"]))
-  ], 14, ["aria-owns", "aria-expanded"]))
+  ], 14, _hoisted_1))
 }
 
 function styleInject(css, ref) {
@@ -29587,7 +29650,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -29601,7 +29664,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
@@ -29633,7 +29696,9 @@ var script = {
 };
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("span", { class: $options.badgeClass }, [
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.badgeClass)
+  }, [
     (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default", {}, () => [
       (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.value), 1)
     ])
@@ -29642,7 +29707,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -29656,7 +29721,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var primevue_ripple__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/ripple */ "./node_modules/primevue/ripple/ripple.esm.js");
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
@@ -29730,45 +29795,46 @@ var script = {
     }
 };
 
-const _hoisted_1 = { class: "p-button-label" };
+const _hoisted_1 = ["disabled"];
+const _hoisted_2 = { class: "p-button-label" };
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_1__.resolveDirective)("ripple");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_1__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createBlock)("button", {
-    class: $options.buttonClass,
+  return (0,vue__WEBPACK_IMPORTED_MODULE_1__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementBlock)("button", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_1__.normalizeClass)($options.buttonClass),
     type: "button",
     disabled: $options.disabled
   }, [
     (0,vue__WEBPACK_IMPORTED_MODULE_1__.renderSlot)(_ctx.$slots, "default", {}, () => [
       ($props.loading && !$props.icon)
-        ? ((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createBlock)("span", {
+        ? ((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementBlock)("span", {
             key: 0,
-            class: $options.iconClass
+            class: (0,vue__WEBPACK_IMPORTED_MODULE_1__.normalizeClass)($options.iconClass)
           }, null, 2))
         : (0,vue__WEBPACK_IMPORTED_MODULE_1__.createCommentVNode)("", true),
       ($props.icon)
-        ? ((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createBlock)("span", {
+        ? ((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementBlock)("span", {
             key: 1,
-            class: $options.iconClass
+            class: (0,vue__WEBPACK_IMPORTED_MODULE_1__.normalizeClass)($options.iconClass)
           }, null, 2))
         : (0,vue__WEBPACK_IMPORTED_MODULE_1__.createCommentVNode)("", true),
-      (0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("span", _hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_1__.toDisplayString)($props.label||' '), 1),
+      (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("span", _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_1__.toDisplayString)($props.label||' '), 1),
       ($props.badge)
-        ? ((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createBlock)("span", {
+        ? ((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementBlock)("span", {
             key: 2,
-            class: $options.badgeStyleClass
+            class: (0,vue__WEBPACK_IMPORTED_MODULE_1__.normalizeClass)($options.badgeStyleClass)
           }, (0,vue__WEBPACK_IMPORTED_MODULE_1__.toDisplayString)($props.badge), 3))
         : (0,vue__WEBPACK_IMPORTED_MODULE_1__.createCommentVNode)("", true)
     ])
-  ], 10, ["disabled"])), [
+  ], 10, _hoisted_1)), [
     [_directive_ripple]
   ])
 }
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -29782,7 +29848,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
 /* harmony import */ var primevue_overlayeventbus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primevue/overlayeventbus */ "./node_modules/primevue/overlayeventbus/overlayeventbus.esm.js");
@@ -32138,74 +32204,119 @@ var script = {
     }
 };
 
-const _hoisted_1 = { class: "p-datepicker-group-container" };
-const _hoisted_2 = { class: "p-datepicker-header" };
-const _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "p-datepicker-prev-icon pi pi-chevron-left" }, null, -1);
-const _hoisted_4 = { class: "p-datepicker-title" };
-const _hoisted_5 = {
+const _hoisted_1 = ["readonly"];
+const _hoisted_2 = ["role"];
+const _hoisted_3 = { class: "p-datepicker-group-container" };
+const _hoisted_4 = { class: "p-datepicker-header" };
+const _hoisted_5 = ["disabled"];
+const _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "p-datepicker-prev-icon pi pi-chevron-left" }, null, -1);
+const _hoisted_7 = [
+  _hoisted_6
+];
+const _hoisted_8 = { class: "p-datepicker-title" };
+const _hoisted_9 = ["disabled"];
+const _hoisted_10 = ["disabled"];
+const _hoisted_11 = {
   key: 2,
   class: "p-datepicker-decade"
 };
-const _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "p-datepicker-next-icon pi pi-chevron-right" }, null, -1);
-const _hoisted_7 = {
+const _hoisted_12 = ["disabled"];
+const _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "p-datepicker-next-icon pi pi-chevron-right" }, null, -1);
+const _hoisted_14 = [
+  _hoisted_13
+];
+const _hoisted_15 = {
   key: 0,
   class: "p-datepicker-calendar-container"
 };
-const _hoisted_8 = { class: "p-datepicker-calendar" };
-const _hoisted_9 = {
+const _hoisted_16 = { class: "p-datepicker-calendar" };
+const _hoisted_17 = {
   key: 0,
   scope: "col",
   class: "p-datepicker-weekheader p-disabled"
 };
-const _hoisted_10 = {
+const _hoisted_18 = {
   key: 0,
   class: "p-datepicker-weeknumber"
 };
-const _hoisted_11 = { class: "p-disabled" };
-const _hoisted_12 = {
+const _hoisted_19 = { class: "p-disabled" };
+const _hoisted_20 = {
   key: 0,
   style: {"visibility":"hidden"}
 };
-const _hoisted_13 = {
+const _hoisted_21 = ["onClick", "onKeydown"];
+const _hoisted_22 = {
   key: 0,
   class: "p-monthpicker"
 };
-const _hoisted_14 = {
+const _hoisted_23 = ["onClick", "onKeydown"];
+const _hoisted_24 = {
   key: 1,
   class: "p-yearpicker"
 };
-const _hoisted_15 = {
+const _hoisted_25 = ["onClick", "onKeydown"];
+const _hoisted_26 = {
   key: 1,
   class: "p-timepicker"
 };
-const _hoisted_16 = { class: "p-hour-picker" };
-const _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "pi pi-chevron-up" }, null, -1);
-const _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "pi pi-chevron-down" }, null, -1);
-const _hoisted_19 = { class: "p-separator" };
-const _hoisted_20 = { class: "p-minute-picker" };
-const _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "pi pi-chevron-up" }, null, -1);
-const _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "pi pi-chevron-down" }, null, -1);
-const _hoisted_23 = {
+const _hoisted_27 = { class: "p-hour-picker" };
+const _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "pi pi-chevron-up" }, null, -1);
+const _hoisted_29 = [
+  _hoisted_28
+];
+const _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "pi pi-chevron-down" }, null, -1);
+const _hoisted_31 = [
+  _hoisted_30
+];
+const _hoisted_32 = { class: "p-separator" };
+const _hoisted_33 = { class: "p-minute-picker" };
+const _hoisted_34 = ["disabled"];
+const _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "pi pi-chevron-up" }, null, -1);
+const _hoisted_36 = [
+  _hoisted_35
+];
+const _hoisted_37 = ["disabled"];
+const _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "pi pi-chevron-down" }, null, -1);
+const _hoisted_39 = [
+  _hoisted_38
+];
+const _hoisted_40 = {
   key: 0,
   class: "p-separator"
 };
-const _hoisted_24 = {
+const _hoisted_41 = {
   key: 1,
   class: "p-second-picker"
 };
-const _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "pi pi-chevron-up" }, null, -1);
-const _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "pi pi-chevron-down" }, null, -1);
-const _hoisted_27 = {
+const _hoisted_42 = ["disabled"];
+const _hoisted_43 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "pi pi-chevron-up" }, null, -1);
+const _hoisted_44 = [
+  _hoisted_43
+];
+const _hoisted_45 = ["disabled"];
+const _hoisted_46 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "pi pi-chevron-down" }, null, -1);
+const _hoisted_47 = [
+  _hoisted_46
+];
+const _hoisted_48 = {
   key: 2,
   class: "p-separator"
 };
-const _hoisted_28 = {
+const _hoisted_49 = {
   key: 3,
   class: "p-ampm-picker"
 };
-const _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "pi pi-chevron-up" }, null, -1);
-const _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "pi pi-chevron-down" }, null, -1);
-const _hoisted_31 = {
+const _hoisted_50 = ["disabled"];
+const _hoisted_51 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "pi pi-chevron-up" }, null, -1);
+const _hoisted_52 = [
+  _hoisted_51
+];
+const _hoisted_53 = ["disabled"];
+const _hoisted_54 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "pi pi-chevron-down" }, null, -1);
+const _hoisted_55 = [
+  _hoisted_54
+];
+const _hoisted_56 = {
   key: 2,
   class: "p-datepicker-buttonbar"
 };
@@ -32214,26 +32325,26 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_CalendarButton = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("CalendarButton");
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDirective)("ripple");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", {
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", {
     ref: "container",
-    class: $options.containerClass,
-    style: $props.style
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.containerClass),
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeStyle)($props.style)
   }, [
     (!$props.inline)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("input", (0,vue__WEBPACK_IMPORTED_MODULE_4__.mergeProps)({
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("input", (0,vue__WEBPACK_IMPORTED_MODULE_4__.mergeProps)({
           key: 0,
           ref: $options.inputRef,
           type: "text",
           class: ['p-inputtext p-component', $props.inputClass],
           style: $props.inputStyle,
-          onInput: _cache[1] || (_cache[1] = (...args) => ($options.onInput && $options.onInput(...args)))
+          onInput: _cache[0] || (_cache[0] = (...args) => ($options.onInput && $options.onInput(...args)))
         }, _ctx.$attrs, {
-          onFocus: _cache[2] || (_cache[2] = (...args) => ($options.onFocus && $options.onFocus(...args))),
-          onBlur: _cache[3] || (_cache[3] = (...args) => ($options.onBlur && $options.onBlur(...args))),
-          onKeydown: _cache[4] || (_cache[4] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
+          onFocus: _cache[1] || (_cache[1] = (...args) => ($options.onFocus && $options.onFocus(...args))),
+          onBlur: _cache[2] || (_cache[2] = (...args) => ($options.onBlur && $options.onBlur(...args))),
+          onKeydown: _cache[3] || (_cache[3] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
           readonly: !$props.manualInput,
           inputmode: "none"
-        }), null, 16, ["readonly"]))
+        }), null, 16, _hoisted_1))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
     ($props.showIcon)
       ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(_component_CalendarButton, {
@@ -32253,127 +32364,123 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, [
       (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_4__.Transition, {
         name: "p-connected-overlay",
-        onEnter: _cache[67] || (_cache[67] = $event => ($options.onOverlayEnter($event))),
+        onEnter: _cache[66] || (_cache[66] = $event => ($options.onOverlayEnter($event))),
         onAfterEnter: $options.onOverlayEnterComplete,
         onAfterLeave: $options.onOverlayAfterLeave,
         onLeave: $options.onOverlayLeave
       }, {
         default: (0,vue__WEBPACK_IMPORTED_MODULE_4__.withCtx)(() => [
           ($props.inline ? true : $data.overlayVisible)
-            ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", {
+            ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", {
                 key: 0,
                 ref: $options.overlayRef,
-                class: $options.panelStyleClass,
+                class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.panelStyleClass),
                 role: $props.inline ? null : 'dialog',
-                onClick: _cache[65] || (_cache[65] = (...args) => ($options.onOverlayClick && $options.onOverlayClick(...args))),
-                onMouseup: _cache[66] || (_cache[66] = (...args) => ($options.onOverlayMouseUp && $options.onOverlayMouseUp(...args)))
+                onClick: _cache[64] || (_cache[64] = (...args) => ($options.onOverlayClick && $options.onOverlayClick(...args))),
+                onMouseup: _cache[65] || (_cache[65] = (...args) => ($options.onOverlayMouseUp && $options.onOverlayMouseUp(...args)))
               }, [
                 (!$props.timeOnly)
-                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 0 }, [
-                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", _hoisted_1, [
-                        ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.months, (month, groupIndex) => {
-                          return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", {
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 0 }, [
+                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", _hoisted_3, [
+                        ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.months, (month, groupIndex) => {
+                          return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", {
                             class: "p-datepicker-group",
                             key: month.month + month.year
                           }, [
-                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", _hoisted_2, [
+                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", _hoisted_4, [
                               (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderSlot)(_ctx.$slots, "header"),
-                              (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("button", {
+                              (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                                 class: "p-datepicker-prev p-link",
-                                onClick: _cache[5] || (_cache[5] = (...args) => ($options.onPrevButtonClick && $options.onPrevButtonClick(...args))),
+                                onClick: _cache[4] || (_cache[4] = (...args) => ($options.onPrevButtonClick && $options.onPrevButtonClick(...args))),
                                 type: "button",
-                                onKeydown: _cache[6] || (_cache[6] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
+                                onKeydown: _cache[5] || (_cache[5] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
                                 disabled: _ctx.$attrs.disabled
-                              }, [
-                                _hoisted_3
-                              ], 40, ["disabled"]), [
+                              }, _hoisted_7, 40, _hoisted_5)), [
                                 [vue__WEBPACK_IMPORTED_MODULE_4__.vShow, groupIndex === 0],
                                 [_directive_ripple]
                               ]),
-                              (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", _hoisted_4, [
+                              (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", _hoisted_8, [
                                 ($data.currentView === 'date')
-                                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("button", {
+                                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                                       key: 0,
                                       type: "button",
-                                      onClick: _cache[7] || (_cache[7] = (...args) => ($options.switchToMonthView && $options.switchToMonthView(...args))),
-                                      onKeydown: _cache[8] || (_cache[8] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
+                                      onClick: _cache[6] || (_cache[6] = (...args) => ($options.switchToMonthView && $options.switchToMonthView(...args))),
+                                      onKeydown: _cache[7] || (_cache[7] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
                                       class: "p-datepicker-month p-link",
                                       disabled: $options.switchViewButtonDisabled
-                                    }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.getMonthName(month.month)), 41, ["disabled"]))
+                                    }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.getMonthName(month.month)), 41, _hoisted_9))
                                   : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                                 ($data.currentView !== 'year')
-                                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("button", {
+                                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                                       key: 1,
                                       type: "button",
-                                      onClick: _cache[9] || (_cache[9] = (...args) => ($options.switchToYearView && $options.switchToYearView(...args))),
-                                      onKeydown: _cache[10] || (_cache[10] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
+                                      onClick: _cache[8] || (_cache[8] = (...args) => ($options.switchToYearView && $options.switchToYearView(...args))),
+                                      onKeydown: _cache[9] || (_cache[9] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
                                       class: "p-datepicker-year p-link",
                                       disabled: $options.switchViewButtonDisabled
-                                    }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.getYear(month)), 41, ["disabled"]))
+                                    }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.getYear(month)), 41, _hoisted_10))
                                   : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                                 ($data.currentView === 'year')
-                                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", _hoisted_5, [
+                                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", _hoisted_11, [
                                       (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderSlot)(_ctx.$slots, "decade", { years: $options.yearPickerValues }, () => [
                                         (0,vue__WEBPACK_IMPORTED_MODULE_4__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.yearPickerValues[0]) + " - " + (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.yearPickerValues[$options.yearPickerValues.length - 1]), 1)
                                       ])
                                     ]))
                                   : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
                               ]),
-                              (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("button", {
+                              (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                                 class: "p-datepicker-next p-link",
-                                onClick: _cache[11] || (_cache[11] = (...args) => ($options.onNextButtonClick && $options.onNextButtonClick(...args))),
+                                onClick: _cache[10] || (_cache[10] = (...args) => ($options.onNextButtonClick && $options.onNextButtonClick(...args))),
                                 type: "button",
-                                onKeydown: _cache[12] || (_cache[12] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
+                                onKeydown: _cache[11] || (_cache[11] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
                                 disabled: _ctx.$attrs.disabled
-                              }, [
-                                _hoisted_6
-                              ], 40, ["disabled"]), [
+                              }, _hoisted_14, 40, _hoisted_12)), [
                                 [vue__WEBPACK_IMPORTED_MODULE_4__.vShow, $props.numberOfMonths === 1 ? true : (groupIndex === $props.numberOfMonths - 1)],
                                 [_directive_ripple]
                               ])
                             ]),
                             ($data.currentView ==='date')
-                              ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_7, [
-                                  (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("table", _hoisted_8, [
-                                    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("thead", null, [
-                                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("tr", null, [
+                              ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_15, [
+                                  (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("table", _hoisted_16, [
+                                    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("thead", null, [
+                                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("tr", null, [
                                         ($props.showWeek)
-                                          ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("th", _hoisted_9, [
-                                              (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.weekHeaderLabel), 1)
+                                          ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("th", _hoisted_17, [
+                                              (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.weekHeaderLabel), 1)
                                             ]))
                                           : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
-                                        ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.weekDays, (weekDay) => {
-                                          return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("th", {
+                                        ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.weekDays, (weekDay) => {
+                                          return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("th", {
                                             scope: "col",
                                             key: weekDay
                                           }, [
-                                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)(weekDay), 1)
+                                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)(weekDay), 1)
                                           ]))
                                         }), 128))
                                       ])
                                     ]),
-                                    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("tbody", null, [
-                                      ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)(month.dates, (week, i) => {
-                                        return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tr", {
+                                    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("tbody", null, [
+                                      ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)(month.dates, (week, i) => {
+                                        return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tr", {
                                           key: week[0].day + '' + week[0].month
                                         }, [
                                           ($props.showWeek)
-                                            ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("td", _hoisted_10, [
-                                                (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", _hoisted_11, [
+                                            ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("td", _hoisted_18, [
+                                                (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", _hoisted_19, [
                                                   (month.weekNumbers[i] < 10)
-                                                    ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", _hoisted_12, "0"))
+                                                    ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", _hoisted_20, "0"))
                                                     : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                                                   (0,vue__WEBPACK_IMPORTED_MODULE_4__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)(month.weekNumbers[i]), 1)
                                                 ])
                                               ]))
                                             : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
-                                          ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)(week, (date) => {
-                                            return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("td", {
+                                          ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)(week, (date) => {
+                                            return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("td", {
                                               key: date.day + '' + date.month,
-                                              class: {'p-datepicker-other-month': date.otherMonth, 'p-datepicker-today': date.today}
+                                              class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)({'p-datepicker-other-month': date.otherMonth, 'p-datepicker-today': date.today})
                                             }, [
-                                              (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", {
-                                                class: {'p-highlight': $options.isSelected(date), 'p-disabled': !date.selectable},
+                                              (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", {
+                                                class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)({'p-highlight': $options.isSelected(date), 'p-disabled': !date.selectable}),
                                                 onClick: $event => ($options.onDateSelect($event, date)),
                                                 draggable: "false",
                                                 onKeydown: $event => ($options.onDateCellKeydown($event,date,groupIndex))
@@ -32381,7 +32488,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                                                 (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderSlot)(_ctx.$slots, "date", { date: date }, () => [
                                                   (0,vue__WEBPACK_IMPORTED_MODULE_4__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)(date.day), 1)
                                                 ])
-                                              ], 42, ["onClick", "onKeydown"]), [
+                                              ], 42, _hoisted_21)), [
                                                 [_directive_ripple]
                                               ])
                                             ], 2))
@@ -32396,32 +32503,32 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                         }), 128))
                       ]),
                       ($data.currentView === 'month')
-                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_13, [
-                            ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.monthPickerValues, (m, i) => {
-                              return (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", {
+                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_22, [
+                            ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.monthPickerValues, (m, i) => {
+                              return (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", {
                                 key: m,
                                 onClick: $event => ($options.onMonthSelect($event, i)),
                                 onKeydown: $event => ($options.onMonthCellKeydown($event,i)),
-                                class: ["p-monthpicker-month", {'p-highlight': $options.isMonthSelected(i)}]
+                                class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(["p-monthpicker-month", {'p-highlight': $options.isMonthSelected(i)}])
                               }, [
                                 (0,vue__WEBPACK_IMPORTED_MODULE_4__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)(m), 1)
-                              ], 42, ["onClick", "onKeydown"])), [
+                              ], 42, _hoisted_23)), [
                                 [_directive_ripple]
                               ])
                             }), 128))
                           ]))
                         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                       ($data.currentView === 'year')
-                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_14, [
-                            ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.yearPickerValues, (y) => {
-                              return (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", {
+                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_24, [
+                            ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.yearPickerValues, (y) => {
+                              return (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", {
                                 key: y,
                                 onClick: $event => ($options.onYearSelect($event, y)),
                                 onKeydown: $event => ($options.onYearCellKeydown($event,y)),
-                                class: ["p-yearpicker-year", {'p-highlight': $options.isYearSelected(y)}]
+                                class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(["p-yearpicker-year", {'p-highlight': $options.isYearSelected(y)}])
                               }, [
                                 (0,vue__WEBPACK_IMPORTED_MODULE_4__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)(y), 1)
-                              ], 42, ["onClick", "onKeydown"])), [
+                              ], 42, _hoisted_25)), [
                                 [_directive_ripple]
                               ])
                             }), 128))
@@ -32430,176 +32537,160 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     ], 64))
                   : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                 (($props.showTime||$props.timeOnly) && $data.currentView === 'date')
-                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_15, [
-                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", _hoisted_16, [
-                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("button", {
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_26, [
+                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", _hoisted_27, [
+                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                           class: "p-link",
-                          onMousedown: _cache[13] || (_cache[13] = $event => ($options.onTimePickerElementMouseDown($event, 0, 1))),
-                          onMouseup: _cache[14] || (_cache[14] = $event => ($options.onTimePickerElementMouseUp($event))),
+                          onMousedown: _cache[12] || (_cache[12] = $event => ($options.onTimePickerElementMouseDown($event, 0, 1))),
+                          onMouseup: _cache[13] || (_cache[13] = $event => ($options.onTimePickerElementMouseUp($event))),
                           onKeydown: [
-                            _cache[15] || (_cache[15] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
-                            _cache[17] || (_cache[17] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 0, 1)), ["enter"])),
-                            _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 0, 1)), ["space"]))
+                            _cache[14] || (_cache[14] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
+                            _cache[16] || (_cache[16] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 0, 1)), ["enter"])),
+                            _cache[17] || (_cache[17] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 0, 1)), ["space"]))
                           ],
-                          onMouseleave: _cache[16] || (_cache[16] = $event => ($options.onTimePickerElementMouseLeave())),
+                          onMouseleave: _cache[15] || (_cache[15] = $event => ($options.onTimePickerElementMouseLeave())),
                           onKeyup: [
-                            _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
-                            _cache[20] || (_cache[20] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
+                            _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
+                            _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
                           ],
                           type: "button"
-                        }, [
-                          _hoisted_17
-                        ], 544), [
+                        }, _hoisted_29, 32)), [
                           [_directive_ripple]
                         ]),
-                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.formattedCurrentHour), 1),
-                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("button", {
+                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.formattedCurrentHour), 1),
+                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                           class: "p-link",
-                          onMousedown: _cache[21] || (_cache[21] = $event => ($options.onTimePickerElementMouseDown($event, 0, -1))),
-                          onMouseup: _cache[22] || (_cache[22] = $event => ($options.onTimePickerElementMouseUp($event))),
+                          onMousedown: _cache[20] || (_cache[20] = $event => ($options.onTimePickerElementMouseDown($event, 0, -1))),
+                          onMouseup: _cache[21] || (_cache[21] = $event => ($options.onTimePickerElementMouseUp($event))),
                           onKeydown: [
-                            _cache[23] || (_cache[23] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
-                            _cache[25] || (_cache[25] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 0, -1)), ["enter"])),
-                            _cache[26] || (_cache[26] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 0, -1)), ["space"]))
+                            _cache[22] || (_cache[22] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
+                            _cache[24] || (_cache[24] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 0, -1)), ["enter"])),
+                            _cache[25] || (_cache[25] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 0, -1)), ["space"]))
                           ],
-                          onMouseleave: _cache[24] || (_cache[24] = $event => ($options.onTimePickerElementMouseLeave())),
+                          onMouseleave: _cache[23] || (_cache[23] = $event => ($options.onTimePickerElementMouseLeave())),
                           onKeyup: [
-                            _cache[27] || (_cache[27] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
-                            _cache[28] || (_cache[28] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
+                            _cache[26] || (_cache[26] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
+                            _cache[27] || (_cache[27] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
                           ],
                           type: "button"
-                        }, [
-                          _hoisted_18
-                        ], 544), [
+                        }, _hoisted_31, 32)), [
                           [_directive_ripple]
                         ])
                       ]),
-                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", _hoisted_19, [
-                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($props.timeSeparator), 1)
+                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", _hoisted_32, [
+                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($props.timeSeparator), 1)
                       ]),
-                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", _hoisted_20, [
-                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("button", {
+                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", _hoisted_33, [
+                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                           class: "p-link",
-                          onMousedown: _cache[29] || (_cache[29] = $event => ($options.onTimePickerElementMouseDown($event, 1, 1))),
-                          onMouseup: _cache[30] || (_cache[30] = $event => ($options.onTimePickerElementMouseUp($event))),
+                          onMousedown: _cache[28] || (_cache[28] = $event => ($options.onTimePickerElementMouseDown($event, 1, 1))),
+                          onMouseup: _cache[29] || (_cache[29] = $event => ($options.onTimePickerElementMouseUp($event))),
                           onKeydown: [
-                            _cache[31] || (_cache[31] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
-                            _cache[33] || (_cache[33] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 1, 1)), ["enter"])),
-                            _cache[34] || (_cache[34] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 1, 1)), ["space"]))
+                            _cache[30] || (_cache[30] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
+                            _cache[32] || (_cache[32] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 1, 1)), ["enter"])),
+                            _cache[33] || (_cache[33] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 1, 1)), ["space"]))
                           ],
                           disabled: _ctx.$attrs.disabled,
-                          onMouseleave: _cache[32] || (_cache[32] = $event => ($options.onTimePickerElementMouseLeave())),
+                          onMouseleave: _cache[31] || (_cache[31] = $event => ($options.onTimePickerElementMouseLeave())),
                           onKeyup: [
-                            _cache[35] || (_cache[35] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
-                            _cache[36] || (_cache[36] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
+                            _cache[34] || (_cache[34] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
+                            _cache[35] || (_cache[35] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
                           ],
                           type: "button"
-                        }, [
-                          _hoisted_21
-                        ], 40, ["disabled"]), [
+                        }, _hoisted_36, 40, _hoisted_34)), [
                           [_directive_ripple]
                         ]),
-                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.formattedCurrentMinute), 1),
-                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("button", {
+                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.formattedCurrentMinute), 1),
+                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                           class: "p-link",
-                          onMousedown: _cache[37] || (_cache[37] = $event => ($options.onTimePickerElementMouseDown($event, 1, -1))),
-                          onMouseup: _cache[38] || (_cache[38] = $event => ($options.onTimePickerElementMouseUp($event))),
+                          onMousedown: _cache[36] || (_cache[36] = $event => ($options.onTimePickerElementMouseDown($event, 1, -1))),
+                          onMouseup: _cache[37] || (_cache[37] = $event => ($options.onTimePickerElementMouseUp($event))),
                           onKeydown: [
-                            _cache[39] || (_cache[39] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
-                            _cache[41] || (_cache[41] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 1, -1)), ["enter"])),
-                            _cache[42] || (_cache[42] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 1, -1)), ["space"]))
+                            _cache[38] || (_cache[38] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
+                            _cache[40] || (_cache[40] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 1, -1)), ["enter"])),
+                            _cache[41] || (_cache[41] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 1, -1)), ["space"]))
                           ],
                           disabled: _ctx.$attrs.disabled,
-                          onMouseleave: _cache[40] || (_cache[40] = $event => ($options.onTimePickerElementMouseLeave())),
+                          onMouseleave: _cache[39] || (_cache[39] = $event => ($options.onTimePickerElementMouseLeave())),
                           onKeyup: [
-                            _cache[43] || (_cache[43] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
-                            _cache[44] || (_cache[44] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
+                            _cache[42] || (_cache[42] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
+                            _cache[43] || (_cache[43] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
                           ],
                           type: "button"
-                        }, [
-                          _hoisted_22
-                        ], 40, ["disabled"]), [
+                        }, _hoisted_39, 40, _hoisted_37)), [
                           [_directive_ripple]
                         ])
                       ]),
                       ($props.showSeconds)
-                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_23, [
-                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($props.timeSeparator), 1)
+                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_40, [
+                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($props.timeSeparator), 1)
                           ]))
                         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                       ($props.showSeconds)
-                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_24, [
-                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("button", {
+                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_41, [
+                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                               class: "p-link",
-                              onMousedown: _cache[45] || (_cache[45] = $event => ($options.onTimePickerElementMouseDown($event, 2, 1))),
-                              onMouseup: _cache[46] || (_cache[46] = $event => ($options.onTimePickerElementMouseUp($event))),
+                              onMousedown: _cache[44] || (_cache[44] = $event => ($options.onTimePickerElementMouseDown($event, 2, 1))),
+                              onMouseup: _cache[45] || (_cache[45] = $event => ($options.onTimePickerElementMouseUp($event))),
                               onKeydown: [
-                                _cache[47] || (_cache[47] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
-                                _cache[49] || (_cache[49] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 2, 1)), ["enter"])),
-                                _cache[50] || (_cache[50] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 2, 1)), ["space"]))
+                                _cache[46] || (_cache[46] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
+                                _cache[48] || (_cache[48] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 2, 1)), ["enter"])),
+                                _cache[49] || (_cache[49] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 2, 1)), ["space"]))
                               ],
                               disabled: _ctx.$attrs.disabled,
-                              onMouseleave: _cache[48] || (_cache[48] = $event => ($options.onTimePickerElementMouseLeave())),
+                              onMouseleave: _cache[47] || (_cache[47] = $event => ($options.onTimePickerElementMouseLeave())),
                               onKeyup: [
-                                _cache[51] || (_cache[51] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
-                                _cache[52] || (_cache[52] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
+                                _cache[50] || (_cache[50] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
+                                _cache[51] || (_cache[51] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
                               ],
                               type: "button"
-                            }, [
-                              _hoisted_25
-                            ], 40, ["disabled"]), [
+                            }, _hoisted_44, 40, _hoisted_42)), [
                               [_directive_ripple]
                             ]),
-                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.formattedCurrentSecond), 1),
-                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("button", {
+                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.formattedCurrentSecond), 1),
+                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                               class: "p-link",
-                              onMousedown: _cache[53] || (_cache[53] = $event => ($options.onTimePickerElementMouseDown($event, 2, -1))),
-                              onMouseup: _cache[54] || (_cache[54] = $event => ($options.onTimePickerElementMouseUp($event))),
+                              onMousedown: _cache[52] || (_cache[52] = $event => ($options.onTimePickerElementMouseDown($event, 2, -1))),
+                              onMouseup: _cache[53] || (_cache[53] = $event => ($options.onTimePickerElementMouseUp($event))),
                               onKeydown: [
-                                _cache[55] || (_cache[55] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
-                                _cache[57] || (_cache[57] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 2, -1)), ["enter"])),
-                                _cache[58] || (_cache[58] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 2, -1)), ["space"]))
+                                _cache[54] || (_cache[54] = (...args) => ($options.onContainerButtonKeydown && $options.onContainerButtonKeydown(...args))),
+                                _cache[56] || (_cache[56] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 2, -1)), ["enter"])),
+                                _cache[57] || (_cache[57] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseDown($event, 2, -1)), ["space"]))
                               ],
                               disabled: _ctx.$attrs.disabled,
-                              onMouseleave: _cache[56] || (_cache[56] = $event => ($options.onTimePickerElementMouseLeave())),
+                              onMouseleave: _cache[55] || (_cache[55] = $event => ($options.onTimePickerElementMouseLeave())),
                               onKeyup: [
-                                _cache[59] || (_cache[59] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
-                                _cache[60] || (_cache[60] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
+                                _cache[58] || (_cache[58] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["enter"])),
+                                _cache[59] || (_cache[59] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => ($options.onTimePickerElementMouseUp($event)), ["space"]))
                               ],
                               type: "button"
-                            }, [
-                              _hoisted_26
-                            ], 40, ["disabled"]), [
+                            }, _hoisted_47, 40, _hoisted_45)), [
                               [_directive_ripple]
                             ])
                           ]))
                         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                       ($props.hourFormat=='12')
-                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_27, [
-                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($props.timeSeparator), 1)
+                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_48, [
+                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($props.timeSeparator), 1)
                           ]))
                         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                       ($props.hourFormat=='12')
-                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_28, [
-                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("button", {
+                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_49, [
+                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
+                              class: "p-link",
+                              onClick: _cache[60] || (_cache[60] = $event => ($options.toggleAMPM($event))),
+                              type: "button",
+                              disabled: _ctx.$attrs.disabled
+                            }, _hoisted_52, 8, _hoisted_50)), [
+                              [_directive_ripple]
+                            ]),
+                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($data.pm ? 'PM' : 'AM'), 1),
+                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                               class: "p-link",
                               onClick: _cache[61] || (_cache[61] = $event => ($options.toggleAMPM($event))),
                               type: "button",
                               disabled: _ctx.$attrs.disabled
-                            }, [
-                              _hoisted_29
-                            ], 8, ["disabled"]), [
-                              [_directive_ripple]
-                            ]),
-                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($data.pm ? 'PM' : 'AM'), 1),
-                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("button", {
-                              class: "p-link",
-                              onClick: _cache[62] || (_cache[62] = $event => ($options.toggleAMPM($event))),
-                              type: "button",
-                              disabled: _ctx.$attrs.disabled
-                            }, [
-                              _hoisted_30
-                            ], 8, ["disabled"]), [
+                            }, _hoisted_55, 8, _hoisted_53)), [
                               [_directive_ripple]
                             ])
                           ]))
@@ -32607,25 +32698,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     ]))
                   : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                 ($props.showButtonBar)
-                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_31, [
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_56, [
                       (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)(_component_CalendarButton, {
                         type: "button",
                         label: $options.todayLabel,
-                        onClick: _cache[63] || (_cache[63] = $event => ($options.onTodayButtonClick($event))),
+                        onClick: _cache[62] || (_cache[62] = $event => ($options.onTodayButtonClick($event))),
                         class: "p-button-text",
                         onKeydown: $options.onContainerButtonKeydown
                       }, null, 8, ["label", "onKeydown"]),
                       (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)(_component_CalendarButton, {
                         type: "button",
                         label: $options.clearLabel,
-                        onClick: _cache[64] || (_cache[64] = $event => ($options.onClearButtonClick($event))),
+                        onClick: _cache[63] || (_cache[63] = $event => ($options.onClearButtonClick($event))),
                         class: "p-button-text",
                         onKeydown: $options.onContainerButtonKeydown
                       }, null, 8, ["label", "onKeydown"])
                     ]))
                   : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                 (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderSlot)(_ctx.$slots, "footer")
-              ], 42, ["role"]))
+              ], 42, _hoisted_2))
             : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
         ]),
         _: 3
@@ -32666,7 +32757,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -32680,7 +32771,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
@@ -32710,28 +32801,28 @@ const _hoisted_7 = {
 };
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_1, [
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [
     (_ctx.$slots.header)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_2, [
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [
           (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "header")
         ]))
       : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("", true),
-    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_3, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [
       (_ctx.$slots.title)
-        ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_4, [
+        ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [
             (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "title")
           ]))
         : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("", true),
       (_ctx.$slots.subtitle)
-        ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_5, [
+        ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_5, [
             (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "subtitle")
           ]))
         : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("", true),
-      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_6, [
+      (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "content")
       ]),
       (_ctx.$slots.footer)
-        ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_7, [
+        ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_7, [
             (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "footer")
           ]))
         : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("", true)
@@ -32771,7 +32862,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -32785,7 +32876,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
@@ -32891,15 +32982,16 @@ var script = {
 };
 
 const _hoisted_1 = { class: "p-chart" };
+const _hoisted_2 = ["width", "height"];
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_1, [
-    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("canvas", {
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("canvas", {
       ref: "canvas",
       width: $props.width,
       height: $props.height,
-      onClick: _cache[1] || (_cache[1] = $event => ($options.onCanvasClick($event)))
-    }, null, 8, ["width", "height"])
+      onClick: _cache[0] || (_cache[0] = $event => ($options.onCanvasClick($event)))
+    }, null, 8, _hoisted_2)
   ]))
 }
 
@@ -32935,7 +33027,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -32949,7 +33041,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 var script = {
     name: 'Column',
@@ -33132,7 +33224,7 @@ var script = {
     }
 };
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -33146,7 +33238,7 @@ var script = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   "default": () => (/* binding */ PrimeVue),
 /* harmony export */   "usePrimeVue": () => (/* binding */ usePrimeVue)
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
@@ -33254,7 +33346,6 @@ var PrimeVue = {
     }
 };
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (PrimeVue);
 
 
 
@@ -33269,7 +33360,7 @@ var PrimeVue = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
 /* harmony import */ var primevue_api__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primevue/api */ "./node_modules/primevue/api/api.esm.js");
@@ -33321,25 +33412,27 @@ var script$a = {
     }
 };
 
+const _hoisted_1$a = ["aria-checked", "tabindex"];
+
 function render$a(_ctx, _cache, $props, $setup, $data, $options) {
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", {
-    class: ['p-checkbox p-component', {'p-checkbox-focused': $data.focused}],
-    onClick: _cache[3] || (_cache[3] = (...args) => ($options.onClick && $options.onClick(...args))),
-    onKeydown: _cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_4__.withModifiers)((...args) => ($options.onClick && $options.onClick(...args)), ["prevent"]), ["space"]))
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(['p-checkbox p-component', {'p-checkbox-focused': $data.focused}]),
+    onClick: _cache[2] || (_cache[2] = (...args) => ($options.onClick && $options.onClick(...args))),
+    onKeydown: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_4__.withModifiers)((...args) => ($options.onClick && $options.onClick(...args)), ["prevent"]), ["space"]))
   }, [
-    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", {
+    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", {
       ref: "box",
-      class: ['p-checkbox-box p-component', {'p-highlight': $props.checked, 'p-disabled': _ctx.$attrs.disabled, 'p-focus': $data.focused}],
+      class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(['p-checkbox-box p-component', {'p-highlight': $props.checked, 'p-disabled': _ctx.$attrs.disabled, 'p-focus': $data.focused}]),
       role: "checkbox",
       "aria-checked": $props.checked,
       tabindex: _ctx.$attrs.disabled ? null : '0',
-      onFocus: _cache[1] || (_cache[1] = $event => ($options.onFocus($event))),
-      onBlur: _cache[2] || (_cache[2] = $event => ($options.onBlur($event)))
+      onFocus: _cache[0] || (_cache[0] = $event => ($options.onFocus($event))),
+      onBlur: _cache[1] || (_cache[1] = $event => ($options.onBlur($event)))
     }, [
-      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", {
-        class: ['p-checkbox-icon', {'pi pi-check': $props.checked}]
+      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", {
+        class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(['p-checkbox-icon', {'pi pi-check': $props.checked}])
       }, null, 2)
-    ], 42, ["aria-checked", "tabindex"])
+    ], 42, _hoisted_1$a)
   ], 34))
 }
 
@@ -33803,35 +33896,45 @@ var script$9 = {
     }
 };
 
-const _hoisted_1$7 = {
+const _hoisted_1$9 = {
   key: 0,
   class: "p-fluid p-column-filter-element"
 };
-const _hoisted_2$5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "pi pi-filter-icon pi-filter" }, null, -1);
-const _hoisted_3$4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "pi pi-filter-slash" }, null, -1);
-const _hoisted_4$2 = {
+const _hoisted_2$7 = ["aria-expanded"];
+const _hoisted_3$6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "pi pi-filter-icon pi-filter" }, null, -1);
+const _hoisted_4$4 = [
+  _hoisted_3$6
+];
+const _hoisted_5$3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "pi pi-filter-slash" }, null, -1);
+const _hoisted_6$3 = [
+  _hoisted_5$3
+];
+const _hoisted_7$1 = {
   key: 0,
   class: "p-column-filter-row-items"
 };
-const _hoisted_5$1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("li", { class: "p-column-filter-separator" }, null, -1);
-const _hoisted_6$1 = {
+const _hoisted_8 = ["onClick", "onKeydown", "tabindex"];
+const _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("li", { class: "p-column-filter-separator" }, null, -1);
+const _hoisted_10 = {
   key: 0,
   class: "p-column-filter-operator"
 };
-const _hoisted_7 = { class: "p-column-filter-constraints" };
-const _hoisted_8 = {
+const _hoisted_11 = { class: "p-column-filter-constraints" };
+const _hoisted_12 = {
   key: 1,
   class: "p-column-filter-add-rule"
 };
-const _hoisted_9 = { class: "p-column-filter-buttonbar" };
+const _hoisted_13 = { class: "p-column-filter-buttonbar" };
 
 function render$9(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_CFDropdown = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("CFDropdown");
   const _component_CFButton = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("CFButton");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", { class: $options.containerClass }, [
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.containerClass)
+  }, [
     ($props.display === 'row')
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_1$7, [
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_1$9, [
           ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDynamicComponent)($props.filterElement), {
             field: $props.field,
             filterModel: $props.filters[$props.field],
@@ -33840,28 +33943,24 @@ function render$9(_ctx, _cache, $props, $setup, $data, $options) {
         ]))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
     ($options.showMenuButton)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("button", {
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
           key: 1,
           ref: "icon",
           type: "button",
-          class: ["p-column-filter-menu-button p-link", {'p-column-filter-menu-button-open': $data.overlayVisible, 'p-column-filter-menu-button-active': $options.hasFilter()}],
+          class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(["p-column-filter-menu-button p-link", {'p-column-filter-menu-button-open': $data.overlayVisible, 'p-column-filter-menu-button-active': $options.hasFilter()}]),
           "aria-haspopup": "true",
           "aria-expanded": $data.overlayVisible,
-          onClick: _cache[1] || (_cache[1] = $event => ($options.toggleMenu())),
-          onKeydown: _cache[2] || (_cache[2] = $event => ($options.onToggleButtonKeyDown($event)))
-        }, [
-          _hoisted_2$5
-        ], 42, ["aria-expanded"]))
+          onClick: _cache[0] || (_cache[0] = $event => ($options.toggleMenu())),
+          onKeydown: _cache[1] || (_cache[1] = $event => ($options.onToggleButtonKeyDown($event)))
+        }, _hoisted_4$4, 42, _hoisted_2$7))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
     ($props.showClearButton && $props.display === 'row')
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("button", {
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
           key: 2,
-          class: [{'p-hidden-space': !$options.hasRowFilter()}, "p-column-filter-clear-button p-link"],
+          class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)([{'p-hidden-space': !$options.hasRowFilter()}, "p-column-filter-clear-button p-link"]),
           type: "button",
-          onClick: _cache[3] || (_cache[3] = $event => ($options.clearFilter()))
-        }, [
-          _hoisted_3$4
-        ], 2))
+          onClick: _cache[2] || (_cache[2] = $event => ($options.clearFilter()))
+        }, _hoisted_6$3, 2))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
     ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Teleport, { to: "body" }, [
       (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_4__.Transition, {
@@ -33872,13 +33971,13 @@ function render$9(_ctx, _cache, $props, $setup, $data, $options) {
       }, {
         default: (0,vue__WEBPACK_IMPORTED_MODULE_4__.withCtx)(() => [
           ($data.overlayVisible)
-            ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", {
+            ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", {
                 key: 0,
                 ref: $options.overlayRef,
-                class: $options.overlayClass,
-                onKeydown: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)((...args) => ($options.onEscape && $options.onEscape(...args)), ["escape"])),
-                onClick: _cache[13] || (_cache[13] = (...args) => ($options.onContentClick && $options.onContentClick(...args))),
-                onMousedown: _cache[14] || (_cache[14] = (...args) => ($options.onContentMouseDown && $options.onContentMouseDown(...args)))
+                class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.overlayClass),
+                onKeydown: _cache[11] || (_cache[11] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)((...args) => ($options.onEscape && $options.onEscape(...args)), ["escape"])),
+                onClick: _cache[12] || (_cache[12] = (...args) => ($options.onContentClick && $options.onContentClick(...args))),
+                onMousedown: _cache[13] || (_cache[13] = (...args) => ($options.onContentMouseDown && $options.onContentMouseDown(...args)))
               }, [
                 ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDynamicComponent)($props.filterHeaderTemplate), {
                   field: $props.field,
@@ -33886,45 +33985,45 @@ function render$9(_ctx, _cache, $props, $setup, $data, $options) {
                   filterCallback: $options.filterCallback
                 }, null, 8, ["field", "filterModel", "filterCallback"])),
                 ($props.display === 'row')
-                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("ul", _hoisted_4$2, [
-                      ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.matchModes, (matchMode, i) => {
-                        return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("li", {
-                          class: ["p-column-filter-row-item", {'p-highlight': $options.isRowMatchModeSelected(matchMode.value)}],
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("ul", _hoisted_7$1, [
+                      ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.matchModes, (matchMode, i) => {
+                        return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("li", {
+                          class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(["p-column-filter-row-item", {'p-highlight': $options.isRowMatchModeSelected(matchMode.value)}]),
                           key: matchMode.label,
                           onClick: $event => ($options.onRowMatchModeChange(matchMode.value)),
                           onKeydown: [
-                            _cache[4] || (_cache[4] = $event => ($options.onRowMatchModeKeyDown($event))),
+                            _cache[3] || (_cache[3] = $event => ($options.onRowMatchModeKeyDown($event))),
                             (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_4__.withModifiers)($event => ($options.onRowMatchModeChange(matchMode.value)), ["prevent"]), ["enter"])
                           ],
                           tabindex: i === 0 ? '0' : null
-                        }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)(matchMode.label), 43, ["onClick", "onKeydown", "tabindex"]))
+                        }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)(matchMode.label), 43, _hoisted_8))
                       }), 128)),
-                      _hoisted_5$1,
-                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("li", {
+                      _hoisted_9,
+                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("li", {
                         class: "p-column-filter-row-item",
-                        onClick: _cache[5] || (_cache[5] = $event => ($options.clearFilter())),
+                        onClick: _cache[4] || (_cache[4] = $event => ($options.clearFilter())),
                         onKeydown: [
-                          _cache[6] || (_cache[6] = $event => ($options.onRowMatchModeKeyDown($event))),
-                          _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => (_ctx.onRowClearItemClick()), ["enter"]))
+                          _cache[5] || (_cache[5] = $event => ($options.onRowMatchModeKeyDown($event))),
+                          _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)($event => (_ctx.onRowClearItemClick()), ["enter"]))
                         ]
                       }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.noFilterLabel), 33)
                     ]))
-                  : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 1 }, [
+                  : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 1 }, [
                       ($options.isShowOperator)
-                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_6$1, [
+                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_10, [
                             (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)(_component_CFDropdown, {
                               options: $options.operatorOptions,
                               modelValue: $options.operator,
-                              "onUpdate:modelValue": _cache[8] || (_cache[8] = $event => ($options.onOperatorChange($event))),
+                              "onUpdate:modelValue": _cache[7] || (_cache[7] = $event => ($options.onOperatorChange($event))),
                               class: "p-column-filter-operator-dropdown",
                               optionLabel: "label",
                               optionValue: "value"
                             }, null, 8, ["options", "modelValue"])
                           ]))
                         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
-                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", _hoisted_7, [
-                        ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.fieldConstraints, (fieldConstraint, i) => {
-                          return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", {
+                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", _hoisted_11, [
+                        ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.fieldConstraints, (fieldConstraint, i) => {
+                          return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", {
                             key: i,
                             class: "p-column-filter-constraint"
                           }, [
@@ -33947,7 +34046,7 @@ function render$9(_ctx, _cache, $props, $setup, $data, $options) {
                                   filterCallback: $options.filterCallback
                                 }, null, 8, ["field", "filterModel", "filterCallback"]))
                               : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
-                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", null, [
+                            (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", null, [
                               ($options.showRemoveIcon)
                                 ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(_component_CFButton, {
                                     key: 0,
@@ -33963,23 +34062,23 @@ function render$9(_ctx, _cache, $props, $setup, $data, $options) {
                         }), 128))
                       ]),
                       ($options.isShowAddConstraint)
-                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_8, [
+                        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_12, [
                             (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)(_component_CFButton, {
                               type: "button",
                               label: $options.addRuleButtonLabel,
                               icon: "pi pi-plus",
                               class: "p-column-filter-add-button p-button-text p-button-sm",
-                              onClick: _cache[9] || (_cache[9] = $event => ($options.addConstraint()))
+                              onClick: _cache[8] || (_cache[8] = $event => ($options.addConstraint()))
                             }, null, 8, ["label"])
                           ]))
                         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
-                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", _hoisted_9, [
+                      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", _hoisted_13, [
                         (!$props.filterClearTemplate && $props.showClearButton)
                           ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(_component_CFButton, {
                               key: 0,
                               type: "button",
                               class: "p-button-outlined p-button-sm",
-                              onClick: _cache[10] || (_cache[10] = $event => ($options.clearFilter())),
+                              onClick: _cache[9] || (_cache[9] = $event => ($options.clearFilter())),
                               label: $options.clearButtonLabel
                             }, null, 8, ["label"]))
                           : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDynamicComponent)($props.filterClearTemplate), {
@@ -33989,13 +34088,13 @@ function render$9(_ctx, _cache, $props, $setup, $data, $options) {
                               filterCallback: $options.clearFilter
                             }, null, 8, ["field", "filterModel", "filterCallback"])),
                         ($props.showApplyButton)
-                          ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 2 }, [
+                          ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 2 }, [
                               (!$props.filterApplyTemplate)
                                 ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(_component_CFButton, {
                                     key: 0,
                                     type: "button",
                                     class: "p-button-sm",
-                                    onClick: _cache[11] || (_cache[11] = $event => ($options.applyFilter())),
+                                    onClick: _cache[10] || (_cache[10] = $event => ($options.applyFilter())),
                                     label: $options.applyButtonLabel
                                   }, null, 8, ["label"]))
                                 : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDynamicComponent)($props.filterApplyTemplate), {
@@ -34239,12 +34338,13 @@ var script$8 = {
     }
 };
 
-const _hoisted_1$6 = { class: "p-column-header-content" };
-const _hoisted_2$4 = {
+const _hoisted_1$8 = ["tabindex", "colspan", "rowspan", "aria-sort"];
+const _hoisted_2$6 = { class: "p-column-header-content" };
+const _hoisted_3$5 = {
   key: 1,
   class: "p-column-title"
 };
-const _hoisted_3$3 = {
+const _hoisted_4$3 = {
   key: 3,
   class: "p-sortable-column-badge"
 };
@@ -34253,30 +34353,30 @@ function render$8(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_DTHeaderCheckbox = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("DTHeaderCheckbox");
   const _component_DTColumnFilter = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("DTColumnFilter");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("th", {
-    style: $options.containerStyle,
-    class: $options.containerClass,
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("th", {
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeStyle)($options.containerStyle),
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.containerClass),
     tabindex: $options.columnProp('sortable') ? '0' : null,
     role: "cell",
-    onClick: _cache[9] || (_cache[9] = (...args) => ($options.onClick && $options.onClick(...args))),
-    onKeydown: _cache[10] || (_cache[10] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
-    onMousedown: _cache[11] || (_cache[11] = (...args) => ($options.onMouseDown && $options.onMouseDown(...args))),
-    onDragstart: _cache[12] || (_cache[12] = (...args) => ($options.onDragStart && $options.onDragStart(...args))),
-    onDragover: _cache[13] || (_cache[13] = (...args) => ($options.onDragOver && $options.onDragOver(...args))),
-    onDragleave: _cache[14] || (_cache[14] = (...args) => ($options.onDragLeave && $options.onDragLeave(...args))),
-    onDrop: _cache[15] || (_cache[15] = (...args) => ($options.onDrop && $options.onDrop(...args))),
+    onClick: _cache[8] || (_cache[8] = (...args) => ($options.onClick && $options.onClick(...args))),
+    onKeydown: _cache[9] || (_cache[9] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
+    onMousedown: _cache[10] || (_cache[10] = (...args) => ($options.onMouseDown && $options.onMouseDown(...args))),
+    onDragstart: _cache[11] || (_cache[11] = (...args) => ($options.onDragStart && $options.onDragStart(...args))),
+    onDragover: _cache[12] || (_cache[12] = (...args) => ($options.onDragOver && $options.onDragOver(...args))),
+    onDragleave: _cache[13] || (_cache[13] = (...args) => ($options.onDragLeave && $options.onDragLeave(...args))),
+    onDrop: _cache[14] || (_cache[14] = (...args) => ($options.onDrop && $options.onDrop(...args))),
     colspan: $options.columnProp('colspan'),
     rowspan: $options.columnProp('rowspan'),
     "aria-sort": $options.ariaSort
   }, [
     ($props.resizableColumns && !$options.columnProp('frozen'))
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", {
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", {
           key: 0,
           class: "p-column-resizer",
-          onMousedown: _cache[1] || (_cache[1] = (...args) => ($options.onResizeStart && $options.onResizeStart(...args)))
+          onMousedown: _cache[0] || (_cache[0] = (...args) => ($options.onResizeStart && $options.onResizeStart(...args)))
         }, null, 32))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
-    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", _hoisted_1$6, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", _hoisted_2$6, [
       ($props.column.children && $props.column.children.header)
         ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDynamicComponent)($props.column.children.header), {
             key: 0,
@@ -34284,16 +34384,16 @@ function render$8(_ctx, _cache, $props, $setup, $data, $options) {
           }, null, 8, ["column"]))
         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
       ($options.columnProp('header'))
-        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", _hoisted_2$4, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.columnProp('header')), 1))
+        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", _hoisted_3$5, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.columnProp('header')), 1))
         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
       ($options.columnProp('sortable'))
-        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", {
+        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", {
             key: 2,
-            class: $options.sortableColumnIcon
+            class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.sortableColumnIcon)
           }, null, 2))
         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
       ($options.isMultiSorted())
-        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", _hoisted_3$3, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.getBadgeValue()), 1))
+        ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", _hoisted_4$3, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.getBadgeValue()), 1))
         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
       ($options.columnProp('selectionMode') ==='multiple' && $props.filterDisplay !== 'row')
         ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(_component_DTHeaderCheckbox, {
@@ -34317,8 +34417,8 @@ function render$8(_ctx, _cache, $props, $setup, $data, $options) {
             filterApplyTemplate: $props.column.children && $props.column.children.filterapply,
             filters: $props.filters,
             filtersStore: $props.filtersStore,
-            onFilterChange: _cache[2] || (_cache[2] = $event => (_ctx.$emit('filter-change', $event))),
-            onFilterApply: _cache[3] || (_cache[3] = $event => (_ctx.$emit('filter-apply'))),
+            onFilterChange: _cache[1] || (_cache[1] = $event => (_ctx.$emit('filter-change', $event))),
+            onFilterApply: _cache[2] || (_cache[2] = $event => (_ctx.$emit('filter-apply'))),
             filterMenuStyle: $options.columnProp('filterMenuStyle'),
             filterMenuClass: $options.columnProp('filterMenuClass'),
             showOperator: $options.columnProp('showFilterOperator'),
@@ -34328,15 +34428,15 @@ function render$8(_ctx, _cache, $props, $setup, $data, $options) {
             showAddButton: $options.columnProp('showAddButton'),
             matchModeOptions: $options.columnProp('filterMatchModeOptions'),
             maxConstraints: $options.columnProp('maxConstraints'),
-            onOperatorChange: _cache[4] || (_cache[4] = $event => (_ctx.$emit('operator-change',$event))),
-            onMatchmodeChange: _cache[5] || (_cache[5] = $event => (_ctx.$emit('matchmode-change', $event))),
-            onConstraintAdd: _cache[6] || (_cache[6] = $event => (_ctx.$emit('constraint-add', $event))),
-            onConstraintRemove: _cache[7] || (_cache[7] = $event => (_ctx.$emit('constraint-remove', $event))),
-            onApplyClick: _cache[8] || (_cache[8] = $event => (_ctx.$emit('apply-click',$event)))
+            onOperatorChange: _cache[3] || (_cache[3] = $event => (_ctx.$emit('operator-change',$event))),
+            onMatchmodeChange: _cache[4] || (_cache[4] = $event => (_ctx.$emit('matchmode-change', $event))),
+            onConstraintAdd: _cache[5] || (_cache[5] = $event => (_ctx.$emit('constraint-add', $event))),
+            onConstraintRemove: _cache[6] || (_cache[6] = $event => (_ctx.$emit('constraint-remove', $event))),
+            onApplyClick: _cache[7] || (_cache[7] = $event => (_ctx.$emit('apply-click',$event)))
           }, null, 8, ["field", "type", "showMenu", "filterElement", "filterHeaderTemplate", "filterFooterTemplate", "filterClearTemplate", "filterApplyTemplate", "filters", "filtersStore", "filterMenuStyle", "filterMenuClass", "showOperator", "showClearButton", "showApplyButton", "showMatchModes", "showAddButton", "matchModeOptions", "maxConstraints"]))
         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
     ])
-  ], 46, ["tabindex", "colspan", "rowspan", "aria-sort"]))
+  ], 46, _hoisted_1$8))
 }
 
 script$8.render = render$8;
@@ -34459,12 +34559,12 @@ var script$7 = {
     }
 };
 
-const _hoisted_1$5 = {
+const _hoisted_1$7 = {
   class: "p-datatable-thead",
   role: "rowgroup"
 };
-const _hoisted_2$3 = { role: "row" };
-const _hoisted_3$2 = {
+const _hoisted_2$5 = { role: "row" };
+const _hoisted_3$4 = {
   key: 0,
   role: "row"
 };
@@ -34474,67 +34574,67 @@ function render$7(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_DTHeaderCheckbox = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("DTHeaderCheckbox");
   const _component_DTColumnFilter = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("DTColumnFilter");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("thead", _hoisted_1$5, [
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("thead", _hoisted_1$7, [
     (!$props.columnGroup)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 0 }, [
-          (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("tr", _hoisted_2$3, [
-            ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($props.columns, (col, i) => {
-              return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 0 }, [
+          (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("tr", _hoisted_2$5, [
+            ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($props.columns, (col, i) => {
+              return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
                 key: $options.columnProp(col, 'columnKey')||$options.columnProp(col, 'field')||i
               }, [
                 (!$options.columnProp(col, 'hidden') && ($props.rowGroupMode !== 'subheader' || ($props.groupRowsBy !== $options.columnProp(col, 'field'))))
                   ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(_component_DTHeaderCell, {
                       key: 0,
                       column: col,
-                      onColumnClick: _cache[1] || (_cache[1] = $event => (_ctx.$emit('column-click', $event))),
-                      onColumnMousedown: _cache[2] || (_cache[2] = $event => (_ctx.$emit('column-mousedown', $event))),
-                      onColumnDragstart: _cache[3] || (_cache[3] = $event => (_ctx.$emit('column-dragstart', $event))),
-                      onColumnDragover: _cache[4] || (_cache[4] = $event => (_ctx.$emit('column-dragover', $event))),
-                      onColumnDragleave: _cache[5] || (_cache[5] = $event => (_ctx.$emit('column-dragleave', $event))),
-                      onColumnDrop: _cache[6] || (_cache[6] = $event => (_ctx.$emit('column-drop', $event))),
+                      onColumnClick: _cache[0] || (_cache[0] = $event => (_ctx.$emit('column-click', $event))),
+                      onColumnMousedown: _cache[1] || (_cache[1] = $event => (_ctx.$emit('column-mousedown', $event))),
+                      onColumnDragstart: _cache[2] || (_cache[2] = $event => (_ctx.$emit('column-dragstart', $event))),
+                      onColumnDragover: _cache[3] || (_cache[3] = $event => (_ctx.$emit('column-dragover', $event))),
+                      onColumnDragleave: _cache[4] || (_cache[4] = $event => (_ctx.$emit('column-dragleave', $event))),
+                      onColumnDrop: _cache[5] || (_cache[5] = $event => (_ctx.$emit('column-drop', $event))),
                       groupRowsBy: $props.groupRowsBy,
                       groupRowSortField: $props.groupRowSortField,
                       resizableColumns: $props.resizableColumns,
-                      onColumnResizestart: _cache[7] || (_cache[7] = $event => (_ctx.$emit('column-resizestart', $event))),
+                      onColumnResizestart: _cache[6] || (_cache[6] = $event => (_ctx.$emit('column-resizestart', $event))),
                       sortMode: $props.sortMode,
                       sortField: $props.sortField,
                       sortOrder: $props.sortOrder,
                       multiSortMeta: $props.multiSortMeta,
                       allRowsSelected: $props.allRowsSelected,
                       empty: $props.empty,
-                      onCheckboxChange: _cache[8] || (_cache[8] = $event => (_ctx.$emit('checkbox-change', $event))),
+                      onCheckboxChange: _cache[7] || (_cache[7] = $event => (_ctx.$emit('checkbox-change', $event))),
                       filters: $props.filters,
                       filterDisplay: $props.filterDisplay,
                       filtersStore: $props.filtersStore,
-                      onFilterChange: _cache[9] || (_cache[9] = $event => (_ctx.$emit('filter-change', $event))),
-                      onFilterApply: _cache[10] || (_cache[10] = $event => (_ctx.$emit('filter-apply'))),
-                      onOperatorChange: _cache[11] || (_cache[11] = $event => (_ctx.$emit('operator-change',$event))),
-                      onMatchmodeChange: _cache[12] || (_cache[12] = $event => (_ctx.$emit('matchmode-change', $event))),
-                      onConstraintAdd: _cache[13] || (_cache[13] = $event => (_ctx.$emit('constraint-add', $event))),
-                      onConstraintRemove: _cache[14] || (_cache[14] = $event => (_ctx.$emit('constraint-remove', $event))),
-                      onApplyClick: _cache[15] || (_cache[15] = $event => (_ctx.$emit('apply-click',$event)))
+                      onFilterChange: _cache[8] || (_cache[8] = $event => (_ctx.$emit('filter-change', $event))),
+                      onFilterApply: _cache[9] || (_cache[9] = $event => (_ctx.$emit('filter-apply'))),
+                      onOperatorChange: _cache[10] || (_cache[10] = $event => (_ctx.$emit('operator-change',$event))),
+                      onMatchmodeChange: _cache[11] || (_cache[11] = $event => (_ctx.$emit('matchmode-change', $event))),
+                      onConstraintAdd: _cache[12] || (_cache[12] = $event => (_ctx.$emit('constraint-add', $event))),
+                      onConstraintRemove: _cache[13] || (_cache[13] = $event => (_ctx.$emit('constraint-remove', $event))),
+                      onApplyClick: _cache[14] || (_cache[14] = $event => (_ctx.$emit('apply-click',$event)))
                     }, null, 8, ["column", "groupRowsBy", "groupRowSortField", "resizableColumns", "sortMode", "sortField", "sortOrder", "multiSortMeta", "allRowsSelected", "empty", "filters", "filterDisplay", "filtersStore"]))
                   : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
               ], 64))
             }), 128))
           ]),
           ($props.filterDisplay === 'row')
-            ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tr", _hoisted_3$2, [
-                ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($props.columns, (col, i) => {
-                  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+            ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tr", _hoisted_3$4, [
+                ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($props.columns, (col, i) => {
+                  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
                     key: $options.columnProp(col, 'columnKey')||$options.columnProp(col, 'field')||i
                   }, [
                     (!$options.columnProp(col, 'hidden') && ($props.rowGroupMode !== 'subheader' || ($props.groupRowsBy !== $options.columnProp(col, 'field'))))
-                      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("th", {
+                      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("th", {
                           key: 0,
-                          style: $options.getFilterColumnHeaderStyle(col),
-                          class: $options.getFilterColumnHeaderClass(col)
+                          style: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeStyle)($options.getFilterColumnHeaderStyle(col)),
+                          class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.getFilterColumnHeaderClass(col))
                         }, [
                           ($options.columnProp(col, 'selectionMode') ==='multiple')
                             ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(_component_DTHeaderCheckbox, {
                                 key: 0,
                                 checked: $props.allRowsSelected,
-                                onChange: _cache[16] || (_cache[16] = $event => (_ctx.$emit('checkbox-change', $event))),
+                                onChange: _cache[15] || (_cache[15] = $event => (_ctx.$emit('checkbox-change', $event))),
                                 disabled: $props.empty
                               }, null, 8, ["checked", "disabled"]))
                             : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
@@ -34552,8 +34652,8 @@ function render$7(_ctx, _cache, $props, $setup, $data, $options) {
                                 filterApplyTemplate: col.children && col.children.filterapply,
                                 filters: $props.filters,
                                 filtersStore: $props.filtersStore,
-                                onFilterChange: _cache[17] || (_cache[17] = $event => (_ctx.$emit('filter-change', $event))),
-                                onFilterApply: _cache[18] || (_cache[18] = $event => (_ctx.$emit('filter-apply'))),
+                                onFilterChange: _cache[16] || (_cache[16] = $event => (_ctx.$emit('filter-change', $event))),
+                                onFilterApply: _cache[17] || (_cache[17] = $event => (_ctx.$emit('filter-apply'))),
                                 filterMenuStyle: $options.columnProp(col,'filterMenuStyle'),
                                 filterMenuClass: $options.columnProp(col,'filterMenuClass'),
                                 showOperator: $options.columnProp(col,'showFilterOperator'),
@@ -34563,11 +34663,11 @@ function render$7(_ctx, _cache, $props, $setup, $data, $options) {
                                 showAddButton: $options.columnProp(col,'showAddButton'),
                                 matchModeOptions: $options.columnProp(col,'filterMatchModeOptions'),
                                 maxConstraints: $options.columnProp(col,'maxConstraints'),
-                                onOperatorChange: _cache[19] || (_cache[19] = $event => (_ctx.$emit('operator-change',$event))),
-                                onMatchmodeChange: _cache[20] || (_cache[20] = $event => (_ctx.$emit('matchmode-change', $event))),
-                                onConstraintAdd: _cache[21] || (_cache[21] = $event => (_ctx.$emit('constraint-add', $event))),
-                                onConstraintRemove: _cache[22] || (_cache[22] = $event => (_ctx.$emit('constraint-remove', $event))),
-                                onApplyClick: _cache[23] || (_cache[23] = $event => (_ctx.$emit('apply-click',$event)))
+                                onOperatorChange: _cache[18] || (_cache[18] = $event => (_ctx.$emit('operator-change',$event))),
+                                onMatchmodeChange: _cache[19] || (_cache[19] = $event => (_ctx.$emit('matchmode-change', $event))),
+                                onConstraintAdd: _cache[20] || (_cache[20] = $event => (_ctx.$emit('constraint-add', $event))),
+                                onConstraintRemove: _cache[21] || (_cache[21] = $event => (_ctx.$emit('constraint-remove', $event))),
+                                onApplyClick: _cache[22] || (_cache[22] = $event => (_ctx.$emit('apply-click',$event)))
                               }, null, 8, ["field", "type", "showMenu", "filterElement", "filterHeaderTemplate", "filterFooterTemplate", "filterClearTemplate", "filterApplyTemplate", "filters", "filtersStore", "filterMenuStyle", "filterMenuClass", "showOperator", "showClearButton", "showApplyButton", "showMatchModes", "showAddButton", "matchModeOptions", "maxConstraints"]))
                             : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
                         ], 6))
@@ -34577,21 +34677,21 @@ function render$7(_ctx, _cache, $props, $setup, $data, $options) {
               ]))
             : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
         ], 64))
-      : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 1 }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.getHeaderRows(), (row, i) => {
-          return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tr", {
+      : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 1 }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.getHeaderRows(), (row, i) => {
+          return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tr", {
             key: i,
             role: "row"
           }, [
-            ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.getHeaderColumns(row), (col, j) => {
-              return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+            ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.getHeaderColumns(row), (col, j) => {
+              return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
                 key: $options.columnProp(col, 'columnKey')||$options.columnProp(col, 'field')||j
               }, [
                 (!$options.columnProp(col, 'hidden') && ($props.rowGroupMode !== 'subheader' || ($props.groupRowsBy !== $options.columnProp(col, 'field'))) && (typeof col.children !== 'string'))
                   ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(_component_DTHeaderCell, {
                       key: 0,
                       column: col,
-                      onColumnClick: _cache[24] || (_cache[24] = $event => (_ctx.$emit('column-click', $event))),
-                      onColumnMousedown: _cache[25] || (_cache[25] = $event => (_ctx.$emit('column-mousedown', $event))),
+                      onColumnClick: _cache[23] || (_cache[23] = $event => (_ctx.$emit('column-click', $event))),
+                      onColumnMousedown: _cache[24] || (_cache[24] = $event => (_ctx.$emit('column-mousedown', $event))),
                       groupRowsBy: $props.groupRowsBy,
                       groupRowSortField: $props.groupRowSortField,
                       sortMode: $props.sortMode,
@@ -34600,17 +34700,17 @@ function render$7(_ctx, _cache, $props, $setup, $data, $options) {
                       multiSortMeta: $props.multiSortMeta,
                       allRowsSelected: $props.allRowsSelected,
                       empty: $props.empty,
-                      onCheckboxChange: _cache[26] || (_cache[26] = $event => (_ctx.$emit('checkbox-change', $event))),
+                      onCheckboxChange: _cache[25] || (_cache[25] = $event => (_ctx.$emit('checkbox-change', $event))),
                       filters: $props.filters,
                       filterDisplay: $props.filterDisplay,
                       filtersStore: $props.filtersStore,
-                      onFilterChange: _cache[27] || (_cache[27] = $event => (_ctx.$emit('filter-change', $event))),
-                      onFilterApply: _cache[28] || (_cache[28] = $event => (_ctx.$emit('filter-apply'))),
-                      onOperatorChange: _cache[29] || (_cache[29] = $event => (_ctx.$emit('operator-change',$event))),
-                      onMatchmodeChange: _cache[30] || (_cache[30] = $event => (_ctx.$emit('matchmode-change', $event))),
-                      onConstraintAdd: _cache[31] || (_cache[31] = $event => (_ctx.$emit('constraint-add', $event))),
-                      onConstraintRemove: _cache[32] || (_cache[32] = $event => (_ctx.$emit('constraint-remove', $event))),
-                      onApplyClick: _cache[33] || (_cache[33] = $event => (_ctx.$emit('apply-click',$event)))
+                      onFilterChange: _cache[26] || (_cache[26] = $event => (_ctx.$emit('filter-change', $event))),
+                      onFilterApply: _cache[27] || (_cache[27] = $event => (_ctx.$emit('filter-apply'))),
+                      onOperatorChange: _cache[28] || (_cache[28] = $event => (_ctx.$emit('operator-change',$event))),
+                      onMatchmodeChange: _cache[29] || (_cache[29] = $event => (_ctx.$emit('matchmode-change', $event))),
+                      onConstraintAdd: _cache[30] || (_cache[30] = $event => (_ctx.$emit('constraint-add', $event))),
+                      onConstraintRemove: _cache[31] || (_cache[31] = $event => (_ctx.$emit('constraint-remove', $event))),
+                      onApplyClick: _cache[32] || (_cache[32] = $event => (_ctx.$emit('apply-click',$event)))
                     }, null, 8, ["column", "groupRowsBy", "groupRowSortField", "sortMode", "sortField", "sortOrder", "multiSortMeta", "allRowsSelected", "empty", "filters", "filterDisplay", "filtersStore"]))
                   : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
               ], 64))
@@ -34655,25 +34755,27 @@ var script$6 = {
     }
 };
 
-const _hoisted_1$4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", { class: "p-radiobutton-icon" }, null, -1);
+const _hoisted_1$6 = ["aria-checked"];
+const _hoisted_2$4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", { class: "p-radiobutton-icon" }, null, -1);
+const _hoisted_3$3 = [
+  _hoisted_2$4
+];
 
 function render$6(_ctx, _cache, $props, $setup, $data, $options) {
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", {
-    class: ['p-radiobutton p-component', {'p-radiobutton-focused': $data.focused}],
-    onClick: _cache[1] || (_cache[1] = (...args) => ($options.onClick && $options.onClick(...args))),
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(['p-radiobutton p-component', {'p-radiobutton-focused': $data.focused}]),
+    onClick: _cache[0] || (_cache[0] = (...args) => ($options.onClick && $options.onClick(...args))),
     tabindex: "0",
-    onFocus: _cache[2] || (_cache[2] = $event => ($options.onFocus($event))),
-    onBlur: _cache[3] || (_cache[3] = $event => ($options.onBlur($event))),
-    onKeydown: _cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_4__.withModifiers)((...args) => ($options.onClick && $options.onClick(...args)), ["prevent"]), ["space"]))
+    onFocus: _cache[1] || (_cache[1] = $event => ($options.onFocus($event))),
+    onBlur: _cache[2] || (_cache[2] = $event => ($options.onBlur($event))),
+    onKeydown: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_4__.withModifiers)((...args) => ($options.onClick && $options.onClick(...args)), ["prevent"]), ["space"]))
   }, [
-    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", {
+    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", {
       ref: "box",
-      class: ['p-radiobutton-box p-component', {'p-highlight': $props.checked, 'p-disabled': _ctx.$attrs.disabled, 'p-focus': $data.focused}],
+      class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(['p-radiobutton-box p-component', {'p-highlight': $props.checked, 'p-disabled': _ctx.$attrs.disabled, 'p-focus': $data.focused}]),
       role: "radio",
       "aria-checked": $props.checked
-    }, [
-      _hoisted_1$4
-    ], 10, ["aria-checked"])
+    }, _hoisted_3$3, 10, _hoisted_1$6)
   ], 34))
 }
 
@@ -34711,25 +34813,27 @@ var script$5 = {
     }
 };
 
+const _hoisted_1$5 = ["aria-checked", "tabindex"];
+
 function render$5(_ctx, _cache, $props, $setup, $data, $options) {
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", {
-    class: ['p-checkbox p-component', {'p-checkbox-focused': $data.focused}],
-    onClick: _cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withModifiers)((...args) => ($options.onClick && $options.onClick(...args)), ["stop","prevent"]))
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(['p-checkbox p-component', {'p-checkbox-focused': $data.focused}]),
+    onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withModifiers)((...args) => ($options.onClick && $options.onClick(...args)), ["stop","prevent"]))
   }, [
-    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", {
+    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", {
       ref: "box",
-      class: ['p-checkbox-box p-component', {'p-highlight': $props.checked, 'p-disabled': _ctx.$attrs.disabled, 'p-focus': $data.focused}],
+      class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(['p-checkbox-box p-component', {'p-highlight': $props.checked, 'p-disabled': _ctx.$attrs.disabled, 'p-focus': $data.focused}]),
       role: "checkbox",
       "aria-checked": $props.checked,
       tabindex: _ctx.$attrs.disabled ? null : '0',
-      onKeydown: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_4__.withModifiers)((...args) => ($options.onClick && $options.onClick(...args)), ["prevent"]), ["space"])),
-      onFocus: _cache[2] || (_cache[2] = $event => ($options.onFocus($event))),
-      onBlur: _cache[3] || (_cache[3] = $event => ($options.onBlur($event)))
+      onKeydown: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_4__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_4__.withModifiers)((...args) => ($options.onClick && $options.onClick(...args)), ["prevent"]), ["space"])),
+      onFocus: _cache[1] || (_cache[1] = $event => ($options.onFocus($event))),
+      onBlur: _cache[2] || (_cache[2] = $event => ($options.onBlur($event)))
     }, [
-      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", {
-        class: ['p-checkbox-icon', {'pi pi-check': $props.checked}]
+      (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", {
+        class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(['p-checkbox-icon', {'pi pi-check': $props.checked}])
       }, null, 2)
-    ], 42, ["aria-checked", "tabindex"])
+    ], 42, _hoisted_1$5)
   ], 2))
 }
 
@@ -35100,13 +35204,22 @@ var script$4 = {
     }
 };
 
-const _hoisted_1$3 = {
+const _hoisted_1$4 = {
   key: 0,
   class: "p-column-title"
 };
-const _hoisted_2$2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "p-row-editor-init-icon pi pi-fw pi-pencil" }, null, -1);
-const _hoisted_3$1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "p-row-editor-save-icon pi pi-fw pi-check" }, null, -1);
-const _hoisted_4$1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: "p-row-editor-cancel-icon pi pi-fw pi-times" }, null, -1);
+const _hoisted_2$3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "p-row-editor-init-icon pi pi-fw pi-pencil" }, null, -1);
+const _hoisted_3$2 = [
+  _hoisted_2$3
+];
+const _hoisted_4$2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "p-row-editor-save-icon pi pi-fw pi-check" }, null, -1);
+const _hoisted_5$2 = [
+  _hoisted_4$2
+];
+const _hoisted_6$2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", { class: "p-row-editor-cancel-icon pi pi-fw pi-times" }, null, -1);
+const _hoisted_7 = [
+  _hoisted_6$2
+];
 
 function render$4(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_DTRadioButton = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("DTRadioButton");
@@ -35114,10 +35227,10 @@ function render$4(_ctx, _cache, $props, $setup, $data, $options) {
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDirective)("ripple");
 
   return ($options.loading)
-    ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("td", {
+    ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("td", {
         key: 0,
-        style: $options.containerStyle,
-        class: $options.containerClass
+        style: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeStyle)($options.containerStyle),
+        class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.containerClass)
       }, [
         ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDynamicComponent)($props.column.children.loading), {
           data: $props.rowData,
@@ -35128,16 +35241,16 @@ function render$4(_ctx, _cache, $props, $setup, $data, $options) {
           loadingOptions: $options.loadingOptions
         }, null, 8, ["data", "column", "field", "index", "frozenRow", "loadingOptions"]))
       ], 6))
-    : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("td", {
+    : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("td", {
         key: 1,
-        style: $options.containerStyle,
-        class: $options.containerClass,
-        onClick: _cache[7] || (_cache[7] = (...args) => ($options.onClick && $options.onClick(...args))),
-        onKeydown: _cache[8] || (_cache[8] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
+        style: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeStyle)($options.containerStyle),
+        class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.containerClass),
+        onClick: _cache[6] || (_cache[6] = (...args) => ($options.onClick && $options.onClick(...args))),
+        onKeydown: _cache[7] || (_cache[7] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
         role: "cell"
       }, [
         ($props.responsiveLayout === 'stack')
-          ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", _hoisted_1$3, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.columnProp('header')), 1))
+          ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", _hoisted_1$4, (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.columnProp('header')), 1))
           : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
         ($props.column.children && $props.column.children.body && !$data.d_editing)
           ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDynamicComponent)($props.column.children.body), {
@@ -35170,79 +35283,75 @@ function render$4(_ctx, _cache, $props, $setup, $data, $options) {
                   frozenRow: $props.frozenRow
                 }, null, 8, ["data", "column", "field", "index", "frozenRow"]))
               : ($options.columnProp('selectionMode'))
-                ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 4 }, [
+                ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 4 }, [
                     ($options.columnProp('selectionMode') === 'single')
                       ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(_component_DTRadioButton, {
                           key: 0,
                           value: $props.rowData,
                           checked: $props.selected,
-                          onChange: _cache[1] || (_cache[1] = $event => ($options.toggleRowWithRadio($event, $props.rowIndex)))
+                          onChange: _cache[0] || (_cache[0] = $event => ($options.toggleRowWithRadio($event, $props.rowIndex)))
                         }, null, 8, ["value", "checked"]))
                       : ($options.columnProp('selectionMode') ==='multiple')
                         ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(_component_DTCheckbox, {
                             key: 1,
                             value: $props.rowData,
                             checked: $props.selected,
-                            onChange: _cache[2] || (_cache[2] = $event => ($options.toggleRowWithCheckbox($event, $props.rowIndex)))
+                            onChange: _cache[1] || (_cache[1] = $event => ($options.toggleRowWithCheckbox($event, $props.rowIndex)))
                           }, null, 8, ["value", "checked"]))
                         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
                   ], 64))
                 : ($options.columnProp('rowReorder'))
-                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("i", {
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("i", {
                       key: 5,
-                      class: ['p-datatable-reorderablerow-handle', ($options.columnProp('rowReorderIcon') || 'pi pi-bars')]
+                      class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(['p-datatable-reorderablerow-handle', ($options.columnProp('rowReorderIcon') || 'pi pi-bars')])
                     }, null, 2))
                   : ($options.columnProp('expander'))
-                    ? (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("button", {
+                    ? (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                         key: 6,
                         class: "p-row-toggler p-link",
-                        onClick: _cache[3] || (_cache[3] = (...args) => ($options.toggleRow && $options.toggleRow(...args))),
+                        onClick: _cache[2] || (_cache[2] = (...args) => ($options.toggleRow && $options.toggleRow(...args))),
                         type: "button"
                       }, [
-                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", { class: $props.rowTogglerIcon }, null, 2)
-                      ], 512)), [
+                        (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", {
+                          class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($props.rowTogglerIcon)
+                        }, null, 2)
+                      ])), [
                         [_directive_ripple]
                       ])
                     : ($props.editMode === 'row' && $options.columnProp('rowEditor'))
-                      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 7 }, [
+                      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 7 }, [
                           (!$data.d_editing)
-                            ? (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("button", {
+                            ? (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                                 key: 0,
                                 class: "p-row-editor-init p-link",
-                                onClick: _cache[4] || (_cache[4] = (...args) => ($options.onRowEditInit && $options.onRowEditInit(...args))),
+                                onClick: _cache[3] || (_cache[3] = (...args) => ($options.onRowEditInit && $options.onRowEditInit(...args))),
                                 type: "button"
-                              }, [
-                                _hoisted_2$2
-                              ], 512)), [
+                              }, _hoisted_3$2)), [
                                 [_directive_ripple]
                               ])
                             : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                           ($data.d_editing)
-                            ? (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("button", {
+                            ? (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                                 key: 1,
                                 class: "p-row-editor-save p-link",
-                                onClick: _cache[5] || (_cache[5] = (...args) => ($options.onRowEditSave && $options.onRowEditSave(...args))),
+                                onClick: _cache[4] || (_cache[4] = (...args) => ($options.onRowEditSave && $options.onRowEditSave(...args))),
                                 type: "button"
-                              }, [
-                                _hoisted_3$1
-                              ], 512)), [
+                              }, _hoisted_5$2)), [
                                 [_directive_ripple]
                               ])
                             : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                           ($data.d_editing)
-                            ? (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("button", {
+                            ? (0,vue__WEBPACK_IMPORTED_MODULE_4__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                                 key: 2,
                                 class: "p-row-editor-cancel p-link",
-                                onClick: _cache[6] || (_cache[6] = (...args) => ($options.onRowEditCancel && $options.onRowEditCancel(...args))),
+                                onClick: _cache[5] || (_cache[5] = (...args) => ($options.onRowEditCancel && $options.onRowEditCancel(...args))),
                                 type: "button"
-                              }, [
-                                _hoisted_4$1
-                              ], 512)), [
+                              }, _hoisted_7)), [
                                 [_directive_ripple]
                               ])
                             : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
                         ], 64))
-                      : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 8 }, [
+                      : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 8 }, [
                           (0,vue__WEBPACK_IMPORTED_MODULE_4__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.resolveFieldData()), 1)
                         ], 64))
       ], 38))
@@ -35731,76 +35840,81 @@ var script$3 = {
     }
 };
 
-const _hoisted_1$2 = {
+const _hoisted_1$3 = ["colspan"];
+const _hoisted_2$2 = ["onClick"];
+const _hoisted_3$1 = ["onClick", "onDblclick", "onContextmenu", "onKeydown", "tabindex", "onDragstart", "onDragover"];
+const _hoisted_4$1 = ["colspan"];
+const _hoisted_5$1 = {
   key: 1,
   class: "p-datatable-emptymessage",
   role: "row"
 };
+const _hoisted_6$1 = ["colspan"];
 
 function render$3(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_DTBodyCell = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("DTBodyCell");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tbody", {
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tbody", {
     ref: $options.bodyRef,
     class: "p-datatable-tbody",
     role: "rowgroup",
-    style: $options.bodyStyle
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeStyle)($options.bodyStyle)
   }, [
     (!$props.empty)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 0 }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($props.value, (rowData, index) => {
-          return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 0 }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($props.value, (rowData, index) => {
+          return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
             key: $options.getRowKey(rowData, $options.getRowIndex(index)) + '_subheader'
           }, [
             ($props.templates['groupheader'] && $props.rowGroupMode === 'subheader' && $options.shouldRenderRowGroupHeader($props.value, rowData, $options.getRowIndex(index)))
-              ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tr", {
+              ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tr", {
                   key: 0,
                   class: "p-rowgroup-header",
-                  style: $options.rowGroupHeaderStyle,
+                  style: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeStyle)($options.rowGroupHeaderStyle),
                   role: "row"
                 }, [
-                  (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("td", {
+                  (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("td", {
                     colspan: $options.columnsLength - 1
                   }, [
                     ($props.expandableRowGroups)
-                      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("button", {
+                      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("button", {
                           key: 0,
                           class: "p-row-toggler p-link",
                           onClick: $event => ($options.onRowGroupToggle($event, rowData)),
                           type: "button"
                         }, [
-                          (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("span", {
-                            class: $options.rowGroupTogglerIcon(rowData)
+                          (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("span", {
+                            class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.rowGroupTogglerIcon(rowData))
                           }, null, 2)
-                        ], 8, ["onClick"]))
+                        ], 8, _hoisted_2$2))
                       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
                     ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDynamicComponent)($props.templates['groupheader']), {
                       data: rowData,
                       index: $options.getRowIndex(index)
                     }, null, 8, ["data", "index"]))
-                  ], 8, ["colspan"])
+                  ], 8, _hoisted_1$3)
                 ], 4))
               : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
             ($props.expandableRowGroups ? $options.isRowGroupExpanded(rowData): true)
-              ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tr", {
-                  class: $options.getRowClass(rowData),
-                  style: $props.rowStyle,
+              ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tr", {
+                  class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.getRowClass(rowData)),
+                  style: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeStyle)($props.rowStyle),
                   key: $options.getRowKey(rowData, $options.getRowIndex(index)),
                   onClick: $event => ($options.onRowClick($event, rowData, $options.getRowIndex(index))),
                   onDblclick: $event => ($options.onRowDblClick($event, rowData, $options.getRowIndex(index))),
                   onContextmenu: $event => ($options.onRowRightClick($event, rowData, $options.getRowIndex(index))),
-                  onTouchend: _cache[10] || (_cache[10] = $event => ($options.onRowTouchEnd($event))),
+                  onTouchend: _cache[9] || (_cache[9] = $event => ($options.onRowTouchEnd($event))),
                   onKeydown: $event => ($options.onRowKeyDown($event, rowData, $options.getRowIndex(index))),
                   tabindex: $props.selectionMode || $props.contextMenu ? '0' : null,
-                  onMousedown: _cache[11] || (_cache[11] = $event => ($options.onRowMouseDown($event))),
+                  onMousedown: _cache[10] || (_cache[10] = $event => ($options.onRowMouseDown($event))),
                   onDragstart: $event => ($options.onRowDragStart($event, $options.getRowIndex(index))),
                   onDragover: $event => ($options.onRowDragOver($event, $options.getRowIndex(index))),
-                  onDragleave: _cache[12] || (_cache[12] = $event => ($options.onRowDragLeave($event))),
-                  onDragend: _cache[13] || (_cache[13] = $event => ($options.onRowDragEnd($event))),
-                  onDrop: _cache[14] || (_cache[14] = $event => ($options.onRowDrop($event))),
+                  onDragleave: _cache[11] || (_cache[11] = $event => ($options.onRowDragLeave($event))),
+                  onDragend: _cache[12] || (_cache[12] = $event => ($options.onRowDragEnd($event))),
+                  onDrop: _cache[13] || (_cache[13] = $event => ($options.onRowDrop($event))),
                   role: "row"
                 }, [
-                  ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($props.columns, (col, i) => {
-                    return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+                  ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($props.columns, (col, i) => {
+                    return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
                       key: $options.columnProp(col,'columnKey')||$options.columnProp(col,'field')||i
                     }, [
                       ($options.shouldRenderBodyCell($props.value, col, $options.getRowIndex(index)))
@@ -35817,15 +35931,15 @@ function render$3(_ctx, _cache, $props, $setup, $data, $options) {
                             editMode: $props.editMode,
                             editing: $props.editMode === 'row' && $options.isRowEditing(rowData),
                             responsiveLayout: $props.responsiveLayout,
-                            onRadioChange: _cache[1] || (_cache[1] = $event => ($options.onRadioChange($event))),
-                            onCheckboxChange: _cache[2] || (_cache[2] = $event => ($options.onCheckboxChange($event))),
-                            onRowToggle: _cache[3] || (_cache[3] = $event => ($options.onRowToggle($event))),
-                            onCellEditInit: _cache[4] || (_cache[4] = $event => ($options.onCellEditInit($event))),
-                            onCellEditComplete: _cache[5] || (_cache[5] = $event => ($options.onCellEditComplete($event))),
-                            onCellEditCancel: _cache[6] || (_cache[6] = $event => ($options.onCellEditCancel($event))),
-                            onRowEditInit: _cache[7] || (_cache[7] = $event => ($options.onRowEditInit($event))),
-                            onRowEditSave: _cache[8] || (_cache[8] = $event => ($options.onRowEditSave($event))),
-                            onRowEditCancel: _cache[9] || (_cache[9] = $event => ($options.onRowEditCancel($event))),
+                            onRadioChange: _cache[0] || (_cache[0] = $event => ($options.onRadioChange($event))),
+                            onCheckboxChange: _cache[1] || (_cache[1] = $event => ($options.onCheckboxChange($event))),
+                            onRowToggle: _cache[2] || (_cache[2] = $event => ($options.onRowToggle($event))),
+                            onCellEditInit: _cache[3] || (_cache[3] = $event => ($options.onCellEditInit($event))),
+                            onCellEditComplete: _cache[4] || (_cache[4] = $event => ($options.onCellEditComplete($event))),
+                            onCellEditCancel: _cache[5] || (_cache[5] = $event => ($options.onCellEditCancel($event))),
+                            onRowEditInit: _cache[6] || (_cache[6] = $event => ($options.onRowEditInit($event))),
+                            onRowEditSave: _cache[7] || (_cache[7] = $event => ($options.onRowEditSave($event))),
+                            onRowEditCancel: _cache[8] || (_cache[8] = $event => ($options.onRowEditCancel($event))),
                             editingMeta: $props.editingMeta,
                             onEditingMetaChange: $options.onEditingMetaChange,
                             virtualScrollerContentProps: $props.virtualScrollerContentProps
@@ -35833,24 +35947,24 @@ function render$3(_ctx, _cache, $props, $setup, $data, $options) {
                         : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
                     ], 64))
                   }), 128))
-                ], 46, ["onClick", "onDblclick", "onContextmenu", "onKeydown", "tabindex", "onDragstart", "onDragover"]))
+                ], 46, _hoisted_3$1))
               : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
             ($props.templates['expansion'] && $props.expandedRows && $options.isRowExpanded(rowData))
-              ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tr", {
+              ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tr", {
                   class: "p-datatable-row-expansion",
                   key: $options.getRowKey(rowData, $options.getRowIndex(index)) + '_expansion',
                   role: "row"
                 }, [
-                  (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("td", { colspan: $options.columnsLength }, [
+                  (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("td", { colspan: $options.columnsLength }, [
                     ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDynamicComponent)($props.templates['expansion']), {
                       data: rowData,
                       index: $options.getRowIndex(index)
                     }, null, 8, ["data", "index"]))
-                  ], 8, ["colspan"])
+                  ], 8, _hoisted_4$1)
                 ]))
               : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
             ($props.templates['groupfooter'] && $props.rowGroupMode === 'subheader' && $options.shouldRenderRowGroupFooter($props.value, rowData, $options.getRowIndex(index)))
-              ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tr", {
+              ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tr", {
                   class: "p-rowgroup-footer",
                   key: $options.getRowKey(rowData, $options.getRowIndex(index)) + '_subfooter',
                   role: "row"
@@ -35863,15 +35977,15 @@ function render$3(_ctx, _cache, $props, $setup, $data, $options) {
               : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
           ], 64))
         }), 128))
-      : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tr", _hoisted_1$2, [
-          (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("td", { colspan: $options.columnsLength }, [
+      : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tr", _hoisted_5$1, [
+          (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("td", { colspan: $options.columnsLength }, [
             ($props.templates.empty && !$props.loading)
               ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDynamicComponent)($props.templates.empty), { key: 0 }))
               : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
             ($props.templates.loading && $props.loading)
               ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveDynamicComponent)($props.templates.loading), { key: 1 }))
               : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
-          ], 8, ["colspan"])
+          ], 8, _hoisted_6$1)
         ]))
   ], 4))
 }
@@ -35942,10 +36056,12 @@ var script$2 = {
     }
 };
 
+const _hoisted_1$2 = ["colspan", "rowspan"];
+
 function render$2(_ctx, _cache, $props, $setup, $data, $options) {
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("td", {
-    style: $options.containerStyle,
-    class: $options.containerClass,
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("td", {
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeStyle)($options.containerStyle),
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.containerClass),
     role: "cell",
     colspan: $options.columnProp('colspan'),
     rowspan: $options.columnProp('rowspan')
@@ -35957,7 +36073,7 @@ function render$2(_ctx, _cache, $props, $setup, $data, $options) {
         }, null, 8, ["column"]))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
     (0,vue__WEBPACK_IMPORTED_MODULE_4__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_4__.toDisplayString)($options.columnProp('footer')), 1)
-  ], 14, ["colspan", "rowspan"]))
+  ], 14, _hoisted_1$2))
 }
 
 script$2.render = render$2;
@@ -36048,11 +36164,11 @@ function render$1(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_DTFooterCell = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("DTFooterCell");
 
   return ($options.hasFooter)
-    ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tfoot", _hoisted_1$1, [
+    ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tfoot", _hoisted_1$1, [
         (!$props.columnGroup)
-          ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tr", _hoisted_2$1, [
-              ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($props.columns, (col, i) => {
-                return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+          ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tr", _hoisted_2$1, [
+              ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($props.columns, (col, i) => {
+                return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
                   key: $options.columnProp(col,'columnKey')||$options.columnProp(col,'field')||i
                 }, [
                   (!$options.columnProp(col,'hidden'))
@@ -36064,13 +36180,13 @@ function render$1(_ctx, _cache, $props, $setup, $data, $options) {
                 ], 64))
               }), 128))
             ]))
-          : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 1 }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.getFooterRows(), (row, i) => {
-              return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("tr", {
+          : ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, { key: 1 }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.getFooterRows(), (row, i) => {
+              return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("tr", {
                 key: i,
                 role: "row"
               }, [
-                ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.getFooterColumns(row), (col, j) => {
-                  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
+                ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderList)($options.getFooterColumns(row), (col, j) => {
+                  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
                     key: $options.columnProp(col,'columnKey')||$options.columnProp(col,'field')||j
                   }, [
                     (!$options.columnProp(col,'hidden'))
@@ -37958,18 +38074,20 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_DTTableFooter = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("DTTableFooter");
   const _component_DTVirtualScroller = (0,vue__WEBPACK_IMPORTED_MODULE_4__.resolveComponent)("DTVirtualScroller");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", {
-    class: $options.containerClass,
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.containerClass),
     "data-scrollselectors": ".p-datatable-wrapper"
   }, [
     (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderSlot)(_ctx.$slots, "default"),
     ($props.loading)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_1, [
-          (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("i", { class: $options.loadingIconClass }, null, 2)
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_1, [
+          (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("i", {
+            class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)($options.loadingIconClass)
+          }, null, 2)
         ]))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
     (_ctx.$slots.header)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_2, [
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_2, [
           (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderSlot)(_ctx.$slots, "header")
         ]))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
@@ -37984,7 +38102,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           rowsPerPageOptions: $props.rowsPerPageOptions,
           currentPageReportTemplate: $props.currentPageReportTemplate,
           class: "p-paginator-top",
-          onPage: _cache[1] || (_cache[1] = $event => ($options.onPage($event))),
+          onPage: _cache[0] || (_cache[0] = $event => ($options.onPage($event))),
           alwaysShow: $props.alwaysShowPaginator
         }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.createSlots)({ _: 2 }, [
           (_ctx.$slots.paginatorstart)
@@ -38005,9 +38123,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             : undefined
         ]), 1032, ["rows", "first", "totalRecords", "pageLinkSize", "template", "rowsPerPageOptions", "currentPageReportTemplate", "alwaysShow"]))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
-    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", {
+    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", {
       class: "p-datatable-wrapper",
-      style: { maxHeight: $options.virtualScrollerDisabled ? $props.scrollHeight : '' }
+      style: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeStyle)({ maxHeight: $options.virtualScrollerDisabled ? $props.scrollHeight : '' })
     }, [
       (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)(_component_DTVirtualScroller, (0,vue__WEBPACK_IMPORTED_MODULE_4__.mergeProps)($props.virtualScrollerOptions, {
         items: $options.processedData,
@@ -38018,11 +38136,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         showSpacer: false
       }), {
         content: (0,vue__WEBPACK_IMPORTED_MODULE_4__.withCtx)((slotProps) => [
-          (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("table", {
+          (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("table", {
             ref: "table",
             role: "table",
-            class: [$props.tableClass, 'p-datatable-table'],
-            style: [$props.tableStyle, slotProps.spacerStyle]
+            class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)([$props.tableClass, 'p-datatable-table']),
+            style: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeStyle)([$props.tableStyle, slotProps.spacerStyle])
           }, [
             (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)(_component_DTTableHeader, {
               columnGroup: $options.headerColumnGroup,
@@ -38040,16 +38158,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               filters: $data.d_filters,
               filtersStore: $props.filters,
               filterDisplay: $props.filterDisplay,
-              onColumnClick: _cache[2] || (_cache[2] = $event => ($options.onColumnHeaderClick($event))),
-              onColumnMousedown: _cache[3] || (_cache[3] = $event => ($options.onColumnHeaderMouseDown($event))),
+              onColumnClick: _cache[1] || (_cache[1] = $event => ($options.onColumnHeaderClick($event))),
+              onColumnMousedown: _cache[2] || (_cache[2] = $event => ($options.onColumnHeaderMouseDown($event))),
               onFilterChange: $options.onFilterChange,
               onFilterApply: $options.onFilterApply,
-              onColumnDragstart: _cache[4] || (_cache[4] = $event => ($options.onColumnHeaderDragStart($event))),
-              onColumnDragover: _cache[5] || (_cache[5] = $event => ($options.onColumnHeaderDragOver($event))),
-              onColumnDragleave: _cache[6] || (_cache[6] = $event => ($options.onColumnHeaderDragLeave($event))),
-              onColumnDrop: _cache[7] || (_cache[7] = $event => ($options.onColumnHeaderDrop($event))),
-              onColumnResizestart: _cache[8] || (_cache[8] = $event => ($options.onColumnResizeStart($event))),
-              onCheckboxChange: _cache[9] || (_cache[9] = $event => ($options.toggleRowsWithCheckbox($event)))
+              onColumnDragstart: _cache[3] || (_cache[3] = $event => ($options.onColumnHeaderDragStart($event))),
+              onColumnDragover: _cache[4] || (_cache[4] = $event => ($options.onColumnHeaderDragOver($event))),
+              onColumnDragleave: _cache[5] || (_cache[5] = $event => ($options.onColumnHeaderDragLeave($event))),
+              onColumnDrop: _cache[6] || (_cache[6] = $event => ($options.onColumnHeaderDrop($event))),
+              onColumnResizestart: _cache[7] || (_cache[7] = $event => ($options.onColumnResizeStart($event))),
+              onCheckboxChange: _cache[8] || (_cache[8] = $event => ($options.toggleRowsWithCheckbox($event)))
             }, null, 8, ["columnGroup", "columns", "rowGroupMode", "groupRowsBy", "groupRowSortField", "resizableColumns", "allRowsSelected", "empty", "sortMode", "sortField", "sortOrder", "multiSortMeta", "filters", "filtersStore", "filterDisplay", "onFilterChange", "onFilterApply"]),
             ($props.frozenValue)
               ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)(_component_DTTableBody, {
@@ -38083,26 +38201,26 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   loading: $props.loading,
                   responsiveLayout: $props.responsiveLayout,
                   onRowgroupToggle: $options.toggleRowGroup,
-                  onRowClick: _cache[10] || (_cache[10] = $event => ($options.onRowClick($event))),
-                  onRowDblclick: _cache[11] || (_cache[11] = $event => ($options.onRowDblClick($event))),
-                  onRowRightclick: _cache[12] || (_cache[12] = $event => ($options.onRowRightClick($event))),
+                  onRowClick: _cache[9] || (_cache[9] = $event => ($options.onRowClick($event))),
+                  onRowDblclick: _cache[10] || (_cache[10] = $event => ($options.onRowDblClick($event))),
+                  onRowRightclick: _cache[11] || (_cache[11] = $event => ($options.onRowRightClick($event))),
                   onRowTouchend: $options.onRowTouchEnd,
                   onRowKeydown: $options.onRowKeyDown,
                   onRowMousedown: $options.onRowMouseDown,
-                  onRowDragstart: _cache[13] || (_cache[13] = $event => ($options.onRowDragStart($event))),
-                  onRowDragover: _cache[14] || (_cache[14] = $event => ($options.onRowDragOver($event))),
-                  onRowDragleave: _cache[15] || (_cache[15] = $event => ($options.onRowDragLeave($event))),
-                  onRowDragend: _cache[16] || (_cache[16] = $event => ($options.onRowDragEnd($event))),
-                  onRowDrop: _cache[17] || (_cache[17] = $event => ($options.onRowDrop($event))),
-                  onRowToggle: _cache[18] || (_cache[18] = $event => ($options.toggleRow($event))),
-                  onRadioChange: _cache[19] || (_cache[19] = $event => ($options.toggleRowWithRadio($event))),
-                  onCheckboxChange: _cache[20] || (_cache[20] = $event => ($options.toggleRowWithCheckbox($event))),
-                  onCellEditInit: _cache[21] || (_cache[21] = $event => ($options.onCellEditInit($event))),
-                  onCellEditComplete: _cache[22] || (_cache[22] = $event => ($options.onCellEditComplete($event))),
-                  onCellEditCancel: _cache[23] || (_cache[23] = $event => ($options.onCellEditCancel($event))),
-                  onRowEditInit: _cache[24] || (_cache[24] = $event => ($options.onRowEditInit($event))),
-                  onRowEditSave: _cache[25] || (_cache[25] = $event => ($options.onRowEditSave($event))),
-                  onRowEditCancel: _cache[26] || (_cache[26] = $event => ($options.onRowEditCancel($event))),
+                  onRowDragstart: _cache[12] || (_cache[12] = $event => ($options.onRowDragStart($event))),
+                  onRowDragover: _cache[13] || (_cache[13] = $event => ($options.onRowDragOver($event))),
+                  onRowDragleave: _cache[14] || (_cache[14] = $event => ($options.onRowDragLeave($event))),
+                  onRowDragend: _cache[15] || (_cache[15] = $event => ($options.onRowDragEnd($event))),
+                  onRowDrop: _cache[16] || (_cache[16] = $event => ($options.onRowDrop($event))),
+                  onRowToggle: _cache[17] || (_cache[17] = $event => ($options.toggleRow($event))),
+                  onRadioChange: _cache[18] || (_cache[18] = $event => ($options.toggleRowWithRadio($event))),
+                  onCheckboxChange: _cache[19] || (_cache[19] = $event => ($options.toggleRowWithCheckbox($event))),
+                  onCellEditInit: _cache[20] || (_cache[20] = $event => ($options.onCellEditInit($event))),
+                  onCellEditComplete: _cache[21] || (_cache[21] = $event => ($options.onCellEditComplete($event))),
+                  onCellEditCancel: _cache[22] || (_cache[22] = $event => ($options.onCellEditCancel($event))),
+                  onRowEditInit: _cache[23] || (_cache[23] = $event => ($options.onRowEditInit($event))),
+                  onRowEditSave: _cache[24] || (_cache[24] = $event => ($options.onRowEditSave($event))),
+                  onRowEditCancel: _cache[25] || (_cache[25] = $event => ($options.onRowEditCancel($event))),
                   editingMeta: $data.d_editingMeta,
                   onEditingMetaChange: $options.onEditingMetaChange,
                   isVirtualScrollerDisabled: true
@@ -38110,7 +38228,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
             (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)(_component_DTTableBody, {
               value: $options.dataToRender(slotProps.rows),
-              class: slotProps.styleClass,
+              class: (0,vue__WEBPACK_IMPORTED_MODULE_4__.normalizeClass)(slotProps.styleClass),
               columns: slotProps.columns,
               empty: $options.empty,
               dataKey: $props.dataKey,
@@ -38138,26 +38256,26 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               loading: $props.loading,
               responsiveLayout: $props.responsiveLayout,
               onRowgroupToggle: $options.toggleRowGroup,
-              onRowClick: _cache[27] || (_cache[27] = $event => ($options.onRowClick($event))),
-              onRowDblclick: _cache[28] || (_cache[28] = $event => ($options.onRowDblClick($event))),
-              onRowRightclick: _cache[29] || (_cache[29] = $event => ($options.onRowRightClick($event))),
+              onRowClick: _cache[26] || (_cache[26] = $event => ($options.onRowClick($event))),
+              onRowDblclick: _cache[27] || (_cache[27] = $event => ($options.onRowDblClick($event))),
+              onRowRightclick: _cache[28] || (_cache[28] = $event => ($options.onRowRightClick($event))),
               onRowTouchend: $options.onRowTouchEnd,
               onRowKeydown: $options.onRowKeyDown,
               onRowMousedown: $options.onRowMouseDown,
-              onRowDragstart: _cache[30] || (_cache[30] = $event => ($options.onRowDragStart($event))),
-              onRowDragover: _cache[31] || (_cache[31] = $event => ($options.onRowDragOver($event))),
-              onRowDragleave: _cache[32] || (_cache[32] = $event => ($options.onRowDragLeave($event))),
-              onRowDragend: _cache[33] || (_cache[33] = $event => ($options.onRowDragEnd($event))),
-              onRowDrop: _cache[34] || (_cache[34] = $event => ($options.onRowDrop($event))),
-              onRowToggle: _cache[35] || (_cache[35] = $event => ($options.toggleRow($event))),
-              onRadioChange: _cache[36] || (_cache[36] = $event => ($options.toggleRowWithRadio($event))),
-              onCheckboxChange: _cache[37] || (_cache[37] = $event => ($options.toggleRowWithCheckbox($event))),
-              onCellEditInit: _cache[38] || (_cache[38] = $event => ($options.onCellEditInit($event))),
-              onCellEditComplete: _cache[39] || (_cache[39] = $event => ($options.onCellEditComplete($event))),
-              onCellEditCancel: _cache[40] || (_cache[40] = $event => ($options.onCellEditCancel($event))),
-              onRowEditInit: _cache[41] || (_cache[41] = $event => ($options.onRowEditInit($event))),
-              onRowEditSave: _cache[42] || (_cache[42] = $event => ($options.onRowEditSave($event))),
-              onRowEditCancel: _cache[43] || (_cache[43] = $event => ($options.onRowEditCancel($event))),
+              onRowDragstart: _cache[29] || (_cache[29] = $event => ($options.onRowDragStart($event))),
+              onRowDragover: _cache[30] || (_cache[30] = $event => ($options.onRowDragOver($event))),
+              onRowDragleave: _cache[31] || (_cache[31] = $event => ($options.onRowDragLeave($event))),
+              onRowDragend: _cache[32] || (_cache[32] = $event => ($options.onRowDragEnd($event))),
+              onRowDrop: _cache[33] || (_cache[33] = $event => ($options.onRowDrop($event))),
+              onRowToggle: _cache[34] || (_cache[34] = $event => ($options.toggleRow($event))),
+              onRadioChange: _cache[35] || (_cache[35] = $event => ($options.toggleRowWithRadio($event))),
+              onCheckboxChange: _cache[36] || (_cache[36] = $event => ($options.toggleRowWithCheckbox($event))),
+              onCellEditInit: _cache[37] || (_cache[37] = $event => ($options.onCellEditInit($event))),
+              onCellEditComplete: _cache[38] || (_cache[38] = $event => ($options.onCellEditComplete($event))),
+              onCellEditCancel: _cache[39] || (_cache[39] = $event => ($options.onCellEditCancel($event))),
+              onRowEditInit: _cache[40] || (_cache[40] = $event => ($options.onRowEditInit($event))),
+              onRowEditSave: _cache[41] || (_cache[41] = $event => ($options.onRowEditSave($event))),
+              onRowEditCancel: _cache[42] || (_cache[42] = $event => ($options.onRowEditCancel($event))),
               editingMeta: $data.d_editingMeta,
               onEditingMetaChange: $options.onEditingMetaChange,
               virtualScrollerContentProps: slotProps,
@@ -38183,7 +38301,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           rowsPerPageOptions: $props.rowsPerPageOptions,
           currentPageReportTemplate: $props.currentPageReportTemplate,
           class: "p-paginator-bottom",
-          onPage: _cache[44] || (_cache[44] = $event => ($options.onPage($event))),
+          onPage: _cache[43] || (_cache[43] = $event => ($options.onPage($event))),
           alwaysShow: $props.alwaysShowPaginator
         }, (0,vue__WEBPACK_IMPORTED_MODULE_4__.createSlots)({ _: 2 }, [
           (_ctx.$slots.paginatorstart)
@@ -38205,16 +38323,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         ]), 1032, ["rows", "first", "totalRecords", "pageLinkSize", "template", "rowsPerPageOptions", "currentPageReportTemplate", "alwaysShow"]))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
     (_ctx.$slots.footer)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("div", _hoisted_3, [
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("div", _hoisted_3, [
           (0,vue__WEBPACK_IMPORTED_MODULE_4__.renderSlot)(_ctx.$slots, "footer")
         ]))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
-    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createVNode)("div", _hoisted_4, null, 512),
+    (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementVNode)("div", _hoisted_4, null, 512),
     ($props.reorderableColumns)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", _hoisted_5, null, 512))
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", _hoisted_5, null, 512))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true),
     ($props.reorderableColumns)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createBlock)("span", _hoisted_6, null, 512))
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_4__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_4__.createElementBlock)("span", _hoisted_6, null, 512))
       : (0,vue__WEBPACK_IMPORTED_MODULE_4__.createCommentVNode)("", true)
   ], 2))
 }
@@ -38251,7 +38369,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -38265,7 +38383,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
 /* harmony import */ var primevue_ripple__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primevue/ripple */ "./node_modules/primevue/ripple/ripple.esm.js");
@@ -38660,9 +38778,15 @@ var script = {
     }
 };
 
-const _hoisted_1 = { class: "p-dialog-header-icons" };
-const _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("span", { class: "p-dialog-header-close-icon pi pi-times" }, null, -1);
-const _hoisted_3 = {
+const _hoisted_1 = ["aria-labelledby", "aria-modal"];
+const _hoisted_2 = ["id"];
+const _hoisted_3 = { class: "p-dialog-header-icons" };
+const _hoisted_4 = ["aria-label"];
+const _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementVNode)("span", { class: "p-dialog-header-close-icon pi pi-times" }, null, -1);
+const _hoisted_6 = [
+  _hoisted_5
+];
+const _hoisted_7 = {
   key: 1,
   class: "p-dialog-footer"
 };
@@ -38675,11 +38799,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     disabled: $options.appendDisabled
   }, [
     ($data.containerVisible)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("div", {
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("div", {
           key: 0,
           ref: $options.maskRef,
-          class: $options.maskClass,
-          onClick: _cache[4] || (_cache[4] = (...args) => ($options.onMaskClick && $options.onMaskClick(...args)))
+          class: (0,vue__WEBPACK_IMPORTED_MODULE_2__.normalizeClass)($options.maskClass),
+          onClick: _cache[3] || (_cache[3] = (...args) => ($options.onMaskClick && $options.onMaskClick(...args)))
         }, [
           (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_2__.Transition, {
             name: "p-dialog",
@@ -38692,7 +38816,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, {
             default: (0,vue__WEBPACK_IMPORTED_MODULE_2__.withCtx)(() => [
               ($props.visible)
-                ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("div", (0,vue__WEBPACK_IMPORTED_MODULE_2__.mergeProps)({
+                ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("div", (0,vue__WEBPACK_IMPORTED_MODULE_2__.mergeProps)({
                     key: 0,
                     ref: $options.containerRef,
                     class: $options.dialogClass
@@ -38702,64 +38826,64 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "aria-modal": $props.modal
                   }), [
                     ($props.showHeader)
-                      ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("div", {
+                      ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("div", {
                           key: 0,
                           class: "p-dialog-header",
-                          onMousedown: _cache[3] || (_cache[3] = (...args) => ($options.initDrag && $options.initDrag(...args)))
+                          onMousedown: _cache[2] || (_cache[2] = (...args) => ($options.initDrag && $options.initDrag(...args)))
                         }, [
                           (0,vue__WEBPACK_IMPORTED_MODULE_2__.renderSlot)(_ctx.$slots, "header", {}, () => [
                             ($props.header)
-                              ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("span", {
+                              ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("span", {
                                   key: 0,
                                   id: $options.ariaLabelledById,
                                   class: "p-dialog-title"
-                                }, (0,vue__WEBPACK_IMPORTED_MODULE_2__.toDisplayString)($props.header), 9, ["id"]))
+                                }, (0,vue__WEBPACK_IMPORTED_MODULE_2__.toDisplayString)($props.header), 9, _hoisted_2))
                               : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true)
                           ]),
-                          (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("div", _hoisted_1, [
+                          (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementVNode)("div", _hoisted_3, [
                             ($props.maximizable)
-                              ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("button", {
+                              ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("button", {
                                   key: 0,
                                   class: "p-dialog-header-icon p-dialog-header-maximize p-link",
-                                  onClick: _cache[1] || (_cache[1] = (...args) => ($options.maximize && $options.maximize(...args))),
+                                  onClick: _cache[0] || (_cache[0] = (...args) => ($options.maximize && $options.maximize(...args))),
                                   type: "button",
                                   tabindex: "-1"
                                 }, [
-                                  (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("span", { class: $options.maximizeIconClass }, null, 2)
-                                ], 512)), [
+                                  (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementVNode)("span", {
+                                    class: (0,vue__WEBPACK_IMPORTED_MODULE_2__.normalizeClass)($options.maximizeIconClass)
+                                  }, null, 2)
+                                ])), [
                                   [_directive_ripple]
                                 ])
                               : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true),
                             ($props.closable)
-                              ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("button", {
+                              ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("button", {
                                   key: 1,
                                   class: "p-dialog-header-icon p-dialog-header-close p-link",
-                                  onClick: _cache[2] || (_cache[2] = (...args) => ($options.close && $options.close(...args))),
+                                  onClick: _cache[1] || (_cache[1] = (...args) => ($options.close && $options.close(...args))),
                                   "aria-label": $props.ariaCloseLabel,
                                   type: "button"
-                                }, [
-                                  _hoisted_2
-                                ], 8, ["aria-label"])), [
+                                }, _hoisted_6, 8, _hoisted_4)), [
                                   [_directive_ripple]
                                 ])
                               : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true)
                           ])
                         ], 32))
                       : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true),
-                    (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("div", {
-                      class: $options.contentStyleClass,
-                      style: $props.contentStyle
+                    (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementVNode)("div", {
+                      class: (0,vue__WEBPACK_IMPORTED_MODULE_2__.normalizeClass)($options.contentStyleClass),
+                      style: (0,vue__WEBPACK_IMPORTED_MODULE_2__.normalizeStyle)($props.contentStyle)
                     }, [
                       (0,vue__WEBPACK_IMPORTED_MODULE_2__.renderSlot)(_ctx.$slots, "default")
                     ], 6),
                     ($props.footer || _ctx.$slots.footer)
-                      ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("div", _hoisted_3, [
+                      ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("div", _hoisted_7, [
                           (0,vue__WEBPACK_IMPORTED_MODULE_2__.renderSlot)(_ctx.$slots, "footer", {}, () => [
                             (0,vue__WEBPACK_IMPORTED_MODULE_2__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_2__.toDisplayString)($props.footer), 1)
                           ])
                         ]))
                       : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true)
-                  ], 16, ["aria-labelledby", "aria-modal"]))
+                  ], 16, _hoisted_1))
                 : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true)
             ]),
             _: 3
@@ -38801,7 +38925,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -38815,7 +38939,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
@@ -38856,12 +38980,12 @@ const _hoisted_1 = {
 };
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
-    class: $options.containerClass,
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.containerClass),
     role: "separator"
   }, [
     (_ctx.$slots.default)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_1, [
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [
           (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")
         ]))
       : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("", true)
@@ -38900,7 +39024,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -38914,7 +39038,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
 /* harmony import */ var primevue_overlayeventbus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primevue/overlayeventbus */ "./node_modules/primevue/overlayeventbus/overlayeventbus.esm.js");
@@ -39595,18 +39719,24 @@ var script = {
 };
 
 const _hoisted_1 = { class: "p-hidden-accessible" };
-const _hoisted_2 = {
+const _hoisted_2 = ["id", "disabled", "tabindex", "aria-expanded", "aria-labelledby"];
+const _hoisted_3 = ["disabled", "placeholder", "value", "aria-expanded"];
+const _hoisted_4 = ["aria-expanded"];
+const _hoisted_5 = {
   key: 0,
   class: "p-dropdown-header"
 };
-const _hoisted_3 = { class: "p-dropdown-filter-container" };
-const _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("span", { class: "p-dropdown-filter-icon pi pi-search" }, null, -1);
-const _hoisted_5 = { class: "p-dropdown-item-group" };
-const _hoisted_6 = {
+const _hoisted_6 = { class: "p-dropdown-filter-container" };
+const _hoisted_7 = ["value", "placeholder"];
+const _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("span", { class: "p-dropdown-filter-icon pi pi-search" }, null, -1);
+const _hoisted_9 = ["onClick", "aria-label", "aria-selected"];
+const _hoisted_10 = { class: "p-dropdown-item-group" };
+const _hoisted_11 = ["onClick", "aria-label", "aria-selected"];
+const _hoisted_12 = {
   key: 2,
   class: "p-dropdown-empty-message"
 };
-const _hoisted_7 = {
+const _hoisted_13 = {
   key: 3,
   class: "p-dropdown-empty-message"
 };
@@ -39615,46 +39745,46 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_VirtualScroller = (0,vue__WEBPACK_IMPORTED_MODULE_5__.resolveComponent)("VirtualScroller");
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_5__.resolveDirective)("ripple");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("div", {
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("div", {
     ref: "container",
-    class: $options.containerClass,
-    onClick: _cache[12] || (_cache[12] = $event => ($options.onClick($event)))
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeClass)($options.containerClass),
+    onClick: _cache[11] || (_cache[11] = $event => ($options.onClick($event)))
   }, [
-    (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("div", _hoisted_1, [
-      (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("input", {
+    (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("div", _hoisted_1, [
+      (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("input", {
         ref: "focusInput",
         type: "text",
         id: $props.inputId,
         readonly: "",
         disabled: $props.disabled,
-        onFocus: _cache[1] || (_cache[1] = (...args) => ($options.onFocus && $options.onFocus(...args))),
-        onBlur: _cache[2] || (_cache[2] = (...args) => ($options.onBlur && $options.onBlur(...args))),
-        onKeydown: _cache[3] || (_cache[3] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
+        onFocus: _cache[0] || (_cache[0] = (...args) => ($options.onFocus && $options.onFocus(...args))),
+        onBlur: _cache[1] || (_cache[1] = (...args) => ($options.onBlur && $options.onBlur(...args))),
+        onKeydown: _cache[2] || (_cache[2] = (...args) => ($options.onKeyDown && $options.onKeyDown(...args))),
         tabindex: $props.tabindex,
         "aria-haspopup": "true",
         "aria-expanded": $data.overlayVisible,
         "aria-labelledby": $props.ariaLabelledBy
-      }, null, 40, ["id", "disabled", "tabindex", "aria-expanded", "aria-labelledby"])
+      }, null, 40, _hoisted_2)
     ]),
     ($props.editable)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("input", {
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("input", {
           key: 0,
           type: "text",
           class: "p-dropdown-label p-inputtext",
           disabled: $props.disabled,
-          onFocus: _cache[4] || (_cache[4] = (...args) => ($options.onFocus && $options.onFocus(...args))),
-          onBlur: _cache[5] || (_cache[5] = (...args) => ($options.onBlur && $options.onBlur(...args))),
+          onFocus: _cache[3] || (_cache[3] = (...args) => ($options.onFocus && $options.onFocus(...args))),
+          onBlur: _cache[4] || (_cache[4] = (...args) => ($options.onBlur && $options.onBlur(...args))),
           placeholder: $props.placeholder,
           value: $options.editableInputValue,
-          onInput: _cache[6] || (_cache[6] = (...args) => ($options.onEditableInput && $options.onEditableInput(...args))),
+          onInput: _cache[5] || (_cache[5] = (...args) => ($options.onEditableInput && $options.onEditableInput(...args))),
           "aria-haspopup": "listbox",
           "aria-expanded": $data.overlayVisible
-        }, null, 40, ["disabled", "placeholder", "value", "aria-expanded"]))
+        }, null, 40, _hoisted_3))
       : (0,vue__WEBPACK_IMPORTED_MODULE_5__.createCommentVNode)("", true),
     (!$props.editable)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("span", {
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("span", {
           key: 1,
-          class: $options.labelClass
+          class: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeClass)($options.labelClass)
         }, [
           (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderSlot)(_ctx.$slots, "value", {
             value: $props.modelValue,
@@ -39665,22 +39795,24 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         ], 2))
       : (0,vue__WEBPACK_IMPORTED_MODULE_5__.createCommentVNode)("", true),
     ($props.showClear && $props.modelValue != null)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("i", {
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("i", {
           key: 2,
           class: "p-dropdown-clear-icon pi pi-times",
-          onClick: _cache[7] || (_cache[7] = $event => ($options.onClearClick($event)))
+          onClick: _cache[6] || (_cache[6] = $event => ($options.onClearClick($event)))
         }))
       : (0,vue__WEBPACK_IMPORTED_MODULE_5__.createCommentVNode)("", true),
-    (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("div", {
+    (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("div", {
       class: "p-dropdown-trigger",
       role: "button",
       "aria-haspopup": "listbox",
       "aria-expanded": $data.overlayVisible
     }, [
       (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderSlot)(_ctx.$slots, "indicator", {}, () => [
-        (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("span", { class: $options.dropdownIconClass }, null, 2)
+        (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("span", {
+          class: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeClass)($options.dropdownIconClass)
+        }, null, 2)
       ])
-    ], 8, ["aria-expanded"]),
+    ], 8, _hoisted_4),
     ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Teleport, {
       to: $options.appendTarget,
       disabled: $options.appendDisabled
@@ -39694,38 +39826,38 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, {
         default: (0,vue__WEBPACK_IMPORTED_MODULE_5__.withCtx)(() => [
           ($data.overlayVisible)
-            ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("div", {
+            ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("div", {
                 key: 0,
                 ref: $options.overlayRef,
-                class: $options.panelStyleClass,
-                onClick: _cache[11] || (_cache[11] = (...args) => ($options.onOverlayClick && $options.onOverlayClick(...args)))
+                class: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeClass)($options.panelStyleClass),
+                onClick: _cache[10] || (_cache[10] = (...args) => ($options.onOverlayClick && $options.onOverlayClick(...args)))
               }, [
                 (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderSlot)(_ctx.$slots, "header", {
                   value: $props.modelValue,
                   options: $options.visibleOptions
                 }),
                 ($props.filter)
-                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("div", _hoisted_2, [
-                      (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("div", _hoisted_3, [
-                        (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("input", {
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("div", _hoisted_5, [
+                      (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("div", _hoisted_6, [
+                        (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("input", {
                           type: "text",
                           ref: "filterInput",
                           value: $data.filterValue,
-                          onVnodeUpdated: _cache[8] || (_cache[8] = (...args) => ($options.onFilterUpdated && $options.onFilterUpdated(...args))),
+                          onVnodeUpdated: _cache[7] || (_cache[7] = (...args) => ($options.onFilterUpdated && $options.onFilterUpdated(...args))),
                           autoComplete: "off",
                           class: "p-dropdown-filter p-inputtext p-component",
                           placeholder: $props.filterPlaceholder,
-                          onKeydown: _cache[9] || (_cache[9] = (...args) => ($options.onFilterKeyDown && $options.onFilterKeyDown(...args))),
-                          onInput: _cache[10] || (_cache[10] = (...args) => ($options.onFilterChange && $options.onFilterChange(...args)))
-                        }, null, 40, ["value", "placeholder"]),
-                        _hoisted_4
+                          onKeydown: _cache[8] || (_cache[8] = (...args) => ($options.onFilterKeyDown && $options.onFilterKeyDown(...args))),
+                          onInput: _cache[9] || (_cache[9] = (...args) => ($options.onFilterChange && $options.onFilterChange(...args)))
+                        }, null, 40, _hoisted_7),
+                        _hoisted_8
                       ])
                     ]))
                   : (0,vue__WEBPACK_IMPORTED_MODULE_5__.createCommentVNode)("", true),
-                (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("div", {
+                (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("div", {
                   ref: $options.itemsWrapperRef,
                   class: "p-dropdown-items-wrapper",
-                  style: {'max-height': $options.virtualScrollerDisabled ? $props.scrollHeight : ''}
+                  style: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeStyle)({'max-height': $options.virtualScrollerDisabled ? $props.scrollHeight : ''})
                 }, [
                   (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)(_component_VirtualScroller, (0,vue__WEBPACK_IMPORTED_MODULE_5__.mergeProps)({ ref: $options.virtualScrollerRef }, $props.virtualScrollerOptions, {
                     items: $options.visibleOptions,
@@ -39733,16 +39865,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     disabled: $options.virtualScrollerDisabled
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createSlots)({
                     content: (0,vue__WEBPACK_IMPORTED_MODULE_5__.withCtx)(({ styleClass, contentRef, items, getItemOptions, contentStyle }) => [
-                      (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("ul", {
+                      (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("ul", {
                         ref: contentRef,
-                        class: ['p-dropdown-items', styleClass],
-                        style: contentStyle,
+                        class: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeClass)(['p-dropdown-items', styleClass]),
+                        style: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeStyle)(contentStyle),
                         role: "listbox"
                       }, [
                         (!$props.optionGroupLabel)
-                          ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, { key: 0 }, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)(items, (option, i) => {
-                              return (0,vue__WEBPACK_IMPORTED_MODULE_5__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("li", {
-                                class: ['p-dropdown-item', {'p-highlight': $options.isSelected(option), 'p-disabled': $options.isOptionDisabled(option)}],
+                          ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, { key: 0 }, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)(items, (option, i) => {
+                              return (0,vue__WEBPACK_IMPORTED_MODULE_5__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("li", {
+                                class: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeClass)(['p-dropdown-item', {'p-highlight': $options.isSelected(option), 'p-disabled': $options.isOptionDisabled(option)}]),
                                 key: $options.getOptionRenderKey(option),
                                 onClick: $event => ($options.onOptionSelect($event, option)),
                                 role: "option",
@@ -39755,15 +39887,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                                 }, () => [
                                   (0,vue__WEBPACK_IMPORTED_MODULE_5__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_5__.toDisplayString)($options.getOptionLabel(option)), 1)
                                 ])
-                              ], 10, ["onClick", "aria-label", "aria-selected"])), [
+                              ], 10, _hoisted_9)), [
                                 [_directive_ripple]
                               ])
                             }), 128))
-                          : ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, { key: 1 }, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)(items, (optionGroup, i) => {
-                              return ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
+                          : ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, { key: 1 }, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)(items, (optionGroup, i) => {
+                              return ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
                                 key: $options.getOptionGroupRenderKey(optionGroup)
                               }, [
-                                (0,vue__WEBPACK_IMPORTED_MODULE_5__.createVNode)("li", _hoisted_5, [
+                                (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementVNode)("li", _hoisted_10, [
                                   (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderSlot)(_ctx.$slots, "optiongroup", {
                                     option: optionGroup,
                                     index: $options.getOptionIndex(i, getItemOptions)
@@ -39771,9 +39903,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                                     (0,vue__WEBPACK_IMPORTED_MODULE_5__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_5__.toDisplayString)($options.getOptionGroupLabel(optionGroup)), 1)
                                   ])
                                 ]),
-                                ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)($options.getOptionGroupChildren(optionGroup), (option, i) => {
-                                  return (0,vue__WEBPACK_IMPORTED_MODULE_5__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("li", {
-                                    class: ['p-dropdown-item', {'p-highlight': $options.isSelected(option), 'p-disabled': $options.isOptionDisabled(option)}],
+                                ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_5__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderList)($options.getOptionGroupChildren(optionGroup), (option, i) => {
+                                  return (0,vue__WEBPACK_IMPORTED_MODULE_5__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("li", {
+                                    class: (0,vue__WEBPACK_IMPORTED_MODULE_5__.normalizeClass)(['p-dropdown-item', {'p-highlight': $options.isSelected(option), 'p-disabled': $options.isOptionDisabled(option)}]),
                                     key: $options.getOptionRenderKey(option),
                                     onClick: $event => ($options.onOptionSelect($event, option)),
                                     role: "option",
@@ -39786,20 +39918,20 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                                     }, () => [
                                       (0,vue__WEBPACK_IMPORTED_MODULE_5__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_5__.toDisplayString)($options.getOptionLabel(option)), 1)
                                     ])
-                                  ], 10, ["onClick", "aria-label", "aria-selected"])), [
+                                  ], 10, _hoisted_11)), [
                                     [_directive_ripple]
                                   ])
                                 }), 128))
                               ], 64))
                             }), 128)),
                         ($data.filterValue && (!items || (items && items.length === 0)))
-                          ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("li", _hoisted_6, [
+                          ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("li", _hoisted_12, [
                               (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderSlot)(_ctx.$slots, "emptyfilter", {}, () => [
                                 (0,vue__WEBPACK_IMPORTED_MODULE_5__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_5__.toDisplayString)($options.emptyFilterMessageText), 1)
                               ])
                             ]))
                           : ((!$props.options || ($props.options && $props.options.length === 0)))
-                            ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createBlock)("li", _hoisted_7, [
+                            ? ((0,vue__WEBPACK_IMPORTED_MODULE_5__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_5__.createElementBlock)("li", _hoisted_13, [
                                 (0,vue__WEBPACK_IMPORTED_MODULE_5__.renderSlot)(_ctx.$slots, "empty", {}, () => [
                                   (0,vue__WEBPACK_IMPORTED_MODULE_5__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_5__.toDisplayString)($options.emptyMessageText), 1)
                                 ])
@@ -39864,7 +39996,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -39878,7 +40010,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var quill__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! quill */ "./node_modules/quill/dist/quill.js");
 /* harmony import */ var quill__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(quill__WEBPACK_IMPORTED_MODULE_0__);
@@ -39956,45 +40088,45 @@ const _hoisted_2 = {
   ref: "toolbarElement",
   class: "p-editor-toolbar"
 };
-const _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("span", { class: "ql-formats" }, [
-  /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("select", {
+const _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("span", { class: "ql-formats" }, [
+  /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("select", {
     class: "ql-header",
     defaultValue: "0"
   }, [
-    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("option", { value: "1" }, "Heading"),
-    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("option", { value: "2" }, "Subheading"),
-    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("option", { value: "0" }, "Normal")
+    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("option", { value: "1" }, "Heading"),
+    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("option", { value: "2" }, "Subheading"),
+    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("option", { value: "0" }, "Normal")
   ]),
-  /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("select", { class: "ql-font" }, [
-    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("option"),
-    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("option", { value: "serif" }),
-    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("option", { value: "monospace" })
+  /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("select", { class: "ql-font" }, [
+    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("option"),
+    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("option", { value: "serif" }),
+    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("option", { value: "monospace" })
   ])
 ], -1);
 const _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createStaticVNode)("<span class=\"ql-formats\"><button class=\"ql-bold\" type=\"button\"></button><button class=\"ql-italic\" type=\"button\"></button><button class=\"ql-underline\" type=\"button\"></button></span><span class=\"ql-formats\"><select class=\"ql-color\"></select><select class=\"ql-background\"></select></span>", 2);
-const _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("span", { class: "ql-formats" }, [
-  /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("button", {
+const _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("span", { class: "ql-formats" }, [
+  /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("button", {
     class: "ql-list",
     value: "ordered",
     type: "button"
   }),
-  /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("button", {
+  /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("button", {
     class: "ql-list",
     value: "bullet",
     type: "button"
   }),
-  /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("select", { class: "ql-align" }, [
-    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("option", { defaultValue: "" }),
-    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("option", { value: "center" }),
-    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("option", { value: "right" }),
-    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("option", { value: "justify" })
+  /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("select", { class: "ql-align" }, [
+    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("option", { defaultValue: "" }),
+    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("option", { value: "center" }),
+    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("option", { value: "right" }),
+    /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("option", { value: "justify" })
   ])
 ], -1);
 const _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createStaticVNode)("<span class=\"ql-formats\"><button class=\"ql-link\" type=\"button\"></button><button class=\"ql-image\" type=\"button\"></button><button class=\"ql-code-block\" type=\"button\"></button></span><span class=\"ql-formats\"><button class=\"ql-clean\" type=\"button\"></button></span>", 2);
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createBlock)("div", _hoisted_1, [
-    (0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("div", _hoisted_2, [
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementBlock)("div", _hoisted_1, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("div", _hoisted_2, [
       (0,vue__WEBPACK_IMPORTED_MODULE_1__.renderSlot)(_ctx.$slots, "toolbar", {}, () => [
         _hoisted_3,
         _hoisted_4,
@@ -40002,10 +40134,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         _hoisted_7
       ])
     ], 512),
-    (0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("div", {
+    (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("div", {
       ref: "editorElement",
       class: "p-editor-content",
-      style: $props.editorStyle
+      style: (0,vue__WEBPACK_IMPORTED_MODULE_1__.normalizeStyle)($props.editorStyle)
     }, null, 4)
   ]))
 }
@@ -40042,7 +40174,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -40056,7 +40188,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var primevue_inputtext__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/inputtext */ "./node_modules/primevue/inputtext/inputtext.esm.js");
 /* harmony import */ var primevue_button__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primevue/button */ "./node_modules/primevue/button/button.esm.js");
@@ -41038,9 +41170,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_INInputText = (0,vue__WEBPACK_IMPORTED_MODULE_2__.resolveComponent)("INInputText");
   const _component_INButton = (0,vue__WEBPACK_IMPORTED_MODULE_2__.resolveComponent)("INButton");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("span", {
-    class: $options.containerClass,
-    style: $props.style
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("span", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_2__.normalizeClass)($options.containerClass),
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_2__.normalizeStyle)($props.style)
   }, [
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)(_component_INInputText, (0,vue__WEBPACK_IMPORTED_MODULE_2__.mergeProps)({
       ref: "input",
@@ -41059,7 +41191,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onBlur: $options.onInputBlur
     }), null, 16, ["class", "style", "value", "aria-valumin", "aria-valuemax", "onInput", "onKeydown", "onKeypress", "onPaste", "onClick", "onFocus", "onBlur"]),
     ($props.showButtons && $props.buttonLayout === 'stacked')
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("span", _hoisted_1, [
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("span", _hoisted_1, [
           (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)(_component_INButton, (0,vue__WEBPACK_IMPORTED_MODULE_2__.mergeProps)({
             class: $options.upButtonClass,
             icon: $props.incrementButtonIcon
@@ -41127,7 +41259,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -41141,7 +41273,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
@@ -41164,17 +41296,19 @@ var script = {
     }
 };
 
+const _hoisted_1 = ["value"];
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("input", (0,vue__WEBPACK_IMPORTED_MODULE_0__.mergeProps)({
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", (0,vue__WEBPACK_IMPORTED_MODULE_0__.mergeProps)({
     class: ['p-inputtext p-component', {'p-filled': $options.filled}],
     value: $props.modelValue,
-    onInput: _cache[1] || (_cache[1] = (...args) => ($options.onInput && $options.onInput(...args)))
-  }, _ctx.$attrs), null, 16, ["value"]))
+    onInput: _cache[0] || (_cache[0] = (...args) => ($options.onInput && $options.onInput(...args)))
+  }, _ctx.$attrs), null, 16, _hoisted_1))
 }
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -41188,7 +41322,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var primevue_ripple__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/ripple */ "./node_modules/primevue/ripple/ripple.esm.js");
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
@@ -41259,7 +41393,10 @@ var script = {
 
 const _hoisted_1 = { class: "p-message-wrapper" };
 const _hoisted_2 = { class: "p-message-text" };
-const _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("i", { class: "p-message-close-icon pi pi-times" }, null, -1);
+const _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("i", { class: "p-message-close-icon pi pi-times" }, null, -1);
+const _hoisted_4 = [
+  _hoisted_3
+];
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_1__.resolveDirective)("ripple");
@@ -41269,24 +41406,24 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     appear: ""
   }, {
     default: (0,vue__WEBPACK_IMPORTED_MODULE_1__.withCtx)(() => [
-      (0,vue__WEBPACK_IMPORTED_MODULE_1__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("div", {
-        class: $options.containerClass,
+      (0,vue__WEBPACK_IMPORTED_MODULE_1__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("div", {
+        class: (0,vue__WEBPACK_IMPORTED_MODULE_1__.normalizeClass)($options.containerClass),
         role: "alert"
       }, [
-        (0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("div", _hoisted_1, [
-          (0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("span", { class: $options.iconClass }, null, 2),
-          (0,vue__WEBPACK_IMPORTED_MODULE_1__.createVNode)("div", _hoisted_2, [
+        (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("div", _hoisted_1, [
+          (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("span", {
+            class: (0,vue__WEBPACK_IMPORTED_MODULE_1__.normalizeClass)($options.iconClass)
+          }, null, 2),
+          (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementVNode)("div", _hoisted_2, [
             (0,vue__WEBPACK_IMPORTED_MODULE_1__.renderSlot)(_ctx.$slots, "default")
           ]),
           ($props.closable)
-            ? (0,vue__WEBPACK_IMPORTED_MODULE_1__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createBlock)("button", {
+            ? (0,vue__WEBPACK_IMPORTED_MODULE_1__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_1__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_1__.createElementBlock)("button", {
                 key: 0,
                 class: "p-message-close p-link",
-                onClick: _cache[1] || (_cache[1] = $event => ($options.close($event))),
+                onClick: _cache[0] || (_cache[0] = $event => ($options.close($event))),
                 type: "button"
-              }, [
-                _hoisted_3
-              ], 512)), [
+              }, _hoisted_4)), [
                 [_directive_ripple]
               ])
             : (0,vue__WEBPACK_IMPORTED_MODULE_1__.createCommentVNode)("", true)
@@ -41331,7 +41468,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -41345,14 +41482,14 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ OverlayEventBus)
 /* harmony export */ });
 /* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
 
 
 var OverlayEventBus = (0,primevue_utils__WEBPACK_IMPORTED_MODULE_0__.EventBus)();
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (OverlayEventBus);
+
 
 
 /***/ }),
@@ -41366,7 +41503,7 @@ var OverlayEventBus = (0,primevue_utils__WEBPACK_IMPORTED_MODULE_0__.EventBus)()
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 /* harmony import */ var primevue_ripple__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primevue/ripple */ "./node_modules/primevue/ripple/ripple.esm.js");
@@ -41428,7 +41565,7 @@ var script$9 = {
 const _hoisted_1$6 = { class: "p-paginator-current" };
 
 function render$9(_ctx, _cache, $props, $setup, $data, $options) {
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("span", _hoisted_1$6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.text), 1))
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_1$6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.text), 1))
 }
 
 script$9.render = render$9;
@@ -41447,17 +41584,18 @@ var script$8 = {
     }
 };
 
-const _hoisted_1$5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", { class: "p-paginator-icon pi pi-angle-double-left" }, null, -1);
+const _hoisted_1$5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", { class: "p-paginator-icon pi pi-angle-double-left" }, null, -1);
+const _hoisted_2$5 = [
+  _hoisted_1$5
+];
 
 function render$8(_ctx, _cache, $props, $setup, $data, $options) {
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("ripple");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("button", {
-    class: $options.containerClass,
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.containerClass),
     type: "button"
-  }, [
-    _hoisted_1$5
-  ], 2)), [
+  }, _hoisted_2$5, 2)), [
     [_directive_ripple]
   ])
 }
@@ -41478,17 +41616,18 @@ var script$7 = {
     }
 };
 
-const _hoisted_1$4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", { class: "p-paginator-icon pi pi-angle-double-right" }, null, -1);
+const _hoisted_1$4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", { class: "p-paginator-icon pi pi-angle-double-right" }, null, -1);
+const _hoisted_2$4 = [
+  _hoisted_1$4
+];
 
 function render$7(_ctx, _cache, $props, $setup, $data, $options) {
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("ripple");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("button", {
-    class: $options.containerClass,
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.containerClass),
     type: "button"
-  }, [
-    _hoisted_1$4
-  ], 2)), [
+  }, _hoisted_2$4, 2)), [
     [_directive_ripple]
   ])
 }
@@ -41509,17 +41648,18 @@ var script$6 = {
     }
 };
 
-const _hoisted_1$3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", { class: "p-paginator-icon pi pi-angle-right" }, null, -1);
+const _hoisted_1$3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", { class: "p-paginator-icon pi pi-angle-right" }, null, -1);
+const _hoisted_2$3 = [
+  _hoisted_1$3
+];
 
 function render$6(_ctx, _cache, $props, $setup, $data, $options) {
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("ripple");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("button", {
-    class: $options.containerClass,
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.containerClass),
     type: "button"
-  }, [
-    _hoisted_1$3
-  ], 2)), [
+  }, _hoisted_2$3, 2)), [
     [_directive_ripple]
   ])
 }
@@ -41548,20 +41688,21 @@ var script$5 = {
 };
 
 const _hoisted_1$2 = { class: "p-paginator-pages" };
+const _hoisted_2$2 = ["onClick"];
 
 function render$5(_ctx, _cache, $props, $setup, $data, $options) {
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("ripple");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("span", _hoisted_1$2, [
-    ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.value, (pageLink) => {
-      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("button", {
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_1$2, [
+    ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.value, (pageLink) => {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: pageLink,
-        class: ['p-paginator-page p-paginator-element p-link', {'p-highlight': ((pageLink - 1) === $props.page)}],
+        class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['p-paginator-page p-paginator-element p-link', {'p-highlight': ((pageLink - 1) === $props.page)}]),
         type: "button",
         onClick: $event => ($options.onPageLinkClick($event, pageLink))
       }, [
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(pageLink), 1)
-      ], 10, ["onClick"])), [
+      ], 10, _hoisted_2$2)), [
         [_directive_ripple]
       ])
     }), 128))
@@ -41584,17 +41725,18 @@ var script$4 = {
     }
 };
 
-const _hoisted_1$1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", { class: "p-paginator-icon pi pi-angle-left" }, null, -1);
+const _hoisted_1$1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", { class: "p-paginator-icon pi pi-angle-left" }, null, -1);
+const _hoisted_2$1 = [
+  _hoisted_1$1
+];
 
 function render$4(_ctx, _cache, $props, $setup, $data, $options) {
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("ripple");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("button", {
-    class: $options.containerClass,
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.containerClass),
     type: "button"
-  }, [
-    _hoisted_1$1
-  ], 2)), [
+  }, _hoisted_2$1, 2)), [
     [_directive_ripple]
   ])
 }
@@ -41639,7 +41781,7 @@ function render$3(_ctx, _cache, $props, $setup, $data, $options) {
     options: $options.rowsOptions,
     optionLabel: "label",
     optionValue: "value",
-    "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($options.onChange($event))),
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($options.onChange($event))),
     class: "p-paginator-rpp-options",
     disabled: $props.disabled
   }, null, 8, ["modelValue", "options", "disabled"]))
@@ -41683,7 +41825,7 @@ function render$2(_ctx, _cache, $props, $setup, $data, $options) {
     options: $options.pageOptions,
     optionLabel: "label",
     optionValue: "value",
-    "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($options.onChange($event))),
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($options.onChange($event))),
     class: "p-paginator-page-options",
     disabled: $props.disabled
   }, null, 8, ["modelValue", "options", "disabled"]))
@@ -41715,7 +41857,7 @@ function render$1(_ctx, _cache, $props, $setup, $data, $options) {
 
   return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_JTPInput, {
     modelValue: $props.page,
-    "onUpdate:modelValue": _cache[1] || (_cache[1] = $event => ($options.onChange($event))),
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = $event => ($options.onChange($event))),
     class: "p-paginator-page-input",
     disabled: $props.disabled
   }, null, 8, ["modelValue", "disabled"]))
@@ -41926,36 +42068,36 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_JumpToPageInput = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("JumpToPageInput");
 
   return ($props.alwaysShow ? true : ($options.pageLinks && $options.pageLinks.length > 1))
-    ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_1, [
+    ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [
         (_ctx.$slots.start)
-          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_2, [
+          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [
               (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "start", { state: $options.currentState })
             ]))
           : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("", true),
-        ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.templateItems, (item) => {
-          return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, { key: item }, [
+        ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.templateItems, (item) => {
+          return ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, { key: item }, [
             (item === 'FirstPageLink')
               ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_FirstPageLink, {
                   key: 0,
-                  onClick: _cache[1] || (_cache[1] = $event => ($options.changePageToFirst($event))),
+                  onClick: _cache[0] || (_cache[0] = $event => ($options.changePageToFirst($event))),
                   disabled: $options.isFirstPage || $options.empty
                 }, null, 8, ["disabled"]))
               : (item === 'PrevPageLink')
                 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_PrevPageLink, {
                     key: 1,
-                    onClick: _cache[2] || (_cache[2] = $event => ($options.changePageToPrev($event))),
+                    onClick: _cache[1] || (_cache[1] = $event => ($options.changePageToPrev($event))),
                     disabled: $options.isFirstPage || $options.empty
                   }, null, 8, ["disabled"]))
                 : (item === 'NextPageLink')
                   ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_NextPageLink, {
                       key: 2,
-                      onClick: _cache[3] || (_cache[3] = $event => ($options.changePageToNext($event))),
+                      onClick: _cache[2] || (_cache[2] = $event => ($options.changePageToNext($event))),
                       disabled: $options.isLastPage || $options.empty
                     }, null, 8, ["disabled"]))
                   : (item === 'LastPageLink')
                     ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_LastPageLink, {
                         key: 3,
-                        onClick: _cache[4] || (_cache[4] = $event => ($options.changePageToLast($event))),
+                        onClick: _cache[3] || (_cache[3] = $event => ($options.changePageToLast($event))),
                         disabled: $options.isLastPage || $options.empty
                       }, null, 8, ["disabled"]))
                     : (item === 'PageLinks')
@@ -41963,7 +42105,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                           key: 4,
                           value: $options.pageLinks,
                           page: $options.page,
-                          onClick: _cache[5] || (_cache[5] = $event => ($options.changePageLink($event)))
+                          onClick: _cache[4] || (_cache[4] = $event => ($options.changePageLink($event)))
                         }, null, 8, ["value", "page"]))
                       : (item === 'CurrentPageReport')
                         ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_CurrentPageReport, {
@@ -41981,7 +42123,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                               key: 6,
                               rows: $data.d_rows,
                               options: $props.rowsPerPageOptions,
-                              onRowsChange: _cache[6] || (_cache[6] = $event => ($options.onRowChange($event))),
+                              onRowsChange: _cache[5] || (_cache[5] = $event => ($options.onRowChange($event))),
                               disabled: $options.empty
                             }, null, 8, ["rows", "options", "disabled"]))
                           : (item === 'JumpToPageDropdown')
@@ -41989,21 +42131,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                                 key: 7,
                                 page: $options.page,
                                 pageCount: $options.pageCount,
-                                onPageChange: _cache[7] || (_cache[7] = $event => ($options.changePage($event))),
+                                onPageChange: _cache[6] || (_cache[6] = $event => ($options.changePage($event))),
                                 disabled: $options.empty
                               }, null, 8, ["page", "pageCount", "disabled"]))
                             : (item === 'JumpToPageInput')
                               ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_JumpToPageInput, {
                                   key: 8,
                                   page: $options.currentPage,
-                                  onPageChange: _cache[8] || (_cache[8] = $event => ($options.changePage($event))),
+                                  onPageChange: _cache[7] || (_cache[7] = $event => ($options.changePage($event))),
                                   disabled: $options.empty
                                 }, null, 8, ["page", "disabled"]))
                               : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("", true)
           ], 64))
         }), 128)),
         (_ctx.$slots.end)
-          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_3, [
+          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [
               (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "end", { state: $options.currentState })
             ]))
           : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("", true)
@@ -42043,7 +42185,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -42057,7 +42199,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
 /* harmony import */ var primevue_overlayeventbus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primevue/overlayeventbus */ "./node_modules/primevue/overlayeventbus/overlayeventbus.esm.js");
@@ -42357,9 +42499,9 @@ const _hoisted_2 = { class: "p-password-info" };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_PInputText = (0,vue__WEBPACK_IMPORTED_MODULE_3__.resolveComponent)("PInputText");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_3__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_3__.createBlock)("div", {
-    class: $options.containerClass,
-    style: $props.style
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_3__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_3__.createElementBlock)("div", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_3__.normalizeClass)($options.containerClass),
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_3__.normalizeStyle)($props.style)
   }, [
     (0,vue__WEBPACK_IMPORTED_MODULE_3__.createVNode)(_component_PInputText, (0,vue__WEBPACK_IMPORTED_MODULE_3__.mergeProps)({
       ref: "input",
@@ -42373,10 +42515,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onKeyup: $options.onKeyUp
     }, _ctx.$attrs), null, 16, ["class", "style", "type", "value", "onInput", "onFocus", "onBlur", "onKeyup"]),
     ($props.toggleMask)
-      ? ((0,vue__WEBPACK_IMPORTED_MODULE_3__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_3__.createBlock)("i", {
+      ? ((0,vue__WEBPACK_IMPORTED_MODULE_3__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_3__.createElementBlock)("i", {
           key: 0,
-          class: $options.toggleIconClass,
-          onClick: _cache[1] || (_cache[1] = (...args) => ($options.onMaskToggle && $options.onMaskToggle(...args)))
+          class: (0,vue__WEBPACK_IMPORTED_MODULE_3__.normalizeClass)($options.toggleIconClass),
+          onClick: _cache[0] || (_cache[0] = (...args) => ($options.onMaskToggle && $options.onMaskToggle(...args)))
         }, null, 2))
       : (0,vue__WEBPACK_IMPORTED_MODULE_3__.createCommentVNode)("", true),
     ((0,vue__WEBPACK_IMPORTED_MODULE_3__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_3__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_3__.Teleport, {
@@ -42391,21 +42533,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, {
         default: (0,vue__WEBPACK_IMPORTED_MODULE_3__.withCtx)(() => [
           ($data.overlayVisible)
-            ? ((0,vue__WEBPACK_IMPORTED_MODULE_3__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_3__.createBlock)("div", {
+            ? ((0,vue__WEBPACK_IMPORTED_MODULE_3__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_3__.createElementBlock)("div", {
                 key: 0,
                 ref: $options.overlayRef,
-                class: $options.panelStyleClass,
-                onClick: _cache[2] || (_cache[2] = (...args) => ($options.onOverlayClick && $options.onOverlayClick(...args)))
+                class: (0,vue__WEBPACK_IMPORTED_MODULE_3__.normalizeClass)($options.panelStyleClass),
+                onClick: _cache[1] || (_cache[1] = (...args) => ($options.onOverlayClick && $options.onOverlayClick(...args)))
               }, [
                 (0,vue__WEBPACK_IMPORTED_MODULE_3__.renderSlot)(_ctx.$slots, "header"),
                 (0,vue__WEBPACK_IMPORTED_MODULE_3__.renderSlot)(_ctx.$slots, "content", {}, () => [
-                  (0,vue__WEBPACK_IMPORTED_MODULE_3__.createVNode)("div", _hoisted_1, [
-                    (0,vue__WEBPACK_IMPORTED_MODULE_3__.createVNode)("div", {
-                      class: $options.strengthClass,
-                      style: {'width': $data.meter ? $data.meter.width : ''}
+                  (0,vue__WEBPACK_IMPORTED_MODULE_3__.createElementVNode)("div", _hoisted_1, [
+                    (0,vue__WEBPACK_IMPORTED_MODULE_3__.createElementVNode)("div", {
+                      class: (0,vue__WEBPACK_IMPORTED_MODULE_3__.normalizeClass)($options.strengthClass),
+                      style: (0,vue__WEBPACK_IMPORTED_MODULE_3__.normalizeStyle)({'width': $data.meter ? $data.meter.width : ''})
                     }, null, 6)
                   ]),
-                  (0,vue__WEBPACK_IMPORTED_MODULE_3__.createVNode)("div", _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_3__.toDisplayString)($data.infoText), 1)
+                  (0,vue__WEBPACK_IMPORTED_MODULE_3__.createElementVNode)("div", _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_3__.toDisplayString)($data.infoText), 1)
                 ]),
                 (0,vue__WEBPACK_IMPORTED_MODULE_3__.renderSlot)(_ctx.$slots, "footer")
               ], 2))
@@ -42449,7 +42591,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -42463,7 +42605,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ Ripple)
 /* harmony export */ });
 /* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
 
@@ -42541,7 +42683,7 @@ const Ripple = {
     }
 };
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Ripple);
+
 
 
 /***/ }),
@@ -42555,7 +42697,7 @@ const Ripple = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ StyleClass)
 /* harmony export */ });
 /* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
 
@@ -42734,7 +42876,7 @@ const StyleClass = {
     }
 };
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (StyleClass);
+
 
 
 /***/ }),
@@ -42748,7 +42890,7 @@ const StyleClass = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
@@ -42767,7 +42909,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -42781,7 +42923,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
 /* harmony import */ var primevue_ripple__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! primevue/ripple */ "./node_modules/primevue/ripple/ripple.esm.js");
@@ -42936,23 +43078,30 @@ var script = {
 };
 
 const _hoisted_1 = { class: "p-tabview-nav-container" };
-const _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("span", { class: "pi pi-chevron-left" }, null, -1);
-const _hoisted_3 = {
+const _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementVNode)("span", { class: "pi pi-chevron-left" }, null, -1);
+const _hoisted_3 = [
+  _hoisted_2
+];
+const _hoisted_4 = {
   ref: "nav",
   class: "p-tabview-nav",
   role: "tablist"
 };
-const _hoisted_4 = {
+const _hoisted_5 = ["onClick", "onKeydown", "tabindex", "aria-selected"];
+const _hoisted_6 = {
   key: 0,
   class: "p-tabview-title"
 };
-const _hoisted_5 = {
+const _hoisted_7 = {
   ref: "inkbar",
   class: "p-tabview-ink-bar"
 };
-const _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("span", { class: "pi pi-chevron-right" }, null, -1);
-const _hoisted_7 = { class: "p-tabview-panels" };
-const _hoisted_8 = {
+const _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementVNode)("span", { class: "pi pi-chevron-right" }, null, -1);
+const _hoisted_9 = [
+  _hoisted_8
+];
+const _hoisted_10 = { class: "p-tabview-panels" };
+const _hoisted_11 = {
   key: 0,
   class: "p-tabview-panel",
   role: "tabpanel"
@@ -42961,34 +43110,34 @@ const _hoisted_8 = {
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   const _directive_ripple = (0,vue__WEBPACK_IMPORTED_MODULE_2__.resolveDirective)("ripple");
 
-  return ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("div", { class: $options.contentClasses }, [
-    (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("div", _hoisted_1, [
+  return ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("div", {
+    class: (0,vue__WEBPACK_IMPORTED_MODULE_2__.normalizeClass)($options.contentClasses)
+  }, [
+    (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementVNode)("div", _hoisted_1, [
       ($props.scrollable && !$data.backwardIsDisabled)
-        ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("button", {
+        ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("button", {
             key: 0,
             ref: "prevBtn",
-            class: $options.prevButtonClasses,
-            onClick: _cache[1] || (_cache[1] = (...args) => ($options.navBackward && $options.navBackward(...args))),
+            class: (0,vue__WEBPACK_IMPORTED_MODULE_2__.normalizeClass)($options.prevButtonClasses),
+            onClick: _cache[0] || (_cache[0] = (...args) => ($options.navBackward && $options.navBackward(...args))),
             type: "button"
-          }, [
-            _hoisted_2
-          ], 2)), [
+          }, _hoisted_3, 2)), [
             [_directive_ripple]
           ])
         : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true),
-      (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("div", {
+      (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementVNode)("div", {
         ref: "content",
         class: "p-tabview-nav-content",
-        onScroll: _cache[2] || (_cache[2] = (...args) => ($options.onScroll && $options.onScroll(...args)))
+        onScroll: _cache[1] || (_cache[1] = (...args) => ($options.onScroll && $options.onScroll(...args)))
       }, [
-        (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("ul", _hoisted_3, [
-          ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_2__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_2__.renderList)($options.tabs, (tab, i) => {
-            return ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("li", {
+        (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementVNode)("ul", _hoisted_4, [
+          ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_2__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_2__.renderList)($options.tabs, (tab, i) => {
+            return ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("li", {
               role: "presentation",
               key: $options.getKey(tab,i),
-              class: [{'p-highlight': ($data.d_activeIndex === i), 'p-disabled': $options.isTabDisabled(tab)}]
+              class: (0,vue__WEBPACK_IMPORTED_MODULE_2__.normalizeClass)([{'p-highlight': ($data.d_activeIndex === i), 'p-disabled': $options.isTabDisabled(tab)}])
             }, [
-              (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("a", {
+              (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("a", {
                 role: "tab",
                 class: "p-tabview-nav-link",
                 onClick: $event => ($options.onTabClick($event, i)),
@@ -42997,40 +43146,38 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "aria-selected": $data.d_activeIndex === i
               }, [
                 (tab.props && tab.props.header)
-                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("span", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_2__.toDisplayString)(tab.props.header), 1))
+                  ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("span", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_2__.toDisplayString)(tab.props.header), 1))
                   : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true),
                 (tab.children && tab.children.header)
                   ? ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_2__.resolveDynamicComponent)(tab.children.header), { key: 1 }))
                   : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true)
-              ], 40, ["onClick", "onKeydown", "tabindex", "aria-selected"]), [
+              ], 40, _hoisted_5)), [
                 [_directive_ripple]
               ])
             ], 2))
           }), 128)),
-          (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("li", _hoisted_5, null, 512)
+          (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementVNode)("li", _hoisted_7, null, 512)
         ], 512)
       ], 544),
       ($props.scrollable && !$data.forwardIsDisabled)
-        ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("button", {
+        ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("button", {
             key: 1,
             ref: "nextBtn",
-            class: $options.nextButtonClasses,
-            onClick: _cache[3] || (_cache[3] = (...args) => ($options.navForward && $options.navForward(...args))),
+            class: (0,vue__WEBPACK_IMPORTED_MODULE_2__.normalizeClass)($options.nextButtonClasses),
+            onClick: _cache[2] || (_cache[2] = (...args) => ($options.navForward && $options.navForward(...args))),
             type: "button"
-          }, [
-            _hoisted_6
-          ], 2)), [
+          }, _hoisted_9, 2)), [
             [_directive_ripple]
           ])
         : (0,vue__WEBPACK_IMPORTED_MODULE_2__.createCommentVNode)("", true)
     ]),
-    (0,vue__WEBPACK_IMPORTED_MODULE_2__.createVNode)("div", _hoisted_7, [
-      ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_2__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_2__.renderList)($options.tabs, (tab, i) => {
-        return ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
+    (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementVNode)("div", _hoisted_10, [
+      ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_2__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_2__.renderList)($options.tabs, (tab, i) => {
+        return ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
           key: $options.getKey(tab,i)
         }, [
           ($props.lazy ? ($data.d_activeIndex === i) : true)
-            ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)("div", _hoisted_8, [
+            ? (0,vue__WEBPACK_IMPORTED_MODULE_2__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createElementBlock)("div", _hoisted_11, [
                 ((0,vue__WEBPACK_IMPORTED_MODULE_2__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_2__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_2__.resolveDynamicComponent)(tab)))
               ], 512)), [
                 [vue__WEBPACK_IMPORTED_MODULE_2__.vShow, $props.lazy ? true: ($data.d_activeIndex === i)]
@@ -43074,7 +43221,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -43088,7 +43235,7 @@ script.render = render;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ Tooltip)
 /* harmony export */ });
 /* harmony import */ var primevue_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! primevue/utils */ "./node_modules/primevue/utils/utils.esm.js");
 
@@ -43429,7 +43576,7 @@ const Tooltip = {
     }
 };
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Tooltip);
+
 
 
 /***/ }),
@@ -44330,7 +44477,7 @@ function primebus() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ script)
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
@@ -44883,13 +45030,13 @@ const _hoisted_1 = {
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (!$props.disabled)
-    ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
+    ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
         key: 0,
         ref: $options.elementRef,
-        class: $options.containerClass,
+        class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.containerClass),
         tabindex: 0,
-        style: $props.style,
-        onScroll: _cache[1] || (_cache[1] = (...args) => ($options.onScroll && $options.onScroll(...args)))
+        style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)($props.style),
+        onScroll: _cache[0] || (_cache[0] = (...args) => ($options.onScroll && $options.onScroll(...args)))
       }, [
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "content", {
           styleClass: $options.contentClass,
@@ -44907,12 +45054,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           horizontal: $options.isHorizontal(),
           both: $options.isBoth()
         }, () => [
-          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
+          (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             ref: $options.contentRef,
-            class: $options.contentClass,
-            style: $data.contentStyle
+            class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.contentClass),
+            style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)($data.contentStyle)
           }, [
-            ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.loadedItems, (item, index) => {
+            ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.loadedItems, (item, index) => {
               return (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "item", {
                 key: index,
                 item: item,
@@ -44922,29 +45069,29 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           ], 6)
         ]),
         ($props.showSpacer)
-          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
+          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
               key: 0,
               class: "p-virtualscroller-spacer",
-              style: $data.spacerStyle
+              style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)($data.spacerStyle)
             }, null, 4))
           : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("", true),
         (!$props.loaderDisabled && $props.showLoader && $data.d_loading)
-          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
+          ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
               key: 1,
-              class: $options.loaderClass
+              class: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.loaderClass)
             }, [
               (_ctx.$slots && _ctx.$slots.loader)
-                ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, { key: 0 }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loaderArr, (_, index) => {
+                ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, { key: 0 }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.loaderArr, (_, index) => {
                     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "loader", {
                       key: index,
                       options: $options.getLoaderOptions(index, $options.isBoth() && { numCols: _ctx.d_numItemsInViewport.cols })
                     })
                   }), 128))
-                : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("i", _hoisted_1))
+                : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_1))
             ], 2))
           : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("", true)
       ], 38))
-    : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, { key: 1 }, [
+    : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, { key: 1 }, [
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default"),
         (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "content", {
           items: $props.items,
@@ -44986,7 +45133,7 @@ styleInject(css_248z);
 
 script.render = render;
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (script);
+
 
 
 /***/ }),
@@ -57472,9 +57619,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "withScopeId": () => (/* reexport safe */ _vue_runtime_dom__WEBPACK_IMPORTED_MODULE_0__.withScopeId)
 /* harmony export */ });
 /* harmony import */ var _vue_runtime_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @vue/runtime-dom */ "./node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js");
-/* harmony import */ var _vue_runtime_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @vue/runtime-dom */ "./node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js");
+/* harmony import */ var _vue_runtime_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @vue/runtime-dom */ "./node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js");
 /* harmony import */ var _vue_compiler_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @vue/compiler-dom */ "./node_modules/@vue/compiler-dom/dist/compiler-dom.esm-bundler.js");
-/* harmony import */ var _vue_shared__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @vue/shared */ "./node_modules/@vue/shared/dist/shared.esm-bundler.js");
+/* harmony import */ var _vue_shared__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @vue/shared */ "./node_modules/@vue/shared/dist/shared.esm-bundler.js");
 
 
 
@@ -57483,7 +57630,7 @@ __webpack_require__.r(__webpack_exports__);
 
 function initDev() {
     {
-        (0,_vue_runtime_dom__WEBPACK_IMPORTED_MODULE_2__.initCustomFormatter)();
+        (0,_vue_runtime_dom__WEBPACK_IMPORTED_MODULE_1__.initCustomFormatter)();
     }
 }
 
@@ -57493,13 +57640,13 @@ if ((true)) {
 }
 const compileCache = Object.create(null);
 function compileToFunction(template, options) {
-    if (!(0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.isString)(template)) {
+    if (!(0,_vue_shared__WEBPACK_IMPORTED_MODULE_2__.isString)(template)) {
         if (template.nodeType) {
             template = template.innerHTML;
         }
         else {
-            ( true) && (0,_vue_runtime_dom__WEBPACK_IMPORTED_MODULE_2__.warn)(`invalid template option: `, template);
-            return _vue_shared__WEBPACK_IMPORTED_MODULE_1__.NOOP;
+            ( true) && (0,_vue_runtime_dom__WEBPACK_IMPORTED_MODULE_1__.warn)(`invalid template option: `, template);
+            return _vue_shared__WEBPACK_IMPORTED_MODULE_2__.NOOP;
         }
     }
     const key = template;
@@ -57510,7 +57657,7 @@ function compileToFunction(template, options) {
     if (template[0] === '#') {
         const el = document.querySelector(template);
         if (( true) && !el) {
-            (0,_vue_runtime_dom__WEBPACK_IMPORTED_MODULE_2__.warn)(`Template element not found or is empty: ${template}`);
+            (0,_vue_runtime_dom__WEBPACK_IMPORTED_MODULE_1__.warn)(`Template element not found or is empty: ${template}`);
         }
         // __UNSAFE__
         // Reason: potential execution of JS expressions in in-DOM template.
@@ -57518,7 +57665,7 @@ function compileToFunction(template, options) {
         // by the server, the template should not contain any user data.
         template = el ? el.innerHTML : ``;
     }
-    const { code } = (0,_vue_compiler_dom__WEBPACK_IMPORTED_MODULE_3__.compile)(template, (0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.extend)({
+    const { code } = (0,_vue_compiler_dom__WEBPACK_IMPORTED_MODULE_3__.compile)(template, (0,_vue_shared__WEBPACK_IMPORTED_MODULE_2__.extend)({
         hoistStatic: true,
         onError: ( true) ? onError : 0,
         onWarn: ( true) ? e => onError(e, true) : 0
@@ -57528,8 +57675,8 @@ function compileToFunction(template, options) {
             ? err.message
             : `Template compilation error: ${err.message}`;
         const codeFrame = err.loc &&
-            (0,_vue_shared__WEBPACK_IMPORTED_MODULE_1__.generateCodeFrame)(template, err.loc.start.offset, err.loc.end.offset);
-        (0,_vue_runtime_dom__WEBPACK_IMPORTED_MODULE_2__.warn)(codeFrame ? `${message}\n${codeFrame}` : message);
+            (0,_vue_shared__WEBPACK_IMPORTED_MODULE_2__.generateCodeFrame)(template, err.loc.start.offset, err.loc.end.offset);
+        (0,_vue_runtime_dom__WEBPACK_IMPORTED_MODULE_1__.warn)(codeFrame ? `${message}\n${codeFrame}` : message);
     }
     // The wildcard import results in a huge object with every export
     // with keys that cannot be mangled, and can be quite heavy size-wise.
@@ -57539,7 +57686,7 @@ function compileToFunction(template, options) {
     render._rc = true;
     return (compileCache[key] = render);
 }
-(0,_vue_runtime_dom__WEBPACK_IMPORTED_MODULE_2__.registerRuntimeCompiler)(compileToFunction);
+(0,_vue_runtime_dom__WEBPACK_IMPORTED_MODULE_1__.registerRuntimeCompiler)(compileToFunction);
 
 
 
@@ -57982,7 +58129,7 @@ module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"P
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "js/" + chunkId + ".js?id=" + {"node_modules_chart_js_auto_auto_esm_js":"10c6b388645ceb22","resources_js_pages_auth_ForgotPassword_vue":"c9f401672b6f2423","resources_js_pages_auth_Login_vue":"cb0cb153b976d2c1","resources_js_pages_auth_ResetPassword_vue":"1078df5cebf2e3c6","resources_js_pages_auth_VerifyEmail_vue":"a0ee23b849c826b1","resources_js_pages_customer_Create_vue":"a3700d9c6c532031","resources_js_pages_customer_Edit_vue":"9563739a6e83b7bd","resources_js_pages_customer_Index_vue":"d8635ffead44a609","resources_js_pages_customer_TableHeader_js":"71be5afdca048a9c","resources_js_pages_discount_Index_vue":"6cc73a3522285ff2","resources_js_pages_error_Error_vue":"a3972a5acb046e33","resources_js_pages_expense_Create_vue":"bc064e310112aaad","resources_js_pages_expense_Index_vue":"597e632f163b5fd9","resources_js_pages_expense_Show_vue":"8f1af2beaf6b7e98","resources_js_pages_expense_TableHeader_js":"72e3dee74175b1c0","resources_js_pages_home_Index_vue":"2e57fa80a6bfbb71","resources_js_pages_laundry_Create_vue":"22077a85961c9891","resources_js_pages_laundry_Edit_vue":"f578d63b1a764a4b","resources_js_pages_laundry_Index_vue":"5bff0418c13fde8c","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Report_vue":"f93dbe3b2550d40f","resources_js_pages_mutation_TableHeader_js":"82c2999bd7d098a1","resources_js_pages_outlet_Create_vue":"0ec83e0cd5c446cd","resources_js_pages_outlet_Edit_vue":"b47c80ec8dde5007","resources_js_pages_outlet_Index_vue":"e1af154a7aa565c2","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_product_Create_vue":"80c469ee8e70fe4e","resources_js_pages_product_Edit_vue":"b1bb9a15f882146f","resources_js_pages_product_Index_vue":"5e2fb932116905d7","resources_js_pages_product_TableHeader_js":"b8eaaa9de25a2322","resources_js_pages_transaction_Create_vue":"64f3a9d44053abd6","resources_js_pages_transaction_Index_vue":"4ff60d0212a941ec","resources_js_pages_transaction_Report_vue":"3e7dfd52a7948c7b","resources_js_pages_transaction_Show_vue":"a15732326f571abe","resources_js_pages_transaction_TableHeader_js":"be63e672e103818b","resources_js_pages_user_Create_vue":"458a403d0cdf0c8b","resources_js_pages_user_Edit_vue":"67f5e5756a3db404","resources_js_pages_user_Index_vue":"56ceac75ee647c1e","resources_js_pages_user_Show_vue":"1b223c5f80f178a4","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
+/******/ 			return "js/" + chunkId + ".js?id=" + {"node_modules_chart_js_auto_auto_esm_js":"10c6b388645ceb22","resources_js_pages_auth_ForgotPassword_vue":"f2bc26b705560301","resources_js_pages_auth_Login_vue":"850bb0299906b8ea","resources_js_pages_auth_ResetPassword_vue":"8291b1da0ea798fb","resources_js_pages_auth_VerifyEmail_vue":"caef7c44fb88db3c","resources_js_pages_customer_Create_vue":"20e9215e62acce8a","resources_js_pages_customer_Edit_vue":"13acdae3f22be875","resources_js_pages_customer_Index_vue":"1b9930b2c2aca9b8","resources_js_pages_customer_TableHeader_js":"71be5afdca048a9c","resources_js_pages_discount_Index_vue":"3695f0f38f944a4c","resources_js_pages_error_Error_vue":"f754a7613554fe44","resources_js_pages_expense_Create_vue":"2e0de48c9500b51c","resources_js_pages_expense_Index_vue":"e29f2802b2a7b8c5","resources_js_pages_expense_Show_vue":"d0bb3127b24d0127","resources_js_pages_expense_TableHeader_js":"72e3dee74175b1c0","resources_js_pages_home_Index_vue":"bd8a50bc51a61247","resources_js_pages_laundry_Create_vue":"ca6c9fd8ec2d7689","resources_js_pages_laundry_Edit_vue":"43fad9220de7e8dd","resources_js_pages_laundry_Index_vue":"479331271a7efd6e","resources_js_pages_laundry_TableHeader_js":"494e577855bbcaf6","resources_js_pages_mutation_Report_vue":"4afd04a9fbf21696","resources_js_pages_mutation_TableHeader_js":"82c2999bd7d098a1","resources_js_pages_outlet_Create_vue":"c92ec4e2cf83719a","resources_js_pages_outlet_Edit_vue":"d6d232b6f1d7e7ee","resources_js_pages_outlet_Index_vue":"9358a7ff7ea73773","resources_js_pages_outlet_TableHeader_js":"498bf7e64bc0d0c4","resources_js_pages_product_Create_vue":"7ae4f62853da23ff","resources_js_pages_product_Edit_vue":"c995c9efae1b38cf","resources_js_pages_product_Index_vue":"72e7bb57706e393d","resources_js_pages_product_TableHeader_js":"b8eaaa9de25a2322","resources_js_pages_transaction_Create_vue":"c20f01b944821e1b","resources_js_pages_transaction_Index_vue":"e9eb888b993ab892","resources_js_pages_transaction_Report_vue":"00f0bbd22c40d95d","resources_js_pages_transaction_Show_vue":"2e9668ba37f5047d","resources_js_pages_transaction_TableHeader_js":"be63e672e103818b","resources_js_pages_user_Create_vue":"270ad61d95973cbf","resources_js_pages_user_Edit_vue":"512dc69f9eae002c","resources_js_pages_user_Index_vue":"5f2f6786a5fda372","resources_js_pages_user_Show_vue":"43cabcf3f4afb654","resources_js_pages_user_TableHeader_js":"5653ecbcd70fd235"}[chunkId] + "";
 /******/ 		};
 /******/ 	})();
 /******/ 	

@@ -190,7 +190,24 @@ class TransactionController extends Controller
 
             DB::commit();
 
+<<<<<<< HEAD
             // $transaction = Transaction::with(['outlet', 'customer', 'transactionDetails.laundry'])->latest()->first();
+=======
+            // $thermalPrinting = new ThermalPrinting($transaction);
+            // $thermalPrinting->startPrinting(2);
+            try {
+                $socket = new WebsocketClient(
+                    new SocketClient('ws://103.157.96.20:5544')
+                );
+                $socket->setHost('escpos-server');
+                $socket->connect();
+                $socket->send(json_encode($transaction));
+                $socket->close();
+                // dd($socket->getConnection()->getCurrentNode());
+            } catch (Exception $e) {
+                return back()->with('error', __('messages.error.store.transaction'));
+            }
+>>>>>>> 9670d79aaef19aeeb557136a3281f6da61a6d08d
 
             // $discount = $transaction->discount();
             // $subTotalAsString = $transaction->subTotalAsString();
