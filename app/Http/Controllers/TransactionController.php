@@ -13,6 +13,8 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionStatus;
 use Exception;
+use Hoa\Socket\Client as SocketClient;
+use Hoa\Websocket\Client as WebsocketClient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -190,11 +192,6 @@ class TransactionController extends Controller
 
             DB::commit();
 
-<<<<<<< HEAD
-            // $transaction = Transaction::with(['outlet', 'customer', 'transactionDetails.laundry'])->latest()->first();
-=======
-            // $thermalPrinting = new ThermalPrinting($transaction);
-            // $thermalPrinting->startPrinting(2);
             try {
                 $socket = new WebsocketClient(
                     new SocketClient('ws://103.157.96.20:5544')
@@ -203,39 +200,13 @@ class TransactionController extends Controller
                 $socket->connect();
                 $socket->send(json_encode($transaction));
                 $socket->close();
-                // dd($socket->getConnection()->getCurrentNode());
             } catch (Exception $e) {
                 return back()->with('error', __('messages.error.store.transaction'));
             }
->>>>>>> 9670d79aaef19aeeb557136a3281f6da61a6d08d
-
-            // $discount = $transaction->discount();
-            // $subTotalAsString = $transaction->subTotalAsString();
-            // $totalPriceAsString = $transaction->totalPriceAsString();
-            // foreach ($transaction->transactionDetails as $transactionDetail) {
-            //     $totalPriceAsStringDetail = $transactionDetail->totalPriceAsString();
-            //     $transactionDetail->totalPriceAsString = $totalPriceAsStringDetail;
-            // }
-
-            // $transaction->discount = $discount;
-            // $transaction->subTotalAsString = $subTotalAsString;
-            // $transaction->totalPriceAsString = $totalPriceAsString;
-
-            // try {
-            //     $socket = new WebsocketClient(
-            //         new SocketClient('ws://127.0.0.1:5544')
-            //     );
-            //     $socket->setHost('escpos-server');
-            //     $socket->connect();
-            //     $socket->send(json_encode($transaction));
-            //     $socket->close();
-            // } catch (Exception $e) {
-            //     return back()->with('error', __('messages.error.store.transaction'));
-            // }
 
             // Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
             //     'receiver' => $transaction->customer->phone,
-            //     'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transaction_number . '*',
+            //     'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transactioWebsocketClientn_number . '*',
             // ]);
 
             return back()->with('success', __('messages.success.store.transaction'));
