@@ -67,7 +67,7 @@ const submit = () => {
           </template>
 
           <template #footer>
-            <div class="flex justify-content-end">
+            <div class="flex flex-column md:flex-row justify-content-end">
               <Button label="Simpan" icon="pi pi-check" class="p-button-outlined" @click="submit" />
             </div>
           </template>

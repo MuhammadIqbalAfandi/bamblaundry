@@ -38,6 +38,11 @@ class Laundry extends Model
         );
     }
 
+    public function transactionDetails()
+    {
+        return $this->hasMany(TransactionDetail::class);
+    }
+
     public function scopeFilter($query, $search)
     {
         $query->when($search ?? null, function ($query, $search) {

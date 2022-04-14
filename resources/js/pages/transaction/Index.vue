@@ -190,7 +190,10 @@ const overlayToggle = (event, data) => {
               </div>
             </div>
           </div>
-          <div v-if="$page.props.auth.user.role_id !== 1" class="col-12 md:col-4 flex justify-content-end">
+          <div
+            v-if="$page.props.auth.user.role_id !== 1"
+            class="col-12 md:col-4 flex flex-column md:flex-row justify-content-end"
+          >
             <AppButton
               label="Tambah Transaksi"
               class="p-button-outlined md:w-16rem"

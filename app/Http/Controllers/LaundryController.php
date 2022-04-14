@@ -10,6 +10,16 @@ use App\Models\Laundry;
 class LaundryController extends Controller
 {
     /**
+     * Create the controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->authorizeResource(Laundry::class);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Inertia\Response
@@ -79,6 +89,7 @@ class LaundryController extends Controller
                 'name' => $laundry->name,
                 'price' => $laundry->getRawOriginal('price'),
                 'unit' => $laundry->unit,
+                'relation' => $laundry->transactionDetails()->exists(),
             ],
         ]);
     }

@@ -1,9 +1,36 @@
 <script setup>
+import { computed } from 'vue'
 import { Head, Link } from '@inertiajs/inertia-vue3'
+
+const props = defineProps({
+  status: null,
+})
+
+const title = computed(() => {
+  return {
+    503: '503: Service Unavailable',
+    500: '500: Server Error',
+    404: '404: Page Not Found',
+    403: '403: Forbidden',
+  }[props.status]
+})
+
+const description = computed(() => {
+  return {
+    503: 'Sorry, we are doing some maintenance. Please check back soon.',
+    500: 'Whoops, something went wrong on our servers.',
+    404: 'Sorry, the page you are looking for could not be found.',
+    403: 'Sorry, you are forbidden from accessing this page.',
+  }[props.status]
+})
+
+const back = () => {
+  window.history.back()
+}
 </script>
 
 <template>
-  <head title="Akses ditolak" />
+  <Head :title="title" />
 
   <div class="surface-0 flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
     <div class="grid justify-content-center p-2 lg:p-0" style="min-width: 80%">
@@ -26,11 +53,11 @@ import { Head, Link } from '@inertiajs/inertia-vue3'
             >
               <i class="pi pi-fw pi-lock text-2xl text-50"></i>
             </div>
-            <h1 class="text-900 font-bold text-4xl lg:text-5xl mb-2">Akses ditolak</h1>
-            <span class="text-600 text-center">Kamu tidak memiliki izi kehalaman ini, silakan hubungan admin</span>
+            <h1 class="text-900 font-bold text-4xl lg:text-5xl mb-2">{{ title }}</h1>
+            <span class="text-600 text-center">{{ description }}</span>
             <div class="col-12 mt-5 text-center">
               <i class="pi pi-fw pi-arrow-left text-blue-500 mr-2" style="vertical-align: center"></i>
-              <Link href="/" class="text-blue-500">Kembali ke Dashboard</Link>
+              <Link href="#" class="text-blue-500" @click="back">Kembali ke Dashboard</Link>
             </div>
           </div>
         </div>

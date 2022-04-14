@@ -121,6 +121,10 @@ __webpack_require__.r(__webpack_exports__);
       type: String,
       required: true
     },
+    disabled: {
+      type: Boolean,
+      "default": false
+    },
     error: {
       type: String,
       "default": null
@@ -827,6 +831,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     placeholder: $props.placeholder,
     options: $props.options,
     "model-value": $props.modelValue,
+    disabled: $props.disabled,
     onChange: _cache[0] || (_cache[0] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.value);
     })
@@ -851,7 +856,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["class", "id", "aria-describedby", "option-disabled", "option-label", "option-value", "placeholder", "options", "model-value"]), $props.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
+  , ["class", "id", "aria-describedby", "option-disabled", "option-label", "option-value", "placeholder", "options", "model-value", "disabled"]), $props.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
     key: 1,
     id: $setup.ariaDescribedbyLabel,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({
@@ -1440,10 +1445,13 @@ var _hoisted_9 = {
   "class": "col-12 md:col-6"
 };
 var _hoisted_10 = {
-  "class": "flex flex-column sm:flex-row align-items-center sm:justify-content-center sm:justify-content-between"
+  "class": "grid"
 };
 var _hoisted_11 = {
-  "class": "flex flex-column sm:flex-row align-items-center sm:justify-content-center"
+  "class": "col-12 md:col-6 flex flex-column md:flex-row justify-content-center md:justify-content-start"
+};
+var _hoisted_12 = {
+  "class": "col-12 md:col-6 flex flex-column md:flex-row justify-content-center md:justify-content-end"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Button = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Button");
@@ -1459,6 +1467,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
             label: "Nama",
             placeholder: "nama",
+            disabled: $props.user.role_id !== 1,
             error: $setup.form.errors.name,
             modelValue: $setup.form.name,
             "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
@@ -1466,9 +1475,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             })
           }, null, 8
           /* PROPS */
-          , ["error", "modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
+          , ["disabled", "error", "modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
             label: "Nomor HP",
             placeholder: "nomor hp",
+            disabled: $props.user.role_id !== 1,
             error: $setup.form.errors.phone,
             modelValue: $setup.form.phone,
             "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
@@ -1476,9 +1486,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             })
           }, null, 8
           /* PROPS */
-          , ["error", "modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
+          , ["disabled", "error", "modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppInputText"], {
             label: "Email",
             placeholder: "email",
+            disabled: $props.user.role_id !== 1,
             error: $setup.form.errors.email,
             modelValue: $setup.form.email,
             "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
@@ -1486,9 +1497,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             })
           }, null, 8
           /* PROPS */
-          , ["error", "modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
+          , ["disabled", "error", "modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
             label: "Jenis Kelamin",
             placeholder: "Pilih satu",
+            disabled: $props.user.role_id !== 1,
             modelValue: $setup.form.gender_id,
             "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
               return $setup.form.gender_id = $event;
@@ -1497,7 +1509,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             error: $setup.form.errors.gender_id
           }, null, 8
           /* PROPS */
-          , ["modelValue", "options", "error"])]), $props.user.role_id !== 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
+          , ["disabled", "modelValue", "options", "error"])]), $props.user.role_id !== 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDropdown"], {
             label: "Hak Akses",
             placeholder: "Pilih satu",
             modelValue: $setup.form.role_id,
@@ -1522,7 +1534,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["modelValue", "options", "error"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
         }),
         footer: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDialog"], {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDialog"], {
             message: "Yakin akan menghapus data ini?",
             visible: $setup.visibleDialog,
             "onUpdate:visible": _cache[6] || (_cache[6] = function ($event) {
@@ -1534,16 +1546,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             onCancel: $setup.onCancel
           }, null, 8
           /* PROPS */
-          , ["visible"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
+          , ["visible"]), !$props.user.relation && _ctx.$page.props.auth.user.role_id !== $props.user.role_id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Button, {
+            key: 0,
             label: "Hapus",
             icon: "pi pi-trash",
             "class": "p-button-outlined p-button-danger",
             onClick: $setup.confirmDialog
-          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
+          })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             label: "Blokir",
             icon: "pi pi-ban",
             method: "delete",
-            "class": "p-button-outlined p-button-danger md:mr-3",
+            "class": "p-button-outlined p-button-danger md:mr-3 mb-3 md:mb-0",
             href: _ctx.route('users.block', $props.user.id)
           }, null, 8
           /* PROPS */
@@ -1555,7 +1568,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             onClick: $setup.submit
           }, null, 8
           /* PROPS */
-          , ["disabled"])])])];
+          , ["disabled"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"grid\">\n                  <div class=\"col-12\"></div>\n\n                  <div class=\"col-12\"></div>\n                </div> ")])])];
         }),
         _: 1
         /* STABLE */

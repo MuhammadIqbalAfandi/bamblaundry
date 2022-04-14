@@ -48,8 +48,13 @@ watch(
             </div>
           </div>
 
-          <div class="col-12 md:col-4 flex justify-content-end">
-            <AppButton label="Tambah User" icon="pi pi-pencil" class="p-button-outlined" :href="route('users.create')" />
+          <div class="col-12 md:col-4 flex flex-column md:flex-row justify-content-end">
+            <AppButton
+              label="Tambah User"
+              icon="pi pi-pencil"
+              class="p-button-outlined"
+              :href="route('users.create')"
+            />
           </div>
         </div>
       </template>

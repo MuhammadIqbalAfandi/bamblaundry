@@ -48,7 +48,7 @@ watch(
             </div>
           </div>
 
-          <div class="col-12 md:col-4 flex justify-content-end">
+          <div class="col-12 md:col-4 flex flex-column md:flex-row justify-content-end">
             <AppButton
               label="Tambah Laundry"
               icon="pi pi-pencil"

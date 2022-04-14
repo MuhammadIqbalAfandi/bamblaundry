@@ -1143,7 +1143,7 @@ var _hoisted_7 = {
   "class": "col-auto mt-2 ml-2"
 };
 var _hoisted_8 = {
-  "class": "col-12 md:col-4 flex justify-content-end"
+  "class": "col-12 md:col-4 flex flex-column md:flex-row justify-content-end"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Calendar = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Calendar");

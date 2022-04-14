@@ -1144,7 +1144,13 @@ var _hoisted_6 = {
   "class": "col-12 md:col-6"
 };
 var _hoisted_7 = {
-  "class": "flex flex-column sm:flex-row align-items-center sm:justify-content-center sm:justify-content-between"
+  "class": "grid"
+};
+var _hoisted_8 = {
+  "class": "col-12 md:col-6 flex flex-column md:flex-row justify-content-center md:justify-content-start"
+};
+var _hoisted_9 = {
+  "class": "col-12 md:col-6 flex flex-column md:flex-row justify-content-center md:justify-content-end"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Button = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Button");
@@ -1190,7 +1196,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           , ["error", "modelValue"])])])];
         }),
         footer: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDialog"], {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppDialog"], {
             message: "Yakin akan menghapus data ini?",
             visible: $setup.visibleDialog,
             "onUpdate:visible": _cache[3] || (_cache[3] = function ($event) {
@@ -1202,17 +1208,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             onCancel: $setup.onCancel
           }, null, 8
           /* PROPS */
-          , ["visible"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
+          , ["visible"]), !$props.outlet.relation ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_Button, {
+            key: 0,
             label: "Hapus",
             icon: "pi pi-trash",
             "class": "p-button-outlined p-button-danger",
             onClick: $setup.confirmDialog
-          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
+          })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, {
             label: "Simpan",
             icon: "pi pi-check",
             "class": "p-button-outlined",
             onClick: $setup.submit
-          })])];
+          })])])];
         }),
         _: 1
         /* STABLE */

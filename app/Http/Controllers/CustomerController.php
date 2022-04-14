@@ -91,6 +91,7 @@ class CustomerController extends Controller
                 'name' => $customer->name,
                 'phone' => $customer->phone,
                 'gender_id' => (int) $customer->getRawOriginal('gender_id'),
+                'relation' => $customer->transaction()->exists(),
             ],
             'genders' => [
                 ['label' => 'Perempuan', 'value' => 1],

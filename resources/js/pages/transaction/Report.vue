@@ -116,7 +116,7 @@ const exportExcelLink = ref('/reports/transactions/export/excel')
               </div>
             </div>
           </div>
-          <div class="col-12 md:col-4 flex justify-content-end">
+          <div class="col-12 md:col-4 flex flex-column md:flex-row justify-content-end">
             <AppButton
               v-if="transactions.total"
               label="Export excel"

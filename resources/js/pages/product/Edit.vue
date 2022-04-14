@@ -2,7 +2,6 @@
 import { ref, watch, computed } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
 import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
-import AppButton from '@/components/AppButton.vue'
 import AppInputText from '@/components/AppInputText.vue'
 import AppInputNumber from '@/components/AppInputNumber.vue'
 import AppDialog from '@/components/AppDialog.vue'
@@ -63,19 +62,27 @@ const onCancel = () => (visibleDialog.value = false)
           </template>
 
           <template #footer>
-            <div
-              class="flex flex-column sm:flex-row align-items-center sm:justify-content-center sm:justify-content-between"
-            >
-              <AppDialog
-                message="Yakin akan menghapus data ini?"
-                v-model:visible="visibleDialog"
-                @agree="onAgree(product.id)"
-                @cancel="onCancel"
-              />
+            <div class="grid">
+              <div class="col-12 md:col-6 flex flex-column md:flex-row justify-content-center md:justify-content-start">
+                <AppDialog
+                  message="Yakin akan menghapus data ini?"
+                  v-model:visible="visibleDialog"
+                  @agree="onAgree(product.id)"
+                  @cancel="onCancel"
+                />
 
-              <Button label="Hapus" icon="pi pi-trash" class="p-button-outlined p-button-danger" @click="confirmDialog" />
+                <Button
+                  v-if="!product.relation"
+                  label="Hapus"
+                  icon="pi pi-trash"
+                  class="p-button-outlined p-button-danger"
+                  @click="confirmDialog"
+                />
+              </div>
 
-              <Button label="Simpan" icon="pi pi-check" class="p-button-outlined" @click="submit" />
+              <div class="col-12 md:col-6 flex flex-column md:flex-row justify-content-center md:justify-content-end">
+                <Button label="Simpan" icon="pi pi-check" class="p-button-outlined" @click="submit" />
+              </div>
             </div>
           </template>
         </Card>

@@ -26,6 +26,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
   error: {
     type: String,
     default: null,
@@ -66,6 +70,7 @@ const selectedDropdownLabel = (value) => {
       :placeholder="placeholder"
       :options="options"
       :model-value="modelValue"
+      :disabled="disabled"
       @change="$emit('update:modelValue', $event.value)"
     >
       <template #value="slotProps">

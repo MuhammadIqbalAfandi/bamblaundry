@@ -10,6 +10,16 @@ use App\Models\Outlet;
 class OutletController extends Controller
 {
     /**
+     * Create the controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->authorizeResource(Outlet::class);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Inertia\Response
@@ -79,6 +89,7 @@ class OutletController extends Controller
                 'name' => $outlet->name,
                 'phone' => $outlet->phone,
                 'address' => $outlet->address,
+                'relation' => $outlet->users()->exists(),
             ],
         ]);
     }

@@ -72,6 +72,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Outlet::class);
     }
 
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
     public function scopeFilter($query, $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {

@@ -124,7 +124,7 @@ const exportExcelLink = ref('/reports/mutations/export/excel')
               </div>
             </div>
           </div>
-          <div class="col-12 md:col-4 flex justify-content-end">
+          <div class="col-12 md:col-4 flex flex-column md:flex-row justify-content-end">
             <AppButton
               v-if="mutations.total"
               label="Export excel"

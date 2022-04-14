@@ -15,6 +15,11 @@ class Outlet extends Model
         'address',
     ];
 
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
     public function scopeFilter($query, $filter)
     {
         $query->when($filter['search'] ?? null, function ($query, $search) {

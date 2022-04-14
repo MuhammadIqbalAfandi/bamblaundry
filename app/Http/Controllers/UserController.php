@@ -14,6 +14,16 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     /**
+     * Create the controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->authorizeResource(User::class);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Inertia\Response
@@ -131,6 +141,7 @@ class UserController extends Controller
                 'gender_id' => (int) $user->getRawOriginal('gender_id'),
                 'outlet_id' => $user->outlet_id,
                 'role_id' => $user->role_id,
+                'relation' => $user->expenses()->exists() || $user->transactions()->exists(),
             ],
             'roles' => Role::whereNotIn('id', [1])
                 ->get()

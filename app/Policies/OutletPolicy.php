@@ -18,7 +18,7 @@ class OutletPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        return $user->role_id === 1;
     }
 
     /**
@@ -30,7 +30,7 @@ class OutletPolicy
      */
     public function view(User $user, Outlet $outlet)
     {
-        //
+        return $user->role_id === 1;
     }
 
     /**
@@ -41,7 +41,7 @@ class OutletPolicy
      */
     public function create(User $user)
     {
-        //
+        return $user->role_id === 1;
     }
 
     /**
@@ -53,7 +53,7 @@ class OutletPolicy
      */
     public function update(User $user, Outlet $outlet)
     {
-        //
+        return $user->role_id === 1;
     }
 
     /**
@@ -65,7 +65,7 @@ class OutletPolicy
      */
     public function delete(User $user, Outlet $outlet)
     {
-        //
+        return $user->role_id === 1;
     }
 
     /**

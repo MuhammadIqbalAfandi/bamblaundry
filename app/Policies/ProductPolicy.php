@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Transaction;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class TransactionPolicy
+class ProductPolicy
 {
     use HandlesAuthorization;
 
@@ -18,19 +18,19 @@ class TransactionPolicy
      */
     public function viewAny(User $user)
     {
-        return true;
+        return $user->role_id !== 3;
     }
 
     /**
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Transaction  $transaction
+     * @param  \App\Models\Product  $product
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Transaction $transaction)
+    public function view(User $user, Product $product)
     {
-        return true;
+        return $user->role_id !== 3;
     }
 
     /**
@@ -41,41 +41,41 @@ class TransactionPolicy
      */
     public function create(User $user)
     {
-        return $user->role_id !== 1;
+        return $user->role_id !== 3;
     }
 
     /**
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Transaction  $transaction
+     * @param  \App\Models\Product  $product
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Transaction $transaction)
+    public function update(User $user, Product $product)
     {
-        return true;
+        return $user->role_id !== 3;
     }
 
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Transaction  $transaction
+     * @param  \App\Models\Product  $product
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Transaction $transaction)
+    public function delete(User $user, Product $product)
     {
-        //
+        return $user->role_id !== 3;
     }
 
     /**
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Transaction  $transaction
+     * @param  \App\Models\Product  $product
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Transaction $transaction)
+    public function restore(User $user, Product $product)
     {
         //
     }
@@ -84,10 +84,10 @@ class TransactionPolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Transaction  $transaction
+     * @param  \App\Models\Product  $product
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Transaction $transaction)
+    public function forceDelete(User $user, Product $product)
     {
         //
     }

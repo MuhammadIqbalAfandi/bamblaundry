@@ -114,6 +114,10 @@ __webpack_require__.r(__webpack_exports__);
       type: String,
       required: true
     },
+    disabled: {
+      type: Boolean,
+      "default": false
+    },
     error: {
       type: String,
       "default": null
@@ -1114,6 +1118,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     placeholder: $props.placeholder,
     options: $props.options,
     "model-value": $props.modelValue,
+    disabled: $props.disabled,
     onChange: _cache[0] || (_cache[0] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.value);
     })
@@ -1138,7 +1143,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["class", "id", "aria-describedby", "option-disabled", "option-label", "option-value", "placeholder", "options", "model-value"]), $props.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
+  , ["class", "id", "aria-describedby", "option-disabled", "option-label", "option-value", "placeholder", "options", "model-value", "disabled"]), $props.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
     key: 1,
     id: $setup.ariaDescribedbyLabel,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({
@@ -1818,7 +1823,7 @@ var _hoisted_16 = {
   "class": "col-12 sm:col-6"
 };
 var _hoisted_17 = {
-  "class": "col-12 sm:col-6 sm:col-offset-6 flex justify-content-end"
+  "class": "col-12 sm:col-6 sm:col-offset-6 flex flex-column md:flex-row justify-content-end"
 };
 var _hoisted_18 = {
   "class": "col-12"
@@ -1866,7 +1871,7 @@ var _hoisted_29 = {
   "class": "font-bold"
 };
 var _hoisted_30 = {
-  "class": "flex justify-content-end"
+  "class": "flex flex-column md:flex-row justify-content-end"
 };
 var _hoisted_31 = {
   "class": "grid"

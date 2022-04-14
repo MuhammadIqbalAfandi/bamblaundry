@@ -9,6 +9,16 @@ use Illuminate\Http\Request;
 class DiscountController extends Controller
 {
     /**
+     * Create the controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->authorizeResource(Discount::class);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Inertia\Response

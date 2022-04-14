@@ -10,6 +10,16 @@ use App\Models\Product;
 class ProductController extends Controller
 {
     /**
+     * Create the controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->authorizeResource(Product::class);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Inertia\Response
@@ -78,6 +88,7 @@ class ProductController extends Controller
                 'name' => $product->name,
                 'price' => $product->getRawOriginal('price'),
                 'unit' => $product->unit,
+                'relation' => $product->transactionDetails()->exists(),
             ],
         ]);
     }

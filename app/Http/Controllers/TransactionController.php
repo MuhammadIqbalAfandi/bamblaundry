@@ -20,6 +20,16 @@ use Inertia\Inertia;
 class TransactionController extends Controller
 {
     /**
+     * Create the controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->authorizeResource(Transaction::class);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Inertia\Response

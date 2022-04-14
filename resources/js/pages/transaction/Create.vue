@@ -380,7 +380,7 @@ const submit = () => {
                 />
               </div>
 
-              <div class="col-12 sm:col-6 sm:col-offset-6 flex justify-content-end">
+              <div class="col-12 sm:col-6 sm:col-offset-6 flex flex-column md:flex-row justify-content-end">
                 <Button
                   label="Tambahkan"
                   class="p-button-outlined"
@@ -480,7 +480,7 @@ const submit = () => {
           </template>
 
           <template #footer>
-            <div class="flex justify-content-end">
+            <div class="flex flex-column md:flex-row justify-content-end">
               <Button
                 label="Simpan Transaksi"
                 icon="pi pi-check"

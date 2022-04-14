@@ -18,7 +18,7 @@ class DiscountPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        return $user->role_id !== 3;
     }
 
     /**
@@ -30,7 +30,7 @@ class DiscountPolicy
      */
     public function view(User $user, Discount $discount)
     {
-        //
+        return $user->role_id !== 3;
     }
 
     /**
@@ -41,7 +41,7 @@ class DiscountPolicy
      */
     public function create(User $user)
     {
-        //
+        return $user->role_id !== 3;
     }
 
     /**
@@ -53,7 +53,7 @@ class DiscountPolicy
      */
     public function update(User $user, Discount $discount)
     {
-        //
+        return $user->role_id !== 3;
     }
 
     /**
@@ -65,7 +65,7 @@ class DiscountPolicy
      */
     public function delete(User $user, Discount $discount)
     {
-        //
+        return $user->role_id !== 3;
     }
 
     /**
