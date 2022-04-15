@@ -296,18 +296,18 @@ class TransactionController extends Controller
     {
         $transaction->update($request->validated());
 
-        // if ($transaction->transaction_status_id == 2) {
-        //     $statusMessage = " sudah diproses, harap menunggu sampai pemberitahuan selanjutnya.";
-        // } else if ($transaction->transaction_status_id == 3) {
-        //     $statusMessage = " sudah selesai, silahkan diambil.";
-        // } else {
-        //     $statusMessage = " sudah diambil. Silahkan datang lagi di kemudian hari jika ingin laundry kembali, terima kasih.";
-        // }
+        if ($transaction->transaction_status_id == 2) {
+            $statusMessage = " sudah diproses, harap menunggu sampai pemberitahuan selanjutnya.";
+        } else if ($transaction->transaction_status_id == 3) {
+            $statusMessage = " sudah selesai, silahkan diambil.";
+        } else {
+            $statusMessage = " sudah diambil. Silahkan datang lagi di kemudian hari jika ingin laundry kembali, terima kasih.";
+        }
 
-        // Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
-        //     'receiver' => $transaction->customer->phone,
-        //     'message' => 'Layanan laundry Anda dengan nomor transaksi *' . $transaction->transaction_number . '*' . $statusMessage,
-        // ]);
+        Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
+            'receiver' => $transaction->customer->phone,
+            'message' => 'Layanan laundry Anda dengan nomor transaksi *' . $transaction->transaction_number . '*' . $statusMessage,
+        ]);
 
         return back()->with('success', __('messages.success.update.transaction_status'));
     }
