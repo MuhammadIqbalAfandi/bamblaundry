@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Owner',
             'phone' => '',
-            'email' => 'owner@laundry.com',
+            'email' => 'owner@bambslaundry.com',
             'email_verified_at' => now(),
             'password' => bcrypt('owner123'),
             'gender_id' => 2, // 1(female), 2(male)

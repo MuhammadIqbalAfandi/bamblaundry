@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[919],{5919:(e,a,d)=>{d.r(a),d.d(a,{default:()=>l});const l=[{field:"createdAt",header:"Tanggal"},{field:"amount",header:"Pengeluaran"},{field:"outlet",header:"Outlet"},{field:"user",header:"User"}]}}]);
