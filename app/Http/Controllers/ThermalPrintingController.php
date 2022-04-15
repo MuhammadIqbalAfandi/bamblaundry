@@ -12,8 +12,7 @@ class ThermalPrintingController extends Controller
 {
     public function __invoke(Transaction $transaction)
     {
-        $transaction->load(['outlet', 'customer', 'transactionDetails.laundry']);
-        $discount = $transaction->discount;
+        $transaction->load(['outlet', 'customer', 'transactionDetails.laundry', 'transactionDetails.product']);
         $subTotalAsString = $transaction->subTotalAsString();
         $totalPriceAsString = $transaction->totalPriceAsString();
         foreach ($transaction->transactionDetails as $transactionDetail) {
@@ -21,7 +20,6 @@ class ThermalPrintingController extends Controller
             $transactionDetail->totalPriceAsString = $totalPriceAsStringDetail;
         }
 
-        $transaction->discount = $discount;
         $transaction->subTotalAsString = $subTotalAsString;
         $transaction->totalPriceAsString = $totalPriceAsString;
 

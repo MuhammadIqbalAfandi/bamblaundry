@@ -22,6 +22,8 @@ class ThermalPrinting
             $printer->selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
             $printer->text("BAMB'S LAUNDRY\n");
             $printer->selectPrintMode();
+            $printer->text("{$this->transaction->outlet->address}\n");
+            $printer->text("Telepon: {$this->transaction->outlet->phone}\n");
             $printer->feed();
 
             /* Unique Id */
@@ -46,26 +48,30 @@ class ThermalPrinting
             $printer->feed();
 
             /* Detail Transaction */
-            $titleType = str_pad("Jenis Laundry", 20);
+            $titleType = str_pad("Laundry/Produk", 20);
             $titleQty = str_pad("Qty", 7);
             $titlePrice = str_pad("@", 11);
             $titleTotalPrice = str_pad("Harga", 10, ' ', STR_PAD_LEFT);
             $printer->text("$titleType$titleQty$titlePrice$titleTotalPrice\n");
-            foreach ($this->transaction->transactionDetails as $transactionDetail) {
-                $type = str_pad("{$transactionDetail->laundry->name}/{$transactionDetail->laundry->unit}", 20);
+            foreach ($this->transaction->transaction_details as $transactionDetail) {
+                if($transactionDetail->laundry) {
+                    $type = str_pad("{$transactionDetail->laundry->name}/{$transactionDetail->laundry->unit}", 20);
+                } else {
+                    $type = str_pad("{$transactionDetail->product->name}/{$transactionDetail->product->unit}", 20);
+                }
                 $qty = str_pad("{$transactionDetail->quantity}", 7);
                 $price = str_pad("{$transactionDetail->price}", 11);
-                $totalPrice = str_pad("{$transactionDetail->totalPriceAsString()}", 10, ' ', STR_PAD_LEFT);
+                $totalPrice = str_pad("{$transactionDetail->totalPriceAsString}", 10, ' ', STR_PAD_LEFT);
                 $printer->text("$type$qty$price$totalPrice\n");
                 $printer->text("DISKON: {$transactionDetail->discount}\n");
             }
 
             /* Discount and total */
             $printer->feed();
-            $printer->text($this->textSpacing('SUBTOTAL', $this->transaction->subTotalAsString()));
+            $printer->text($this->textSpacing('SUBTOTAL', $this->transaction->subTotalAsString));
             $printer->text($this->textSpacing('DISKON', $this->transaction->discount));
             $printer->setEmphasis(true);
-            $printer->text($this->textSpacing('TOTAL', "Rp{$this->transaction->totalPriceAsString()}"));
+            $printer->text($this->textSpacing('TOTAL', "Rp{$this->transaction->totalPriceAsString}"));
             $printer->setEmphasis(false);
             $printer->feed();
 

@@ -13,8 +13,12 @@ try {
         $response = json_decode($data['message']);
         echo '> Received request ', $data['message'], "\n";
 
-        $thermalPrinting = new ThermalPrinting($response);
-        $thermalPrinting->startPrinting(2);
+        if($response) {
+            $thermalPrinting = new ThermalPrinting($response);
+            $thermalPrinting->startPrinting(2);
+        } else {
+            echo 'No data!';
+        }
     });
     $socket->run();
     $socket->receive();

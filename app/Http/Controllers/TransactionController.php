@@ -18,6 +18,7 @@ use Hoa\Websocket\Client as WebsocketClient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Http;
 
 class TransactionController extends Controller
 {
@@ -192,6 +193,18 @@ class TransactionController extends Controller
 
             DB::commit();
 
+            $transaction->load(['outlet', 'customer', 'transactionDetails.laundry', 'transactionDetails.product']);
+
+            $subTotalAsString = $transaction->subTotalAsString();
+            $totalPriceAsString = $transaction->totalPriceAsString();
+            foreach ($transaction->transactionDetails as $transactionDetail) {
+                $totalPriceAsStringDetail = $transactionDetail->totalPriceAsString();
+                $transactionDetail->totalPriceAsString = $totalPriceAsStringDetail;
+            }
+
+            $transaction->subTotalAsString = $subTotalAsString;
+            $transaction->totalPriceAsString = $totalPriceAsString;
+
             try {
                 $socket = new WebsocketClient(
                     new SocketClient('ws://103.157.96.20:5544')
@@ -204,10 +217,10 @@ class TransactionController extends Controller
                 return back()->with('error', __('messages.error.store.transaction'));
             }
 
-            // Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
-            //     'receiver' => $transaction->customer->phone,
-            //     'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transactioWebsocketClientn_number . '*',
-            // ]);
+            Http::post('https://gerbangchatapi.dijitalcode.com/chat/send?id=bambslaundry', [
+                'receiver' => $transaction->customer->phone,
+                'message' => 'Terima kasih sudah mempercayakan layanan laundry kepada Bamb\'s Laundry. Nomor transaksi Anda adalah *' . $request->transaction_number . '*',
+            ]);
 
             return back()->with('success', __('messages.success.store.transaction'));
         } catch (Exception $e) {
