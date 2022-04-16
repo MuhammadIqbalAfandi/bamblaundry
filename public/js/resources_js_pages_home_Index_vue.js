@@ -318,12 +318,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     cardStatistics: Object,
-    transactionStatistics: Object,
-    transactionOutletStatistics: Object
+    chartTransactionStatistics: Object,
+    chartOutletStatistic: Object
   },
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
+    var props = __props;
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.onMounted)(function () {
+      console.log(props.chartTransactionStatistics);
+      console.log(props.chartOutletStatistic);
+    });
 
     var transactionBarData = function transactionBarData(chartData) {
       var colors = ['#17b6ff', '#ffb51c'];
@@ -344,7 +349,7 @@ __webpack_require__.r(__webpack_exports__);
       return data;
     };
 
-    var transactionBarOption = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)({
+    var transactionBarOption = {
       responsive: true,
       maintainAspectRatio: false,
       datasetFill: false,
@@ -360,7 +365,7 @@ __webpack_require__.r(__webpack_exports__);
           }
         }
       }
-    });
+    };
 
     var transactionOutletPieData = function transactionOutletPieData(chartData) {
       var labels = [];
@@ -380,7 +385,7 @@ __webpack_require__.r(__webpack_exports__);
       };
     };
 
-    var transactionOutletPieOption = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)({
+    var transactionOutletPieOption = {
       maintainAspectRatio: false,
       datasetFill: false,
       plugins: {
@@ -390,13 +395,14 @@ __webpack_require__.r(__webpack_exports__);
           }
         }
       }
-    });
+    };
     var __returned__ = {
+      props: props,
       transactionBarData: transactionBarData,
       transactionBarOption: transactionBarOption,
       transactionOutletPieData: transactionOutletPieData,
       transactionOutletPieOption: transactionOutletPieOption,
-      ref: vue__WEBPACK_IMPORTED_MODULE_0__.ref,
+      onMounted: vue__WEBPACK_IMPORTED_MODULE_0__.onMounted,
       Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.Head,
       AppLayout: _layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
     };
@@ -936,7 +942,19 @@ var _hoisted_9 = {
   "class": "col-12 md:col-6"
 };
 var _hoisted_10 = {
+  "class": "flex flex-column"
+};
+var _hoisted_11 = {
+  "class": "text-base font-normal"
+};
+var _hoisted_12 = {
   "class": "col-12 md:col-6"
+};
+var _hoisted_13 = {
+  "class": "flex flex-column"
+};
+var _hoisted_14 = {
+  "class": "text-base font-normal"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Card = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Card");
@@ -974,21 +992,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         )]);
       }), 256
       /* UNKEYED_FRAGMENT */
-      )), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.transactionStatistics, function (transactionStatistic) {
+      )), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.chartTransactionStatistics, function (statistic) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Card, null, {
           title: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(transactionStatistic.title), 1
+            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(statistic.title), 1
             /* TEXT */
-            )];
+            ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(statistic.description), 1
+            /* TEXT */
+            )])];
           }),
           content: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
             return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Chart, {
               type: "bar",
-              data: $setup.transactionBarData(transactionStatistic.data),
+              data: $setup.transactionBarData(statistic.data),
               options: $setup.transactionBarOption
             }, null, 8
             /* PROPS */
-            , ["data", "options"])];
+            , ["data"])];
           }),
           _: 2
           /* DYNAMIC */
@@ -998,22 +1018,24 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         )]);
       }), 256
       /* UNKEYED_FRAGMENT */
-      )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Card, null, {
+      )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Card, null, {
         title: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.transactionOutletStatistics.title), 1
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.chartOutletStatistic.title), 1
           /* TEXT */
-          )];
+          ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.chartOutletStatistic.description), 1
+          /* TEXT */
+          )])];
         }),
         content: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Chart, {
             type: "pie",
             width: 600,
             height: 300,
-            data: $setup.transactionOutletPieData($props.transactionOutletStatistics.data),
+            data: $setup.transactionOutletPieData($props.chartOutletStatistic.data),
             options: $setup.transactionOutletPieOption
           }, null, 8
           /* PROPS */
-          , ["data", "options"])];
+          , ["data"])];
         }),
         _: 1
         /* STABLE */

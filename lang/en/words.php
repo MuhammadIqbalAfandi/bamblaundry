@@ -24,7 +24,8 @@ return [
     'laundry_type' => 'Laundry Type',
     'product_type' => 'Product Type',
     'transaction_statistic' => 'Transaction Statistic',
-    'expense_statistic' => 'Expense Statistic',
+    'mutation_statistic' => 'Mutations Statistic',
     'transaction_outlet_statistic' => 'Transaction Statistic/Outlet',
+    'per_year' => 'Per Year',
 
 ];

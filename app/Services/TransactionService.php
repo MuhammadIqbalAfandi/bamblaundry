@@ -43,9 +43,9 @@ class TransactionService
         return $collections->transform(fn($collection) => $collection->count());
     }
 
-    public function statisticData(SupportCollection $collections)
+    public function statisticData(SupportCollection $collections, int $take = -1)
     {
-        $collections = $collections->take(-2);
+        $collections = $collections->take($take);
         $collections->transform(fn($collections) => $this->totalPerMonth($collections));
         return $collections;
     }

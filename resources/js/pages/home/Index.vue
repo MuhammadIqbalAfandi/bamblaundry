@@ -1,12 +1,17 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted } from 'vue'
 import { Head } from '@inertiajs/inertia-vue3'
 import AppLayout from '@/layouts/AppLayout.vue'
 
-defineProps({
+const props = defineProps({
   cardStatistics: Object,
-  transactionStatistics: Object,
-  transactionOutletStatistics: Object,
+  chartTransactionStatistics: Object,
+  chartOutletStatistic: Object,
+})
+
+onMounted(() => {
+  console.log(props.chartTransactionStatistics)
+  console.log(props.chartOutletStatistic)
 })
 
 const transactionBarData = (chartData) => {
@@ -30,7 +35,7 @@ const transactionBarData = (chartData) => {
   return data
 }
 
-const transactionBarOption = ref({
+const transactionBarOption = {
   responsive: true,
   maintainAspectRatio: false,
   datasetFill: false,
@@ -46,7 +51,7 @@ const transactionBarOption = ref({
       },
     },
   },
-})
+}
 
 const transactionOutletPieData = (chartData) => {
   const labels = []
@@ -68,7 +73,7 @@ const transactionOutletPieData = (chartData) => {
   }
 }
 
-const transactionOutletPieOption = ref({
+const transactionOutletPieOption = {
   maintainAspectRatio: false,
   datasetFill: false,
   plugins: {
@@ -78,7 +83,7 @@ const transactionOutletPieOption = ref({
       },
     },
   },
-})
+}
 </script>
 
 <template>
@@ -107,24 +112,34 @@ const transactionOutletPieOption = ref({
         </Card>
       </div>
 
-      <div v-for="transactionStatistic in transactionStatistics" class="col-12 md:col-6">
+      <div v-for="statistic in chartTransactionStatistics" class="col-12 md:col-6">
         <Card>
-          <template #title>{{ transactionStatistic.title }}</template>
+          <template #title>
+            <div class="flex flex-column">
+              <span>{{ statistic.title }}</span>
+              <span class="text-base font-normal">{{ statistic.description }}</span>
+            </div>
+          </template>
           <template #content>
-            <Chart type="bar" :data="transactionBarData(transactionStatistic.data)" :options="transactionBarOption" />
+            <Chart type="bar" :data="transactionBarData(statistic.data)" :options="transactionBarOption" />
           </template>
         </Card>
       </div>
 
       <div class="col-12 md:col-6">
         <Card>
-          <template #title>{{ transactionOutletStatistics.title }}</template>
+          <template #title>
+            <div class="flex flex-column">
+              <span>{{ chartOutletStatistic.title }}</span>
+              <span class="text-base font-normal">{{ chartOutletStatistic.description }}</span>
+            </div>
+          </template>
           <template #content>
             <Chart
               type="pie"
               :width="600"
               :height="300"
-              :data="transactionOutletPieData(transactionOutletStatistics.data)"
+              :data="transactionOutletPieData(chartOutletStatistic.data)"
               :options="transactionOutletPieOption"
             />
           </template>

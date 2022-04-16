@@ -24,7 +24,8 @@ return [
     'laundry_type' => 'Jenis Laundry',
     'product_type' => 'Jenis Product',
     'transaction_statistic' => 'Statistik Transaksi',
-    'expense_statistic' => 'Statistik Pengeluaran',
+    'mutation_statistic' => 'Statistik Mutasi',
     'transaction_outlet_statistic' => 'Statistik Transaksi/Outlet',
+    'per_year' => 'Pertahun',
 
 ];
