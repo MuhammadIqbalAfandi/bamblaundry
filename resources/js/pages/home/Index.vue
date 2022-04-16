@@ -5,11 +5,12 @@ import AppLayout from '@/layouts/AppLayout.vue'
 
 defineProps({
   cardStatistics: Object,
-  chartStatistics: Object,
+  transactionStatistics: Object,
+  transactionOutletStatistics: Object,
 })
 
-const chartData = (chartData) => {
-  const colors = ['#42A5F5', '#FFA726']
+const transactionBarData = (chartData) => {
+  const colors = ['#17b6ff', '#ffb51c']
 
   const data = {
     datasets: [],
@@ -29,7 +30,7 @@ const chartData = (chartData) => {
   return data
 }
 
-const chartOptions = ref({
+const transactionBarOption = ref({
   responsive: true,
   maintainAspectRatio: false,
   datasetFill: false,
@@ -42,6 +43,38 @@ const chartOptions = ref({
             return label
           }
         },
+      },
+    },
+  },
+})
+
+const transactionOutletPieData = (chartData) => {
+  const labels = []
+  const data = []
+
+  for (const key in chartData) {
+    labels.push(key)
+    data.push(chartData[key])
+  }
+
+  return {
+    labels: labels,
+    datasets: [
+      {
+        data: data,
+        backgroundColor: ['#17b6ff', '#00c3f7', '#00cbdc', '#00d1b2', '#2bd281', '#86cf50', '#c5c623', '#ffb51c'],
+      },
+    ],
+  }
+}
+
+const transactionOutletPieOption = ref({
+  maintainAspectRatio: false,
+  datasetFill: false,
+  plugins: {
+    legend: {
+      labels: {
+        color: '#495057',
       },
     },
   },
@@ -74,11 +107,26 @@ const chartOptions = ref({
         </Card>
       </div>
 
-      <div v-for="chartStatistic in chartStatistics" class="col-12 md:col-6">
+      <div v-for="transactionStatistic in transactionStatistics" class="col-12 md:col-6">
         <Card>
-          <template #title>{{ chartStatistic.title }}</template>
+          <template #title>{{ transactionStatistic.title }}</template>
           <template #content>
-            <Chart type="bar" :data="chartData(chartStatistic.data)" :options="chartOptions" />
+            <Chart type="bar" :data="transactionBarData(transactionStatistic.data)" :options="transactionBarOption" />
+          </template>
+        </Card>
+      </div>
+
+      <div class="col-12 md:col-6">
+        <Card>
+          <template #title>{{ transactionOutletStatistics.title }}</template>
+          <template #content>
+            <Chart
+              type="pie"
+              :width="600"
+              :height="300"
+              :data="transactionOutletPieData(transactionOutletStatistics.data)"
+              :options="transactionOutletPieOption"
+            />
           </template>
         </Card>
       </div>

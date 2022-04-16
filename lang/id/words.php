@@ -25,5 +25,6 @@ return [
     'product_type' => 'Jenis Product',
     'transaction_statistic' => 'Statistik Transaksi',
     'expense_statistic' => 'Statistik Pengeluaran',
+    'transaction_outlet_statistic' => 'Statistik Transaksi/Outlet',
 
 ];

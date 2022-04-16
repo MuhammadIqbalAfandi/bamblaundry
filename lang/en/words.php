@@ -25,5 +25,6 @@ return [
     'product_type' => 'Product Type',
     'transaction_statistic' => 'Transaction Statistic',
     'expense_statistic' => 'Expense Statistic',
+    'transaction_outlet_statistic' => 'Transaction Statistic/Outlet',
 
 ];

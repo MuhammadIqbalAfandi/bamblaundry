@@ -23,18 +23,24 @@ class DashboardController extends Controller
     public function __invoke(Request $request)
     {
         $transactions = Transaction::filter(['startDate' => today()])->get();
+
         $expenses = Expense::filter(['startDate' => today()])->get();
+
         $laundries = Laundry::get();
+
         $products = Product::get();
 
         $transactionChartStatistic = Transaction::get()->groupBy([
             fn($transaction) => Carbon::parse($transaction->getRawOriginal('created_at'))->format('Y'),
             fn($transaction) => Carbon::parse($transaction->getRawOriginal('created_at'))->format('M'),
         ]);
+
         $expenseChartStatistic = Expense::get()->groupBy([
             fn($expense) => Carbon::parse($expense->getRawOriginal('created_at'))->format('Y'),
             fn($expense) => Carbon::parse($expense->getRawOriginal('created_at'))->format('M'),
         ]);
+
+        $transactionOutletChartStatistic = Transaction::get()->groupBy('outlet.name');
 
         return inertia('home/Index', [
             'cardStatistics' => [
@@ -65,7 +71,7 @@ class DashboardController extends Controller
                     'amount' => $products->count(),
                 ],
             ],
-            'chartStatistics' => [
+            'transactionStatistics' => [
                 [
                     'title' => __('words.transaction_statistic'),
                     'data' => (new TransactionService)->statisticData($transactionChartStatistic),
@@ -74,6 +80,10 @@ class DashboardController extends Controller
                     'title' => __('words.expense_statistic'),
                     'data' => (new ExpenseService)->statisticData($expenseChartStatistic),
                 ],
+            ],
+            'transactionOutletStatistics' => [
+                'title' => __('words.transaction_outlet_statistic'),
+                'data' => (new TransactionService)->totalPerMonth($transactionOutletChartStatistic),
             ],
         ]);
     }
