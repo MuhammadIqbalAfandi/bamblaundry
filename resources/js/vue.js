@@ -29,6 +29,7 @@ import Password from 'primevue/password'
 import Ripple from 'primevue/ripple'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
+import Textarea from 'primevue/textarea'
 import Tooltip from 'primevue/tooltip'
 
 createInertiaApp({
@@ -61,6 +62,7 @@ createInertiaApp({
       .component('Password', Password)
       .component('TabView', TabView)
       .component('TabPanel', TabPanel)
+      .component('Textarea', Textarea)
       .mount(el)
   },
 })

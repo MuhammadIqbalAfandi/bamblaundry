@@ -226,6 +226,7 @@ const priceTotal = () => {
 const form = useForm({
   transactionNumber: props.transactionNumber,
   customer: '',
+  description: '',
   discount: props.discount,
 
   laundry: '',
@@ -239,6 +240,7 @@ const submit = () => {
   form
     .transform((data) => ({
       transaction_number: data.transactionNumber,
+      description: data.description,
       discount: data.discount,
       customer_number: data.customer.customerNumber,
       laundries: transactionBasketFilter('laundry'),
@@ -247,6 +249,7 @@ const submit = () => {
     .post(route('transactions.store'), {
       onSuccess: () => {
         transactionBasketClear()
+        form.reset('description')
 
         Inertia.reload({
           data: { customer: form.customer.customerNumber },
@@ -378,6 +381,21 @@ const submit = () => {
                   :error="form.errors.quantityProduct"
                   :min="0"
                 />
+              </div>
+
+              <div class="col-12 sm:col-6">
+                <div class="field">
+                  <label for="description">Keterangan</label>
+                  <Textarea
+                    id="description"
+                    class="w-full"
+                    v-model="form.description"
+                    placeholder="tulis keterangan disini"
+                    rows="5"
+                    cols="30"
+                    :autoResize="true"
+                  />
+                </div>
               </div>
 
               <div class="col-12 sm:col-6 sm:col-offset-6 flex flex-column md:flex-row justify-content-end">

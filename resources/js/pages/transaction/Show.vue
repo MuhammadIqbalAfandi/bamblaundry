@@ -101,33 +101,46 @@ defineProps({
 
     <div class="grid">
       <div class="col-12 md:col-8">
-        <Card>
-          <template #content>
-            <h3 class="text-base"><i class="pi pi-shopping-cart"></i> <span class="ml-2">Daftar Laundry</span></h3>
+        <div class="grid">
+          <div class="col-12">
+            <Card>
+              <template #title>Keterangan</template>
+              <template #content>
+                <p v-if="transaction.description">{{ transaction.description }}</p>
+                <p v-else>-</p>
+              </template>
+            </Card>
+          </div>
 
-            <DataTable
-              class="mt-3"
-              responsiveLayout="scroll"
-              columnResizeMode="expand"
-              :value="transactionDetails"
-              :rowHover="true"
-              :stripedRows="true"
-            >
-              <Column
-                v-for="transactionBasketTable in TransactionBasketTable"
-                :field="transactionBasketTable.field"
-                :header="transactionBasketTable.header"
-                :key="transactionBasketTable.field"
-              />
-            </DataTable>
-          </template>
-        </Card>
+          <div class="col-12">
+            <Card>
+              <template #content>
+                <h3 class="text-base"><i class="pi pi-shopping-cart"></i> <span class="ml-2">Daftar Laundry</span></h3>
+
+                <DataTable
+                  class="mt-3"
+                  responsiveLayout="scroll"
+                  columnResizeMode="expand"
+                  :value="transactionDetails"
+                  :rowHover="true"
+                  :stripedRows="true"
+                >
+                  <Column
+                    v-for="transactionBasketTable in TransactionBasketTable"
+                    :field="transactionBasketTable.field"
+                    :header="transactionBasketTable.header"
+                    :key="transactionBasketTable.field"
+                  />
+                </DataTable>
+              </template>
+            </Card>
+          </div>
+        </div>
       </div>
 
       <div class="col-12 md:col-4">
-        <h2 class="mb-3 text-xl font-bold">Keseluruhan</h2>
-
         <Card class="bg-primary">
+          <template #title>Keseluruhan</template>
           <template #content>
             <h3>Diskon</h3>
             <p>{{ transaction.discount }}</p>

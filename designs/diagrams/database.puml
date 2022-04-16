@@ -31,6 +31,7 @@ entity Transaction {
   __
   * transaction_number
   discount
+  description
   * transaction_status_id
   * user_id
   * customer_number

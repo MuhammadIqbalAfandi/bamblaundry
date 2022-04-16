@@ -17,8 +17,8 @@ use Hoa\Socket\Client as SocketClient;
 use Hoa\Websocket\Client as WebsocketClient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Http;
+use Inertia\Inertia;
 
 class TransactionController extends Controller
 {
@@ -142,6 +142,7 @@ class TransactionController extends Controller
         try {
             $transaction = Transaction::create([
                 'transaction_number' => $request->transaction_number,
+                'description' => $request->description,
                 'discount' => $request->discount,
                 'transaction_status_id' => 1,
                 'customer_number' => $request->customer_number,
@@ -243,6 +244,7 @@ class TransactionController extends Controller
                 'number' => $transaction->transaction_number,
                 'statusId' => $transaction->transactionStatus->id,
                 'status' => $transaction->transactionStatus->name,
+                'description' => $transaction->description,
                 'discount' => $transaction->discount,
                 'price' => $transaction->totalPriceAsFullString(),
                 'dateLaundry' => $transaction->created_at,

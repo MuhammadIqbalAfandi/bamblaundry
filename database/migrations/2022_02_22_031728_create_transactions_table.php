@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->string('transaction_number');
+            $table->text('description')->nullable()->default(null);
             $table->unsignedInteger('discount');
             $table->string('customer_number');
             $table->foreign('customer_number')->references('customer_number')->on('customers');
