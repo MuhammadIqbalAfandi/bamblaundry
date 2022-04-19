@@ -1,21 +1,30 @@
 <script setup>
-import { onMounted } from 'vue'
 import { Head } from '@inertiajs/inertia-vue3'
+import orderBy from 'lodash/orderBy'
 import AppLayout from '@/layouts/AppLayout.vue'
 
-const props = defineProps({
+defineProps({
   cardStatistics: Object,
   chartTransactionStatistics: Object,
   chartOutletStatistic: Object,
+  chartTopTransactionStatistic: Object,
 })
 
-onMounted(() => {
-  console.log(props.chartTransactionStatistics)
-  console.log(props.chartOutletStatistic)
-})
+const colors = [
+  '#349dcf',
+  '#00b2da',
+  '#00c7dd',
+  '#1fdbdb',
+  '#57eed3',
+  '#88ffc9',
+  '#96ed9a',
+  '#a8d96c',
+  '#bbc242',
+  '#cda91d',
+]
 
 const transactionBarData = (chartData) => {
-  const colors = ['#17b6ff', '#ffb51c']
+  const colors = ['#349dcf', '#a8d96c']
 
   const data = {
     datasets: [],
@@ -36,21 +45,8 @@ const transactionBarData = (chartData) => {
 }
 
 const transactionBarOption = {
-  responsive: true,
   maintainAspectRatio: false,
   datasetFill: false,
-  scales: {
-    y: {
-      ticks: {
-        beginAtZero: true,
-        callback: function (label) {
-          if (Math.floor(label) === label) {
-            return label
-          }
-        },
-      },
-    },
-  },
 }
 
 const transactionOutletPieData = (chartData) => {
@@ -67,7 +63,7 @@ const transactionOutletPieData = (chartData) => {
     datasets: [
       {
         data: data,
-        backgroundColor: ['#17b6ff', '#00c3f7', '#00cbdc', '#00d1b2', '#2bd281', '#86cf50', '#c5c623', '#ffb51c'],
+        backgroundColor: colors,
       },
     ],
   }
@@ -76,11 +72,35 @@ const transactionOutletPieData = (chartData) => {
 const transactionOutletPieOption = {
   maintainAspectRatio: false,
   datasetFill: false,
+}
+
+const topTransactionData = (chartData) => {
+  const labels = []
+  const data = []
+
+  for (const chartData of orderBy(chartData, ['totalPrice'], ['desc'])) {
+    labels.push([chartData.customerNumber, chartData.name])
+    data.push(chartData.totalPrice)
+  }
+
+  return {
+    labels: labels,
+    datasets: [
+      {
+        data: data,
+        backgroundColor: colors,
+      },
+    ],
+  }
+}
+
+const topTransactionOption = {
+  maintainAspectRatio: false,
+  datasetFill: false,
+  indexAxis: 'y',
   plugins: {
     legend: {
-      labels: {
-        color: '#495057',
-      },
+      display: false,
     },
   },
 }
@@ -141,6 +161,26 @@ const transactionOutletPieOption = {
               :height="300"
               :data="transactionOutletPieData(chartOutletStatistic.data)"
               :options="transactionOutletPieOption"
+            />
+          </template>
+        </Card>
+      </div>
+
+      <div class="col-12 md:col-6">
+        <Card>
+          <template #title>
+            <div class="flex flex-column">
+              <span>{{ chartTopTransactionStatistic.title }}</span>
+              <span class="text-base font-normal">{{ chartTopTransactionStatistic.description }}</span>
+            </div>
+          </template>
+          <template #content>
+            <Chart
+              type="bar"
+              :width="600"
+              :height="300"
+              :data="topTransactionData(chartTopTransactionStatistic.data)"
+              :options="topTransactionOption"
             />
           </template>
         </Card>

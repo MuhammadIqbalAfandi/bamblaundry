@@ -386,8 +386,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @inertiajs/inertia */ "./node_modules/@inertiajs/inertia/dist/index.js");
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+/* harmony import */ var _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @inertiajs/inertia */ "./node_modules/@inertiajs/inertia/dist/index.js");
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
 /* harmony import */ var dayjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! dayjs */ "./node_modules/dayjs/dayjs.min.js");
 /* harmony import */ var dayjs__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(dayjs__WEBPACK_IMPORTED_MODULE_3__);
@@ -411,9 +411,11 @@ __webpack_require__.r(__webpack_exports__);
     mutations: {
       type: Object,
       "default": {
-        data: [],
-        links: [],
-        total: 0
+        details: {
+          data: [],
+          links: [],
+          total: 0
+        }
       }
     },
     filters: Object,
@@ -429,7 +431,7 @@ __webpack_require__.r(__webpack_exports__);
       endDate: props.filters.endDate,
       outlet: props.filters.outlet
     });
-    (0,vue__WEBPACK_IMPORTED_MODULE_1__.onMounted)(function () {
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.onMounted)(function () {
       if (props.filters.startDate || props.filters.endDate) {
         if (props.filters.endDate) {
           filterForm.dates = [new Date(props.filters.startDate), new Date(props.filters.endDate)];
@@ -438,7 +440,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       }
     });
-    (0,vue__WEBPACK_IMPORTED_MODULE_1__.watch)(filterForm, function () {
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.watch)(filterForm, function () {
       if (filterForm.dates) {
         if (filterForm.dates[1]) {
           filterForm.startDate = dayjs__WEBPACK_IMPORTED_MODULE_3___default()(filterForm.dates[0]).format('YYYY-MM-DD');
@@ -452,7 +454,7 @@ __webpack_require__.r(__webpack_exports__);
         filterForm.startDate = null;
       }
 
-      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_0__.Inertia.reload({
+      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_1__.Inertia.reload({
         data: lodash_pickBy__WEBPACK_IMPORTED_MODULE_4___default()({
           startDate: filterForm.startDate,
           endDate: filterForm.endDate,
@@ -465,7 +467,7 @@ __webpack_require__.r(__webpack_exports__);
     });
 
     var filterReset = function filterReset() {
-      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_0__.Inertia.get('/reports/mutations');
+      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_1__.Inertia.get('/reports/mutations');
     };
 
     var linkReference = function linkReference(data) {
@@ -476,21 +478,19 @@ __webpack_require__.r(__webpack_exports__);
       }
     };
 
-    var exportExcelLink = (0,vue__WEBPACK_IMPORTED_MODULE_1__.ref)('/reports/mutations/export/excel');
+    var exportExcelLink = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)('/reports/mutations/export/excel');
     var __returned__ = {
       props: props,
       filterForm: filterForm,
       filterReset: filterReset,
       linkReference: linkReference,
       exportExcelLink: exportExcelLink,
-      Inertia: _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_0__.Inertia,
-      watch: vue__WEBPACK_IMPORTED_MODULE_1__.watch,
-      computed: vue__WEBPACK_IMPORTED_MODULE_1__.computed,
-      onMounted: vue__WEBPACK_IMPORTED_MODULE_1__.onMounted,
-      ref: vue__WEBPACK_IMPORTED_MODULE_1__.ref,
+      watch: vue__WEBPACK_IMPORTED_MODULE_0__.watch,
+      onMounted: vue__WEBPACK_IMPORTED_MODULE_0__.onMounted,
+      ref: vue__WEBPACK_IMPORTED_MODULE_0__.ref,
+      Inertia: _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_1__.Inertia,
       Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.Head,
       useForm: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm,
-      usePage: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.usePage,
       dayjs: (dayjs__WEBPACK_IMPORTED_MODULE_3___default()),
       pickBy: (lodash_pickBy__WEBPACK_IMPORTED_MODULE_4___default()),
       AppLayout: _layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
@@ -1154,6 +1154,67 @@ var _hoisted_7 = {
 var _hoisted_8 = {
   "class": "col-12 md:col-4 flex flex-column md:flex-row justify-content-end"
 };
+var _hoisted_9 = {
+  key: 0,
+  "class": "grid mt-3 ml-1"
+};
+var _hoisted_10 = {
+  "class": "col-auto mr-7"
+};
+
+var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-base"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "pi pi-wallet"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Pendapatan")], -1
+/* HOISTED */
+);
+
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1
+/* HOISTED */
+);
+
+var _hoisted_13 = {
+  "class": "text-xl font-bold"
+};
+var _hoisted_14 = {
+  "class": "col-auto mr-7"
+};
+
+var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-base"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "pi pi-wallet"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Pengeluaran")], -1
+/* HOISTED */
+);
+
+var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1
+/* HOISTED */
+);
+
+var _hoisted_17 = {
+  "class": "text-xl font-bold"
+};
+var _hoisted_18 = {
+  "class": "col-auto"
+};
+
+var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-base"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "pi pi-wallet"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Total")], -1
+/* HOISTED */
+);
+
+var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1
+/* HOISTED */
+);
+
+var _hoisted_21 = {
+  "class": "text-xl font-bold"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Calendar = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Calendar");
 
@@ -1172,7 +1233,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_DataTable, {
         "responsive-layout": "scroll",
         "column-resize-mode": "expand",
-        value: $props.mutations.data,
+        value: $props.mutations.details.data,
         "row-hover": true,
         "striped-rows": true
       }, {
@@ -1205,7 +1266,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             label: "reset",
             "class": "p-button-link",
             onClick: $setup.filterReset
-          })])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [$props.mutations.total ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["AppButton"], {
+          })])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [$props.mutations.details.total ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["AppButton"], {
             key: 0,
             label: "Export excel",
             "class-button": "p-button-outlined md:w-16rem",
@@ -1214,7 +1275,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             href: $setup.exportExcelLink
           }, null, 8
           /* PROPS */
-          , ["href"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])];
+          , ["href"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), $props.mutations.totalAmount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", null, [_hoisted_11, _hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.mutations.totalIncome), 1
+          /* TEXT */
+          )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", null, [_hoisted_15, _hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.mutations.totalExpense), 1
+          /* TEXT */
+          )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", null, [_hoisted_19, _hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.mutations.totalAmount), 1
+          /* TEXT */
+          )])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
         }),
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.TableHeader, function (tableHeader) {
@@ -1249,7 +1316,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, 8
       /* PROPS */
       , ["value"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppPagination"], {
-        links: $props.mutations.links
+        links: $props.mutations.details.links
       }, null, 8
       /* PROPS */
       , ["links"])];

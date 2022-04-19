@@ -25,9 +25,9 @@ class ReportTransactionController extends Controller
             request()->merge(['outlet' => request()->user()->outlet_id]);
         }
 
-        $transactions = Transaction::filter(request()->only('startDate', 'endDate', 'outlet'))
-            ->get()
-            ->groupBy('created_at')
+        $transactions = Transaction::filter(request()->only('startDate', 'endDate', 'outlet'))->get();
+
+        $transactionGroupBy = $transactions->groupBy('created_at')
             ->transform(fn($transactions) => [[
                 'date' => $transactions->first()->getRawOriginal('created_at'),
                 'createdAt' => $transactions->first()->created_at,
@@ -37,12 +37,16 @@ class ReportTransactionController extends Controller
             ->flatten(1)
             ->toArray();
 
-        $transaction = (new TransactionService)->getPaginator($transactions);
+        $transaction = (new TransactionService)->getPaginator($transactionGroupBy);
 
         return inertia('transaction/Report', [
             'filters' => request()->all('startDate', 'endDate', 'outlet'),
             'transactions' => Inertia::lazy(
-                fn() => $transaction
+                fn() => [
+                    'details' => $transaction,
+                    'totalTransaction' => $transactions->count(),
+                    'totalAmount' => (new TransactionService)->totalPriceGroupAsString($transactions),
+                ]
             ),
             'outlets' => Outlet::all()
                 ->transform(fn($outlet) => [

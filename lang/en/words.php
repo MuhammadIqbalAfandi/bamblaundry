@@ -27,5 +27,7 @@ return [
     'mutation_statistic' => 'Mutations Statistic',
     'transaction_outlet_statistic' => 'Transaction Statistic/Outlet',
     'per_year' => 'Per Year',
+    'top_customer' => 'Top customer',
+    'top_number_customer' => 'Top :number Customer',
 
 ];

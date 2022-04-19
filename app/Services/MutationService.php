@@ -39,7 +39,7 @@ class MutationService extends CurrencyFormatService
         return $this->setRupiahFormat($this->totalExpense($collections), true);
     }
 
-    public function totalAmount(EloquentCollection $collections)
+    public function totalAmountAsString(EloquentCollection $collections)
     {
         $amount = $this->totalIncome($collections) - $this->totalExpense($collections);
         return $this->setRupiahFormat($amount, true);

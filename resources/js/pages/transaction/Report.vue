@@ -1,7 +1,7 @@
 <script setup>
-import { watch, computed, onMounted, ref } from 'vue'
+import { watch, onMounted, ref } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
-import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
+import { Head, useForm } from '@inertiajs/inertia-vue3'
 import dayjs from 'dayjs'
 import pickBy from 'lodash/pickBy'
 import AppLayout from '@/layouts/AppLayout.vue'
@@ -14,9 +14,11 @@ const props = defineProps({
   transactions: {
     type: Object,
     default: {
-      data: [],
-      links: [],
-      total: 0,
+      details: {
+        data: [],
+        links: [],
+        total: 0,
+      },
     },
   },
   filters: Object,
@@ -81,7 +83,7 @@ const exportExcelLink = ref('/reports/transactions/export/excel')
     <DataTable
       responsive-layout="scroll"
       column-resize-mode="expand"
-      :value="transactions.data"
+      :value="transactions.details.data"
       :row-hover="true"
       :striped-rows="true"
     >
@@ -118,13 +120,33 @@ const exportExcelLink = ref('/reports/transactions/export/excel')
           </div>
           <div class="col-12 md:col-4 flex flex-column md:flex-row justify-content-end">
             <AppButton
-              v-if="transactions.total"
+              v-if="transactions.details.total"
               label="Export excel"
               class-button="p-button-outlined md:w-16rem"
               icon="pi pi-file-excel"
               :inertia-link="false"
               :href="exportExcelLink"
             />
+          </div>
+        </div>
+        <div v-if="transactions.totalAmount" class="grid mt-3 ml-1">
+          <div class="col-auto mr-7">
+            <h2>
+              <span class="text-base"> <i class="pi pi-shopping-cart" /> Total Transaksi</span>
+
+              <br />
+
+              <span class="text-xl font-bold">{{ transactions.totalTransaction }}</span>
+            </h2>
+          </div>
+          <div class="col-auto">
+            <h2>
+              <span class="text-base"> <i class="pi pi-wallet" /> Total Nilai</span>
+
+              <br />
+
+              <span class="text-xl font-bold">{{ transactions.totalAmount }}</span>
+            </h2>
           </div>
         </div>
       </template>
@@ -147,6 +169,6 @@ const exportExcelLink = ref('/reports/transactions/export/excel')
       </Column>
     </DataTable>
 
-    <AppPagination :links="transactions.links" />
+    <AppPagination :links="transactions.details.links" />
   </AppLayout>
 </template>

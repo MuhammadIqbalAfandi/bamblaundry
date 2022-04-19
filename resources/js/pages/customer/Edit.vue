@@ -112,6 +112,17 @@ const onCancel = () => (visibleDialog.value = false)
     </div>
 
     <h2>Riwayat Transaksi</h2>
+    <div v-if="transactions.totalTransaction" class="grid mt-3 ml-1">
+      <div class="col-auto">
+        <h2>
+          <span class="text-base"> <i class="pi pi-shopping-cart" /> Total Transaksi</span>
+
+          <br />
+
+          <span class="text-xl font-bold">{{ transactions.totalTransaction }}</span>
+        </h2>
+      </div>
+    </div>
     <div class="grid">
       <div class="col-12">
         <Card>
@@ -119,7 +130,7 @@ const onCancel = () => (visibleDialog.value = false)
             <DataTable
               responsive-layout="scroll"
               column-resize-mode="expand"
-              :value="transactions.data"
+              :value="transactions.details.data"
               :row-hover="true"
               :striped-rows="true"
             >
@@ -165,7 +176,7 @@ const onCancel = () => (visibleDialog.value = false)
               </Column>
             </DataTable>
 
-            <AppPagination :links="transactions.links" />
+            <AppPagination :links="transactions.details.links" />
           </template>
         </Card>
       </div>

@@ -49,4 +49,17 @@ class TransactionService
         $collections->transform(fn($collections) => $this->totalPerMonth($collections));
         return $collections;
     }
+
+    public function topTransaction(EloquentCollection $collections, int $take = 5)
+    {
+        return $collections
+            ->transform(fn($collect) => [[
+                'customerNumber' => $collect->first()->customer->customer_number,
+                'name' => $collect->first()->customer->name,
+                'totalPrice' => $this->totalPriceGroup($collect),
+            ]])
+            ->sortByDesc('totalPrice')
+            ->take($take)
+            ->flatten(1);
+    }
 }

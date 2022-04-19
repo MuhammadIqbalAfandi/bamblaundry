@@ -1,7 +1,7 @@
 <script setup>
+import { watch, onMounted, ref } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
-import { watch, computed, onMounted, ref } from 'vue'
-import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
+import { Head, useForm } from '@inertiajs/inertia-vue3'
 import dayjs from 'dayjs'
 import pickBy from 'lodash/pickBy'
 import AppLayout from '@/layouts/AppLayout.vue'
@@ -14,9 +14,11 @@ const props = defineProps({
   mutations: {
     type: Object,
     default: {
-      data: [],
-      links: [],
-      total: 0,
+      details: {
+        data: [],
+        links: [],
+        total: 0,
+      },
     },
   },
   filters: Object,
@@ -89,7 +91,7 @@ const exportExcelLink = ref('/reports/mutations/export/excel')
     <DataTable
       responsive-layout="scroll"
       column-resize-mode="expand"
-      :value="mutations.data"
+      :value="mutations.details.data"
       :row-hover="true"
       :striped-rows="true"
     >
@@ -126,13 +128,43 @@ const exportExcelLink = ref('/reports/mutations/export/excel')
           </div>
           <div class="col-12 md:col-4 flex flex-column md:flex-row justify-content-end">
             <AppButton
-              v-if="mutations.total"
+              v-if="mutations.details.total"
               label="Export excel"
               class-button="p-button-outlined md:w-16rem"
               icon="pi pi-file-excel"
               :inertia-link="false"
               :href="exportExcelLink"
             />
+          </div>
+        </div>
+
+        <div v-if="mutations.totalAmount" class="grid mt-3 ml-1">
+          <div class="col-auto mr-7">
+            <h2>
+              <span class="text-base"> <i class="pi pi-wallet" /> Pendapatan</span>
+
+              <br />
+
+              <span class="text-xl font-bold">{{ mutations.totalIncome }}</span>
+            </h2>
+          </div>
+          <div class="col-auto mr-7">
+            <h2>
+              <span class="text-base"> <i class="pi pi-wallet" /> Pengeluaran</span>
+
+              <br />
+
+              <span class="text-xl font-bold">{{ mutations.totalExpense }}</span>
+            </h2>
+          </div>
+          <div class="col-auto">
+            <h2>
+              <span class="text-base"> <i class="pi pi-wallet" /> Total</span>
+
+              <br />
+
+              <span class="text-xl font-bold">{{ mutations.totalAmount }}</span>
+            </h2>
           </div>
         </div>
       </template>
@@ -155,6 +187,6 @@ const exportExcelLink = ref('/reports/mutations/export/excel')
       </Column>
     </DataTable>
 
-    <AppPagination :links="mutations.links" />
+    <AppPagination :links="mutations.details.links" />
   </AppLayout>
 </template>

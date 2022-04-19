@@ -97,24 +97,27 @@ class CustomerController extends Controller
                 ['label' => 'Perempuan', 'value' => 1],
                 ['label' => 'Laki-laki', 'value' => 2],
             ],
-            'transactions' => $customer->transaction()
-                ->latest()
-                ->paginate(10)
-                ->withQueryString()
-                ->through(fn($transaction) => [
-                    'id' => $transaction->id,
-                    'transactionNumber' => $transaction->transaction_number,
-                    'createdAt' => $transaction->created_at,
-                    'customer' => [
-                        'number' => $customer->customer_number,
-                        'name' => $customer->name,
-                        'phone' => $customer->phone,
-                    ],
-                    'price' => $transaction->totalPriceAsFullString(),
-                    'outlet' => $transaction->outlet->name,
-                    'transactionStatusName' => $transaction->transactionStatus->name,
-                    'transactionStatusId' => $transaction->transactionStatus->id,
-                ]),
+            'transactions' => [
+                'details' => $customer->transaction()
+                    ->latest()
+                    ->paginate(10)
+                    ->withQueryString()
+                    ->through(fn($transaction) => [
+                        'id' => $transaction->id,
+                        'transactionNumber' => $transaction->transaction_number,
+                        'createdAt' => $transaction->created_at,
+                        'customer' => [
+                            'number' => $customer->customer_number,
+                            'name' => $customer->name,
+                            'phone' => $customer->phone,
+                        ],
+                        'price' => $transaction->totalPriceAsFullString(),
+                        'outlet' => $transaction->outlet->name,
+                        'transactionStatusName' => $transaction->transactionStatus->name,
+                        'transactionStatusId' => $transaction->transactionStatus->id,
+                    ]),
+                'totalTransaction' => $customer->transaction->count(),
+            ],
         ]);
     }
 

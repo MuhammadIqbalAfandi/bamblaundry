@@ -33,10 +33,11 @@ class DashboardController extends Controller
 
         $products = Product::get();
 
-        $transactionChart = Transaction::get()->groupBy([
-            fn($transaction) => Carbon::parse($transaction->getRawOriginal('created_at'))->format('Y'),
-            fn($transaction) => Carbon::parse($transaction->getRawOriginal('created_at'))->format('M'),
-        ]);
+        $transactionChart = Transaction::get()
+            ->groupBy([
+                fn($transaction) => Carbon::parse($transaction->getRawOriginal('created_at'))->format('Y'),
+                fn($transaction) => Carbon::parse($transaction->getRawOriginal('created_at'))->format('M'),
+            ]);
 
         $mutationChart = Mutation::whereYear('created_at', date('Y'))
             ->get()
@@ -52,6 +53,9 @@ class DashboardController extends Controller
                 fn($transaction) => Carbon::parse($transaction->getRawOriginal('created_at'))->format('M'),
                 fn($transaction) => $transaction->outlet->name,
             ]);
+
+        $topTransactionChart = Transaction::get()
+            ->groupBy('customer_number');
 
         return inertia('home/Index', [
             'cardStatistics' => [
@@ -98,6 +102,11 @@ class DashboardController extends Controller
                 'title' => __('words.transaction_outlet_statistic'),
                 'description' => Carbon::parse(date('Y-m-d'))->translatedFormat('F, Y'),
                 'data' => (new TransactionService)->statisticData($transactionOutletChart)->first(),
+            ],
+            'chartTopTransactionStatistic' => [
+                'title' => __('words.top_customer'),
+                'description' => __('words.top_number_customer', ['number' => 5]),
+                'data' => (new TransactionService)->topTransaction($topTransactionChart),
             ],
         ]);
     }

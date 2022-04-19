@@ -27,5 +27,7 @@ return [
     'mutation_statistic' => 'Statistik Mutasi',
     'transaction_outlet_statistic' => 'Statistik Transaksi/Outlet',
     'per_year' => 'Pertahun',
+    'top_customer' => 'Top Pelanggan',
+    'top_number_customer' => 'Top :number Pelanggan',
 
 ];
