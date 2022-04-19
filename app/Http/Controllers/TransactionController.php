@@ -175,13 +175,13 @@ class TransactionController extends Controller
             if ($request->discount) {
                 $transaction->mutation()->create([
                     'type' => 1,
-                    'amount' => $transaction->totalPrice() < 0 ? $transaction->subTotal() : $transaction->totalPrice(),
+                    'amount' => $transaction->totalPrice(),
                     'outlet_id' => $request->user()->outlet_id,
                 ]);
 
                 $transaction->mutation()->create([
                     'type' => 2,
-                    'amount' => $transaction->totalPrice() < 0 ? $transaction->subTotal() : $transaction->totalPrice(),
+                    'amount' => $transaction->totalDiscountGiven(),
                     'outlet_id' => $request->user()->outlet_id,
                 ]);
             } else {
