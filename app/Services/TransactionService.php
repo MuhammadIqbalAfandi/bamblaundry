@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection as SupportCollection;
 
-class TransactionService
+class TransactionService extends CurrencyFormatService
 {
     public function getPaginator(array $items)
     {
@@ -25,7 +25,7 @@ class TransactionService
 
     public function totalPrice(EloquentCollection $collections)
     {
-        return $collections->transform(fn($transactions) => $transactions->totalPrice());
+        return $collections->transform(fn($collect) => $collect->totalPrice());
     }
 
     public function totalPriceGroup(EloquentCollection $collections)
@@ -35,7 +35,12 @@ class TransactionService
 
     public function totalPriceGroupAsString(EloquentCollection $collections)
     {
-        return (new CurrencyFormatService)->setRupiahFormat($this->totalPriceGroup($collections), true);
+        return $this->setRupiahFormat($this->totalPriceGroup($collections), true);
+    }
+
+    public function totalDiscountGivenGroupAsString(EloquentCollection $collections)
+    {
+        return $this->setRupiahFormat($collections->sum(fn($collect) => $collect->totalDiscountGiven()), true);
     }
 
     public function totalPerMonth(EloquentCollection $collections)

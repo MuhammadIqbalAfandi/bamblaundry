@@ -111,27 +111,28 @@ const topTransactionOption = {
     <Head title="Dashboard" />
 
     <div class="grid">
-      <div v-for="cardStatistic in cardStatistics" class="col-12 md:col-3">
-        <Card class="h-full">
-          <template #content>
-            <div class="flex justify-content-between mb-3">
-              <div>
-                <span class="block text-500 font-medium mb-3">{{ cardStatistic.title }}</span>
-                <div v-if="cardStatistic.value" class="text-900 font-medium text-xl">{{ cardStatistic.value }}</div>
+      <div class="col-12 flex flex-wrap justify-content-between card-statistic">
+        <div v-for="cardStatistic in cardStatistics" class="flex-grow-1">
+          <Card class="h-full">
+            <template #content>
+              <div class="flex justify-content-between mb-3">
+                <div>
+                  <span class="block text-500 font-medium mb-3">{{ cardStatistic.title }}</span>
+                  <div v-if="cardStatistic.value" class="text-900 font-medium text-xl">{{ cardStatistic.value }}</div>
+                </div>
+                <div
+                  class="flex align-items-center justify-content-center bg-orange-100 border-round"
+                  style="width: 2.5rem; height: 2.5rem"
+                >
+                  <i class="text-orange-500 text-xl" :class="cardStatistic.icon"></i>
+                </div>
               </div>
-              <div
-                class="flex align-items-center justify-content-center bg-orange-100 border-round"
-                style="width: 2.5rem; height: 2.5rem"
-              >
-                <i class="text-orange-500 text-xl" :class="cardStatistic.icon"></i>
-              </div>
-            </div>
-            <span class="text-green-500 font-medium">{{ cardStatistic.amount }} </span>
-            <span class="text-500"> {{ ' ' + cardStatistic.amountLabel }}</span>
-          </template>
-        </Card>
+              <span class="text-green-500 font-medium">{{ cardStatistic.amount }} </span>
+              <span class="text-500"> {{ ' ' + cardStatistic.amountLabel }}</span>
+            </template>
+          </Card>
+        </div>
       </div>
-
       <div v-for="statistic in chartTransactionStatistics" class="col-12 md:col-6">
         <Card>
           <template #title>
@@ -188,3 +189,9 @@ const topTransactionOption = {
     </div>
   </AppLayout>
 </template>
+
+<style scoped>
+.card-statistic {
+  gap: 1rem;
+}
+</style>

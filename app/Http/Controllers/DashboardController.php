@@ -33,6 +33,8 @@ class DashboardController extends Controller
 
         $products = Product::get();
 
+        $transactionDiscount = Transaction::whereMonth('created_at', date('m'))->whereNotIn('discount', [0])->get();
+
         $transactionChart = Transaction::get()
             ->groupBy([
                 fn($transaction) => Carbon::parse($transaction->getRawOriginal('created_at'))->format('Y'),
@@ -72,6 +74,13 @@ class DashboardController extends Controller
                     'amount' => $expenses->count(),
                     'amountLabel' => __('words.today'),
                     'value' => (new ExpenseService)->totalPriceAsString($expenses),
+                ],
+                [
+                    'title' => __('words.discount_given'),
+                    'icon' => 'pi pi-percentage',
+                    'amount' => $transactionDiscount->count(),
+                    'amountLabel' => __('words.this_month'),
+                    'value' => (new TransactionService)->totalDiscountGivenGroupAsString($transactionDiscount),
                 ],
                 [
                     'title' => __('words.laundry_type'),

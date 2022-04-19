@@ -116,6 +116,16 @@ class Transaction extends Model
         }
     }
 
+    public function totalDiscountGiven()
+    {
+        $totalDiscountGiven = $this->getRawOriginal('discount') - $this->subTotal();
+        if ($totalDiscountGiven < 0) {
+            return abs($totalDiscountGiven);
+        } else {
+            return $totalDiscountGiven;
+        }
+    }
+
     public function totalPriceAsString()
     {
         return (new CurrencyFormatService)->setRupiahFormat($this->totalPrice());
