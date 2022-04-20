@@ -1,9 +1,8 @@
 <script setup>
 import { Inertia } from '@inertiajs/inertia'
-import { watch, computed, onMounted } from 'vue'
-import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
+import { watch, onMounted } from 'vue'
+import { Head, useForm } from '@inertiajs/inertia-vue3'
 import dayjs from 'dayjs'
-import throttle from 'lodash/throttle'
 import pickBy from 'lodash/pickBy'
 import AppLayout from '@/layouts/AppLayout.vue'
 import AppPagination from '@/components/AppPagination.vue'

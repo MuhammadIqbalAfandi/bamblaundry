@@ -1,7 +1,6 @@
 <script setup>
 import { watch, computed } from 'vue'
 import { Head, useForm, usePage } from '@inertiajs/inertia-vue3'
-import AppButton from '@/components/AppButton.vue'
 import AppInputText from '@/components/AppInputText.vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 

@@ -1,7 +1,7 @@
 <script setup>
 import { watch } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
-import { Head, Link, useForm } from '@inertiajs/inertia-vue3'
+import { Head, useForm } from '@inertiajs/inertia-vue3'
 import throttle from 'lodash/throttle'
 import pickBy from 'lodash/pickBy'
 import AppLayout from '@/layouts/AppLayout.vue'
