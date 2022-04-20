@@ -38,9 +38,19 @@ class TransactionService extends CurrencyFormatService
         return $this->setRupiahFormat($this->totalPriceGroup($collections), true);
     }
 
+    public function totalDiscountGiven(EloquentCollection $collections)
+    {
+        return $collections->transform(fn($collect) => $collect->totalDiscountGiven());
+    }
+
+    public function totalDiscountGivenGroup(EloquentCollection $collections)
+    {
+        return $this->totalDiscountGiven($collections)->sum();
+    }
+
     public function totalDiscountGivenGroupAsString(EloquentCollection $collections)
     {
-        return $this->setRupiahFormat($collections->sum(fn($collect) => $collect->totalDiscountGiven()), true);
+        return $this->setRupiahFormat($this->totalDiscountGivenGroup($collections), true);
     }
 
     public function totalPerMonth(EloquentCollection $collections)

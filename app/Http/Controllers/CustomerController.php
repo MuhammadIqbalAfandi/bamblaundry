@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CustomersExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\StoreCustomerRequest;
 use App\Http\Requests\Customer\UpdateCustomerRequest;
 use App\Models\Customer;
+use App\Models\Transaction;
+use App\Services\TransactionService;
 
 class CustomerController extends Controller
 {
@@ -117,6 +120,8 @@ class CustomerController extends Controller
                         'transactionStatusId' => $transaction->transactionStatus->id,
                     ]),
                 'totalTransaction' => $customer->transaction->count(),
+                'totalValue' => (new TransactionService)->totalPriceGroupAsString($customer->fresh()->transaction),
+                'totalDiscountGiven' => (new TransactionService)->totalDiscountGivenGroupAsString($customer->fresh()->transaction),
             ],
         ]);
     }
@@ -146,5 +151,13 @@ class CustomerController extends Controller
         $customer->delete();
 
         return to_route('customers.index')->with('success', __('messages.success.destroy.customer'));
+    }
+
+    /**
+     * Export to excel
+     */
+    public function exportExcel()
+    {
+        return new CustomersExport(request());
     }
 }

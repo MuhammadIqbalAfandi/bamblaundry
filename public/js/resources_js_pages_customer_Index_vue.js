@@ -424,14 +424,18 @@ __webpack_require__.r(__webpack_exports__);
       }), {
         preserveState: true
       });
+      var params = window.location.search;
+      exportExcelLink.value = "/reports/customers/export/excel".concat(params);
     }, 300));
+    var exportExcelLink = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)('/reports/customers/export/excel');
     var __returned__ = {
       props: props,
       filterForm: filterForm,
+      exportExcelLink: exportExcelLink,
       watch: vue__WEBPACK_IMPORTED_MODULE_0__.watch,
+      ref: vue__WEBPACK_IMPORTED_MODULE_0__.ref,
       Inertia: _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_1__.Inertia,
       Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.Head,
-      Link: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.Link,
       useForm: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm,
       throttle: (lodash_throttle__WEBPACK_IMPORTED_MODULE_3___default()),
       pickBy: (lodash_pickBy__WEBPACK_IMPORTED_MODULE_4___default()),
@@ -1081,9 +1085,16 @@ var _hoisted_3 = {
   "class": "col-12 md:col-8"
 };
 var _hoisted_4 = {
-  "class": "flex align-items-center"
+  "class": "grid"
 };
 var _hoisted_5 = {
+  "class": "col-12 md:col-3"
+};
+var _hoisted_6 = {
+  key: 0,
+  "class": "col-12 md:col-3"
+};
+var _hoisted_7 = {
   "class": "col-12 md:col-4 flex flex-column md:flex-row justify-content-end"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -1105,8 +1116,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         stripedRows: true
       }, {
         header: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_InputText, {
-            "class": "w-full md:w-27rem",
+          return [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_InputText, {
+            "class": "w-full",
             placeholder: "cari...",
             modelValue: $setup.filterForm.search,
             "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
@@ -1114,7 +1125,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             })
           }, null, 8
           /* PROPS */
-          , ["modelValue"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
+          , ["modelValue"])]), $props.customers.data ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
+            label: "Export excel",
+            "class-button": "p-button-outlined w-full md:w-16rem",
+            icon: "pi pi-file-excel",
+            "inertia-link": false,
+            href: $setup.exportExcelLink
+          }, null, 8
+          /* PROPS */
+          , ["href"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppButton"], {
             href: _ctx.route('customers.create'),
             label: "Tambah Customer",
             icon: "pi pi-pencil",

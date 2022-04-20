@@ -113,13 +113,31 @@ const onCancel = () => (visibleDialog.value = false)
 
     <h2>Riwayat Transaksi</h2>
     <div v-if="transactions.totalTransaction" class="grid mt-3 ml-1">
-      <div class="col-auto">
+      <div class="col-auto mr-7">
         <h2>
           <span class="text-base"> <i class="pi pi-shopping-cart" /> Total Transaksi</span>
 
           <br />
 
           <span class="text-xl font-bold">{{ transactions.totalTransaction }}</span>
+        </h2>
+      </div>
+      <div class="col-auto mr-7">
+        <h2>
+          <span class="text-base"> <i class="pi pi-shopping-cart" /> Total Nilai</span>
+
+          <br />
+
+          <span class="text-xl font-bold">{{ transactions.totalValue }}</span>
+        </h2>
+      </div>
+      <div class="col-auto">
+        <h2>
+          <span class="text-base"> <i class="pi pi-shopping-cart" /> Total Diskon didapatkan</span>
+
+          <br />
+
+          <span class="text-xl font-bold">{{ transactions.totalDiscountGiven }}</span>
         </h2>
       </div>
     </div>

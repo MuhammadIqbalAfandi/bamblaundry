@@ -118,11 +118,10 @@ class Transaction extends Model
 
     public function totalDiscountGiven()
     {
-        $totalDiscountGiven = $this->getRawOriginal('discount') - $this->subTotal();
-        if ($totalDiscountGiven < 0) {
-            return abs($totalDiscountGiven);
+        if ($this->getRawOriginal('discount') >= $this->subTotal()) {
+            return $this->subTotal();
         } else {
-            return $totalDiscountGiven;
+            return $this->getRawOriginal('discount');
         }
     }
 

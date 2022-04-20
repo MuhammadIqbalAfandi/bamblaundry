@@ -20,7 +20,7 @@ return [
     'today' => 'Hari ini',
     'this_month' => 'Bulan ini',
     'total' => 'Total',
-    'discount_given' => 'Diskon yang diberikan',
+    'discount_given' => 'Diskon diberikan',
     'transaction' => 'Transaksi',
     'expense' => 'Pengeluaran',
     'laundry_type' => 'Jenis Laundry',

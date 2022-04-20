@@ -35,6 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('/users', UserController::class);
 
     Route::resource('/customers', CustomerController::class);
+    Route::get('/reports/customers/export/excel', [CustomerController::class, 'exportExcel'])->name('customers.excel');
 
     Route::resource('/outlets', OutletController::class);
 

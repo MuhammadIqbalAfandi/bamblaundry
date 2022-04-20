@@ -1,7 +1,7 @@
 <script setup>
-import { watch } from 'vue'
+import { watch, ref } from 'vue'
 import { Inertia } from '@inertiajs/inertia'
-import { Head, Link, useForm } from '@inertiajs/inertia-vue3'
+import { Head, useForm } from '@inertiajs/inertia-vue3'
 import throttle from 'lodash/throttle'
 import pickBy from 'lodash/pickBy'
 import AppButton from '@/components/AppButton.vue'
@@ -23,8 +23,13 @@ watch(
   filterForm,
   throttle(() => {
     Inertia.get('/customers', pickBy({ search: filterForm.search }), { preserveState: true })
+
+    const params = window.location.search
+    exportExcelLink.value = `/reports/customers/export/excel${params}`
   }, 300)
 )
+
+const exportExcelLink = ref('/reports/customers/export/excel')
 </script>
 
 <template>
@@ -43,8 +48,19 @@ watch(
 
         <div class="grid">
           <div class="col-12 md:col-8">
-            <div class="flex align-items-center">
-              <InputText class="w-full md:w-27rem" placeholder="cari..." v-model="filterForm.search" />
+            <div class="grid">
+              <div class="col-12 md:col-3">
+                <InputText class="w-full" placeholder="cari..." v-model="filterForm.search" />
+              </div>
+              <div v-if="customers.data" class="col-12 md:col-3">
+                <AppButton
+                  label="Export excel"
+                  class-button="p-button-outlined w-full md:w-16rem"
+                  icon="pi pi-file-excel"
+                  :inertia-link="false"
+                  :href="exportExcelLink"
+                />
+              </div>
             </div>
           </div>
 
