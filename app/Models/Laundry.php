@@ -43,9 +43,9 @@ class Laundry extends Model
         return $this->hasMany(TransactionDetail::class);
     }
 
-    public function scopeFilter($query, $search)
+    public function scopeFilter($query, array $filters)
     {
-        $query->when($search ?? null, function ($query, $search) {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('price', 'like', '%' . $search . '%')

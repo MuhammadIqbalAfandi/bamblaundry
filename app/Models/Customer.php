@@ -30,9 +30,9 @@ class Customer extends Model
         return $this->hasMany(Transaction::class, 'customer_number', 'customer_number');
     }
 
-    public function scopeFilter($query, $search)
+    public function scopeFilter($query, array $filters)
     {
-        $query->when($search ?? null, function ($query, $search) {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('customer_number', 'like', '%' . $search . '%')
                     ->orWhere('name', 'like', '%' . $search . '%')
