@@ -147,7 +147,7 @@ const topTransactionOption = {
         </Card>
       </div>
 
-      <div class="col-12 md:col-6">
+      <div v-if="$page.props.auth.user.role_id === 1" class="col-12 md:col-6">
         <Card>
           <template #title>
             <div class="flex flex-column">
