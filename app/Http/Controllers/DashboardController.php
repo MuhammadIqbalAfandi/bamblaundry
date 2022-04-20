@@ -33,7 +33,13 @@ class DashboardController extends Controller
 
         $products = Product::get();
 
-        $transactionDiscount = Transaction::whereMonth('created_at', date('m'))->whereNotIn('discount', [0])->get();
+        if (request()->user()->outlet_id !== null) {
+            request()->merge(['outlet' => request()->user()->outlet_id]);
+        }
+        $transactionDiscount = Transaction::filter(request()->only('outlet'))
+            ->whereMonth('created_at', date('m'))
+            ->whereNotIn('discount', [0])
+            ->get();
 
         $transactionChart = Transaction::get()
             ->groupBy([
