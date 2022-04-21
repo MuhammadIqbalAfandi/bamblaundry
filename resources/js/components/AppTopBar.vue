@@ -11,7 +11,7 @@ defineEmits(['menu-toggle'])
       <span class="md:block hidden">BAMB'S LAUNDRY</span>
     </div>
 
-    <button class="p-link layout-menu-button layout-topbar-button" @click="$emit('menu-toggle')">
+    <button class="p-link layout-menu-button layout-topbar-button" @click="$emit('menu-toggle', $event)">
       <i class="pi pi-bars"></i>
     </button>
 
@@ -30,25 +30,17 @@ defineEmits(['menu-toggle'])
     </button>
 
     <ul class="layout-topbar-menu hidden lg:flex origin-top">
-      <li>
+      <li class="align-self-center">
         <span class="hidden lg:inline">{{ $page.props.auth.user.name }}</span>
-
-        <Link
-          :href="route('users.show', $page.props.auth.user.id)"
-          class="p-link layout-topbar-button"
-          v-tooltip.bottom="'Profil Saya'"
-        >
+      </li>
+      <li>
+        <Link :href="route('users.show', $page.props.auth.user.id)" class="p-link layout-topbar-button">
           <i class="pi pi-user"></i>
           <span>Profil Saya</span>
         </Link>
-
-        <Link
-          :href="route('logout')"
-          as="button"
-          method="post"
-          class="p-link layout-topbar-button"
-          v-tooltip.bottom="'Sign Out'"
-        >
+      </li>
+      <li>
+        <Link :href="route('logout')" as="button" method="post" class="p-link layout-topbar-button">
           <i class="pi pi-sign-out"></i>
           <span>Sign Out</span>
         </Link>

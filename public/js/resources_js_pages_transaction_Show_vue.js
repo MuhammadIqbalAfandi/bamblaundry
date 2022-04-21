@@ -241,12 +241,6 @@ __webpack_require__.r(__webpack_exports__);
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
-    var containerClass = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
-      return ['layout-wrapper', 'layout-static', {
-        'layout-static-sidebar-inactive': staticMenuInactive.value,
-        'layout-mobile-sidebar-active': mobileMenuActive.value
-      }];
-    });
     var mobileMenuActive = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
     var staticMenuInactive = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
     var menuClick = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
@@ -255,15 +249,27 @@ __webpack_require__.r(__webpack_exports__);
       return window.innerWidth >= 992;
     };
 
-    var onMenuToggle = function onMenuToggle() {
-      menuClick.value = true;
-
-      if (isDesktop()) {
-        staticMenuInactive.value = !staticMenuInactive.value;
-      } else {
-        mobileMenuActive.value = !mobileMenuActive.value;
-      }
+    var addClass = function addClass(element, className) {
+      if (element.classList) element.classList.add(className);else element.className += ' ' + className;
     };
+
+    var removeClass = function removeClass(element, className) {
+      if (element.classList) element.classList.remove(className);else element.className = element.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+    };
+
+    (0,vue__WEBPACK_IMPORTED_MODULE_0__.onBeforeUpdate)(function () {
+      if (mobileMenuActive.value) {
+        addClass(document.body, 'body-overflow-hidden');
+      } else {
+        removeClass(document.body, 'body-overflow-hidden');
+      }
+    });
+    var containerClass = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
+      return ['layout-wrapper', 'layout-static', {
+        'layout-static-sidebar-inactive': staticMenuInactive.value,
+        'layout-mobile-sidebar-active': mobileMenuActive.value
+      }];
+    });
 
     var onWrapperClick = function onWrapperClick() {
       if (!menuClick.value) {
@@ -273,16 +279,43 @@ __webpack_require__.r(__webpack_exports__);
       menuClick.value = false;
     };
 
+    var onMenuToggle = function onMenuToggle(event) {
+      menuClick.value = true;
+
+      if (isDesktop()) {
+        staticMenuInactive.value = !staticMenuInactive.value;
+      } else {
+        mobileMenuActive.value = !mobileMenuActive.value;
+      }
+
+      event.preventDefault();
+    };
+
+    var onSidebarClick = function onSidebarClick() {
+      menuClick.value = true;
+    };
+
+    var onMenuItemClick = function onMenuItemClick(event) {
+      if (event.item && !event.item.items) {
+        mobileMenuActive.value = false;
+      }
+    };
+
     var __returned__ = {
-      containerClass: containerClass,
       mobileMenuActive: mobileMenuActive,
       staticMenuInactive: staticMenuInactive,
       menuClick: menuClick,
       isDesktop: isDesktop,
-      onMenuToggle: onMenuToggle,
+      addClass: addClass,
+      removeClass: removeClass,
+      containerClass: containerClass,
       onWrapperClick: onWrapperClick,
+      onMenuToggle: onMenuToggle,
+      onSidebarClick: onSidebarClick,
+      onMenuItemClick: onMenuItemClick,
       ref: vue__WEBPACK_IMPORTED_MODULE_0__.ref,
       computed: vue__WEBPACK_IMPORTED_MODULE_0__.computed,
+      onBeforeUpdate: vue__WEBPACK_IMPORTED_MODULE_0__.onBeforeUpdate,
       AppTopBar: _components_AppTopBar_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
       AppSidebar: _components_AppSidebar_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
       AppFooter: _components_AppFooter_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
@@ -521,12 +554,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   return $props.items ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("ul", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.items, function (item, i) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [$setup.visible(item) && !item.separator ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
-      role: "none",
       key: item.label || i,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([{
         'layout-menuitem-category': $props.root,
         'active-menuitem': $setup.activeIndex === i && !item.to && !item.disabled
-      }])
+      }]),
+      role: "none"
     }, [$props.root ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: 0
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
@@ -545,12 +578,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     /* STABLE_FRAGMENT */
     )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: 1
-    }, [item.to ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
+    }, [item.to ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
       key: 0,
       role: "menuitem",
       href: item.to,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([item["class"], 'p-ripple', {
         'p-disabled': item.disabled,
+        'router-link-active': _ctx.$page.component.startsWith(item.component) || _ctx.$page.url.startsWith(item.to),
         'router-link-exact-active': _ctx.$page.component.startsWith(item.component) || _ctx.$page.url.startsWith(item.to)
       }]),
       style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)(item.style),
@@ -579,14 +613,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
     }, 1032
     /* PROPS, DYNAMIC_SLOTS */
-    , ["href", "class", "style", "target", "aria-label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !item.to ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+    , ["href", "class", "style", "target", "aria-label", "onClick"])), [[_directive_ripple]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !item.to ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
       key: 1,
       role: "menuitem",
-      href: item.url || '#',
       style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)(item.style),
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([item["class"], 'p-ripple', {
         'p-disabled': item.disabled
       }]),
+      href: item.url || '#',
       target: item.target,
       "aria-label": item.label,
       onClick: function onClick($event) {
@@ -628,8 +662,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     ))], 2
     /* CLASS */
     )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $setup.visible(item) && item.separator ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
-      role: "separator",
       "class": "p-menu-separator",
+      role: "separator",
       style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)(item.style),
       key: 'separator' + i
     }, null, 4
@@ -694,38 +728,39 @@ var _hoisted_8 = {
   "class": "layout-topbar-menu hidden lg:flex origin-top"
 };
 var _hoisted_9 = {
+  "class": "align-self-center"
+};
+var _hoisted_10 = {
   "class": "hidden lg:inline"
 };
 
-var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "pi pi-user"
 }, null, -1
 /* HOISTED */
 );
 
-var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Profil Saya", -1
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Profil Saya", -1
 /* HOISTED */
 );
 
-var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "pi pi-sign-out"
 }, null, -1
 /* HOISTED */
 );
 
-var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Sign Out", -1
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Sign Out", -1
 /* HOISTED */
 );
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _directive_styleclass = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("styleclass");
 
-  var _directive_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("tooltip");
-
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [_hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "p-link layout-menu-button layout-topbar-button",
     onClick: _cache[0] || (_cache[0] = function ($event) {
-      return _ctx.$emit('menu-toggle');
+      return _ctx.$emit('menu-toggle', $event);
     })
   }, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", _hoisted_5, _hoisted_7)), [[_directive_styleclass, {
     selector: '@next',
@@ -734,39 +769,35 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     leaveToClass: 'hidden',
     leaveActiveClass: 'fadeout',
     hideOnOutsideClick: true
-  }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$page.props.auth.user.name), 1
+  }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$page.props.auth.user.name), 1
   /* TEXT */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["Link"], {
     href: _ctx.route('users.show', _ctx.$page.props.auth.user.id),
     "class": "p-link layout-topbar-button"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_10, _hoisted_11];
+      return [_hoisted_11, _hoisted_12];
     }),
     _: 1
     /* STABLE */
 
   }, 8
   /* PROPS */
-  , ["href"])), [[_directive_tooltip, 'Profil Saya', void 0, {
-    bottom: true
-  }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
+  , ["href"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["Link"], {
     href: _ctx.route('logout'),
     as: "button",
     method: "post",
     "class": "p-link layout-topbar-button"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_12, _hoisted_13];
+      return [_hoisted_13, _hoisted_14];
     }),
     _: 1
     /* STABLE */
 
   }, 8
   /* PROPS */
-  , ["href"])), [[_directive_tooltip, 'Sign Out', void 0, {
-    bottom: true
-  }]])])])]);
+  , ["href"])])])]);
 }
 
 /***/ }),
@@ -784,15 +815,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  "class": "layout-sidebar"
-};
-var _hoisted_2 = {
   "class": "layout-main-container"
 };
-var _hoisted_3 = {
+var _hoisted_2 = {
   "class": "layout-main"
 };
-var _hoisted_4 = {
+var _hoisted_3 = {
   key: 0,
   "class": "layout-mask p-component-overlay"
 };
@@ -802,15 +830,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: $setup.onWrapperClick
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppTopBar"], {
     onMenuToggle: $setup.onMenuToggle
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppSidebar"], {
-    model: $setup.menu[_ctx.$page.props.auth.user.role_id]
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "layout-sidebar",
+    onClick: $setup.onSidebarClick
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppSidebar"], {
+    model: $setup.menu[_ctx.$page.props.auth.user.role_id],
+    onMenuitemClick: $setup.onMenuItemClick
   }, null, 8
   /* PROPS */
-  , ["model"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppMessage"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppFooter"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
+  , ["model"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppMessage"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["AppFooter"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
     name: "layout-mask"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [$setup.mobileMenuActive ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+      return [$setup.mobileMenuActive ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
     }),
     _: 1
     /* STABLE */

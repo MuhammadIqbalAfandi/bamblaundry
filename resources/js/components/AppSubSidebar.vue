@@ -45,20 +45,23 @@ const visible = (item) => {
     <template v-for="(item, i) of items">
       <li
         v-if="visible(item) && !item.separator"
-        role="none"
         :key="item.label || i"
         :class="[
           { 'layout-menuitem-category': root, 'active-menuitem': activeIndex === i && !item.to && !item.disabled },
         ]"
+        role="none"
       >
         <template v-if="root">
           <div class="layout-menuitem-root-text" :aria-label="item.label">{{ item.label }}</div>
-
-          <AppSubSidebar :items="visible(item) && item.items" @menuitem-click="$emit('menuitem-click', $event)" />
+          <AppSubSidebar
+            :items="visible(item) && item.items"
+            @menuitem-click="$emit('menuitem-click', $event)"
+          ></AppSubSidebar>
         </template>
         <template v-else>
           <Link
             v-if="item.to"
+            v-ripple
             role="menuitem"
             :href="item.to"
             :class="[
@@ -66,6 +69,7 @@ const visible = (item) => {
               'p-ripple',
               {
                 'p-disabled': item.disabled,
+                'router-link-active': $page.component.startsWith(item.component) || $page.url.startsWith(item.to),
                 'router-link-exact-active': $page.component.startsWith(item.component) || $page.url.startsWith(item.to),
               },
             ]"
@@ -84,9 +88,9 @@ const visible = (item) => {
             v-if="!item.to"
             v-ripple
             role="menuitem"
-            :href="item.url || '#'"
             :style="item.style"
             :class="[item.class, 'p-ripple', { 'p-disabled': item.disabled }]"
+            :href="item.url || '#'"
             :target="item.target"
             :aria-label="item.label"
             @click="onMenuItemClick($event, item, i)"
@@ -102,14 +106,14 @@ const visible = (item) => {
               v-show="activeIndex === i"
               :items="visible(item) && item.items"
               @menuitem-click="$emit('menuitem-click', $event)"
-            />
+            ></AppSubSidebar>
           </transition>
         </template>
       </li>
       <li
+        class="p-menu-separator"
         v-if="visible(item) && item.separator"
         role="separator"
-        class="p-menu-separator"
         :style="item.style"
         :key="'separator' + i"
       ></li>
