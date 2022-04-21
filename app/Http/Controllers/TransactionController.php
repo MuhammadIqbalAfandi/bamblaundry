@@ -89,7 +89,7 @@ class TransactionController extends Controller
         return inertia('transaction/Create', [
             'transactionNumber' => 'TS' . now()->format('YmdHis'),
             'customers' => Inertia::lazy(
-                fn() => Customer::filter(request('customer'))
+                fn() => Customer::filter(['search' => request('customer')])
                     ->latest()
                     ->get()
                     ->transform(fn($customer) => [
@@ -101,7 +101,7 @@ class TransactionController extends Controller
             ),
             'discount' => Discount::first()->discount,
             'laundries' => Inertia::lazy(
-                fn() => Laundry::filter(request('laundry'))
+                fn() => Laundry::filter(['search' => request('laundry')])
                     ->latest()
                     ->get()
                     ->transform(fn($laundry) => [
@@ -112,7 +112,7 @@ class TransactionController extends Controller
                     ])
             ),
             'products' => Inertia::lazy(
-                fn() => Product::filter(request('product'))
+                fn() => Product::filter(['search' => request('product')])
                     ->get()
                     ->transform(fn($product) => [
                         'id' => $product->id,
