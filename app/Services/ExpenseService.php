@@ -14,7 +14,11 @@ class ExpenseService extends CurrencyFormatService
 
     public function totalPriceAsString(EloquentCollection $collection)
     {
-        return $this->setRupiahFormat($this->totalPrice($collection), true);
+        if ($collection->count()) {
+            return $this->setRupiahFormat($this->totalPrice($collection), true);
+        } else {
+            return $this->setRupiahFormat(0, true);
+        }
     }
 
     public function totalPerMonth(EloquentCollection $collections)

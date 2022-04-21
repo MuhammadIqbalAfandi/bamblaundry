@@ -43,9 +43,9 @@ class ReportTransactionController extends Controller
             'filters' => request()->all('startDate', 'endDate', 'outlet'),
             'transactions' => Inertia::lazy(
                 fn() => [
-                    'details' => $transaction,
                     'totalTransaction' => $transactions->count(),
                     'totalAmount' => (new TransactionService)->totalPriceGroupAsString($transactions),
+                    'details' => $transaction,
                 ]
             ),
             'outlets' => Outlet::all()

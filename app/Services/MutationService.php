@@ -31,17 +31,30 @@ class MutationService extends CurrencyFormatService
 
     public function totalIncomeAsString(EloquentCollection $collections)
     {
-        return $this->setRupiahFormat($this->totalIncome($collections), true);
+        if ($collections->count()) {
+            return $this->setRupiahFormat($this->totalIncome($collections), true);
+        } else {
+            return $this->setRupiahFormat(0, true);
+        }
     }
 
     public function totalExpenseAsString(EloquentCollection $collections)
     {
-        return $this->setRupiahFormat($this->totalExpense($collections), true);
+        if ($collections->count()) {
+            return $this->setRupiahFormat($this->totalExpense($collections), true);
+        } else {
+            return $this->setRupiahFormat(0, true);
+        }
     }
 
     public function totalAmountAsString(EloquentCollection $collections)
     {
-        $amount = $this->totalIncome($collections) - $this->totalExpense($collections);
+        if ($collections->count()) {
+            $amount = $this->totalIncome($collections) - $this->totalExpense($collections);
+        } else {
+            $amount = 0;
+        }
+
         return $this->setRupiahFormat($amount, true);
     }
 

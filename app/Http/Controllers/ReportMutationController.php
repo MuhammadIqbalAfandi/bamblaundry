@@ -31,6 +31,9 @@ class ReportMutationController extends Controller
             'filters' => request()->all('startDate', 'endDate', 'outlet'),
             'mutations' => Inertia::lazy(
                 fn() => [
+                    'totalIncome' => (new MutationService)->totalIncomeAsString($mutations->get()),
+                    'totalExpense' => (new MutationService)->totalExpenseAsString($mutations->get()),
+                    'totalAmount' => (new MutationService)->totalAmountAsString($mutations->get()),
                     'details' => $mutations
                         ->latest()
                         ->paginate(10)
@@ -43,9 +46,6 @@ class ReportMutationController extends Controller
                             'transactionId' => $mutation->transaction_id,
                             'expenseId' => $mutation->expense_id,
                         ]),
-                    'totalIncome' => (new MutationService)->totalIncomeAsString($mutations->get()),
-                    'totalExpense' => (new MutationService)->totalExpenseAsString($mutations->get()),
-                    'totalAmount' => (new MutationService)->totalAmountAsString($mutations->get()),
                 ]
             ),
             'outlets' => Outlet::all()
