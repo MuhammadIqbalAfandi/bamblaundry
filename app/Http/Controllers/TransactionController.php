@@ -47,10 +47,9 @@ class TransactionController extends Controller
 
         return inertia('transaction/Index', [
             'filters' => request()->all('search', 'startDate', 'endDate', 'outlet'),
-            'transactions' => Transaction::latest()
-                ->filter(request()->only('search', 'startDate', 'endDate', 'outlet'))
+            'transactions' => fn() => Transaction::filter(request()->only('search', 'startDate', 'endDate', 'outlet'))
                 ->latest()
-                ->paginate(10)
+                ->paginate(3)
                 ->withQueryString()
                 ->through(fn($transaction) => [
                     'id' => $transaction->id,

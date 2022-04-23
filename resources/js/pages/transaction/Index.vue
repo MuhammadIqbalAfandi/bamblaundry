@@ -51,18 +51,15 @@ watch(filterForm, () => {
     filterForm.startDate = null
   }
 
-  Inertia.get(
-    '/transactions',
-    pickBy({
+  Inertia.reload({
+    data: pickBy({
       search: filterForm.search,
       startDate: filterForm.startDate,
       endDate: filterForm.endDate,
       outlet: filterForm.outlet,
     }),
-    {
-      preserveState: true,
-    }
-  )
+    only: ['transactions'],
+  })
 })
 
 const filterReset = () => {

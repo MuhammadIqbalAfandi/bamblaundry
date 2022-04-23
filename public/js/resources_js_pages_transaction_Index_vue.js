@@ -859,13 +859,14 @@ __webpack_require__.r(__webpack_exports__);
         filterForm.startDate = null;
       }
 
-      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_1__.Inertia.get('/transactions', lodash_pickBy__WEBPACK_IMPORTED_MODULE_4___default()({
-        search: filterForm.search,
-        startDate: filterForm.startDate,
-        endDate: filterForm.endDate,
-        outlet: filterForm.outlet
-      }), {
-        preserveState: true
+      _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_1__.Inertia.reload({
+        data: lodash_pickBy__WEBPACK_IMPORTED_MODULE_4___default()({
+          search: filterForm.search,
+          startDate: filterForm.startDate,
+          endDate: filterForm.endDate,
+          outlet: filterForm.outlet
+        }),
+        only: ['transactions']
       });
     });
 
