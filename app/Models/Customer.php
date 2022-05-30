@@ -25,7 +25,7 @@ class Customer extends Model
         );
     }
 
-    public function transaction()
+    public function transactions()
     {
         return $this->hasMany(Transaction::class, 'customer_number', 'customer_number');
     }
@@ -43,10 +43,8 @@ class Customer extends Model
 
     public function checkTransaction()
     {
-        $transactions = $this->transaction;
-
-        if ($transactions->count()) {
-            return $transactions->chunk(7)->last()->count();
+        if ($this->transactions->count()) {
+            return $this->transactions->chunk(7)->last()->count();
         } else {
             return 0;
         }
