@@ -22,12 +22,12 @@
                     <td>{{ $customer->customer_number }}</td>
                     <td>{{ $customer->name }}</td>
                     <td>{{ $customer->phone }}</td>
-                    <td>{{ $customer->transaction->count() }}</td>
+                    <td>{{ $customer->transactions->count() }}</td>
                     <td>
-                        {{ (new App\Services\TransactionService())->totalPriceGroupAsString($customer->fresh()->transaction) }}
+                        {{ (new App\Services\TransactionService())->totalPriceGroupAsString($customer->fresh()->transactions) }}
                     </td>
                     <td>
-                        {{ (new App\Services\TransactionService())->totalDiscountGivenGroupAsString($customer->fresh()->transaction) }}
+                        {{ (new App\Services\TransactionService())->totalDiscountGivenGroupAsString($customer->fresh()->transactions) }}
                     </td>
                 </tr>
             @endforeach

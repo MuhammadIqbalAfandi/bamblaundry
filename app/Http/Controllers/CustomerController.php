@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\StoreCustomerRequest;
 use App\Http\Requests\Customer\UpdateCustomerRequest;
 use App\Models\Customer;
-use App\Models\Transaction;
 use App\Services\TransactionService;
 
 class CustomerController extends Controller
@@ -94,14 +93,14 @@ class CustomerController extends Controller
                 'name' => $customer->name,
                 'phone' => $customer->phone,
                 'gender_id' => (int) $customer->getRawOriginal('gender_id'),
-                'relation' => $customer->transaction()->exists(),
+                'relation' => $customer->transactions()->exists(),
             ],
             'genders' => [
                 ['label' => 'Perempuan', 'value' => 1],
                 ['label' => 'Laki-laki', 'value' => 2],
             ],
             'transactions' => [
-                'details' => $customer->transaction()
+                'details' => $customer->transactions()
                     ->latest()
                     ->paginate(10)
                     ->withQueryString()
@@ -119,9 +118,9 @@ class CustomerController extends Controller
                         'transactionStatusName' => $transaction->transactionStatus->name,
                         'transactionStatusId' => $transaction->transactionStatus->id,
                     ]),
-                'totalTransaction' => $customer->transaction->count(),
-                'totalValue' => (new TransactionService)->totalPriceGroupAsString($customer->fresh()->transaction),
-                'totalDiscountGiven' => (new TransactionService)->totalDiscountGivenGroupAsString($customer->fresh()->transaction),
+                'totalTransaction' => $customer->transactions->count(),
+                'totalValue' => (new TransactionService)->totalPriceGroupAsString($customer->fresh()->transactions),
+                'totalDiscountGiven' => (new TransactionService)->totalDiscountGivenGroupAsString($customer->fresh()->transactions),
             ],
         ]);
     }
