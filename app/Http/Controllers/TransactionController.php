@@ -13,6 +13,8 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionStatus;
 use Exception;
+use Hoa\Socket\Client as SocketClient;
+use Hoa\Websocket\Client as WebsocketClient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
